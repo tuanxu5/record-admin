@@ -1,4 +1,12 @@
-import { BarChart3, Boxes, ClipboardList, FileBarChart2, FileText, Layers } from "lucide-react";
+import {
+  Calendar,
+  Package,
+  Receipt,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  Wallet
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 // Assume these icons are imported from an icon library
@@ -8,68 +16,64 @@ import { BoxCubeIcon, ChevronDownIcon, HorizontaLDots, PieChartIcon, PlugInIcon 
 
 const navItems = [
   {
-    icon: <FileBarChart2 />,
-    name: "Báo cáo tài chính",
-    path: "/bao-cao-tai-chinh",
+    icon: <Calendar />,
+    name: "Giao dịch trong ngày",
+    subItems: [
+      { name: "Bảng kê chứng từ", path: "/bao-cao-tai-chinh", pro: false },
+      { name: "Tổng thu", path: "/giao-dich-trong-ngay/tong-thu", pro: false },
+      { name: "Tổng chi", path: "/giao-dich-trong-ngay/tong-chi", pro: false },
+      { name: "Số ca làm việc", path: "/giao-dich-trong-ngay/so-ca-lam-viec", pro: false },
+      { name: "Quà thưởng nhân viên", path: "/giao-dich-trong-ngay/qua-thuong-nhan-vien", pro: false },
+      { name: "Số tiền chi trả theo công tác", path: "/giao-dich-trong-ngay/chi-tra-cong-tac", pro: false },
+    ],
   },
   {
-    icon: <BarChart3 />,
-    name: "Báo cáo thu chi",
-    path: "/bao-cao-thu-chi",
+    icon: <Wallet />,
+    name: "Vốn bằng tiền",
+    subItems: [
+      { name: "Quỹ tiền mặt", path: "/von-bang-tien/quy-tien-mat", pro: false },
+      { name: "Tiền gửi NH BIDV", path: "/von-bang-tien/tien-gui-bidv", pro: false },
+      { name: "Tiền gửi NH ViettinBank", path: "/von-bang-tien/tien-gui-viettinbank", pro: false },
+    ],
   },
   {
-    icon: <FileText />,
-    name: "Báo cáo nhanh",
-    path: "/bao-cao-nhanh",
+    icon: <TrendingDown />,
+    name: "Chi phí",
+    subItems: [
+      { name: "Chi phí theo khoản mục", path: "/chi-phi/chi-phi-theo-khoan-muc", pro: false },
+      { name: "Chi phí lương", path: "/chi-phi/chi-phi-luong", pro: false },
+      { name: "Chi phí văn phòng", path: "/chi-phi/chi-phi-van-phong", pro: false },
+    ],
   },
   {
-    icon: <Layers />,
-    name: "Báo cáo phân hệ",
-    path: "/bao-cao-phan-he",
+    icon: <TrendingUp />,
+    name: "Doanh thu",
+    subItems: [
+      { name: "Doanh thu theo nhân viên Taler", path: "/doanh-thu/doanh-thu-taler", pro: false },
+      { name: "Doanh thu khác", path: "/doanh-thu/doanh-thu-khac", pro: false },
+    ],
   },
   {
-    icon: <Boxes />,
-    name: "Báo cáo tồn kho",
-    path: "/bao-cao-ton-kho",
+    icon: <Receipt />,
+    name: "Công nợ",
+    subItems: [
+      { name: "Công nợ phải thu", path: "/cong-no/cong-no-phai-thu", pro: false },
+      { name: "Công nợ phải trả", path: "/cong-no/cong-no-phai-tra", pro: false },
+    ],
   },
   {
-    icon: <ClipboardList />,
-    name: "Báo cáo quản trị",
-    path: "/bao-cao-quan-tri",
+    icon: <Target />,
+    name: "Kế hoạch",
+    subItems: [
+      { name: "Doanh thu", path: "/ke-hoach/doanh-thu", pro: false },
+      { name: "Chi phí", path: "/ke-hoach/chi-phi", pro: false },
+    ],
   },
-  // {
-  //   icon: <GridIcon />,
-  //   name: "Dashboard",
-  //   subItems: [{ name: "Ecommerce", path: "/", pro: false }],
-  // },
-  // {
-  //   icon: <CalenderIcon />,
-  //   name: "Calendar",
-  //   path: "/calendar",
-  // },
-  // {
-  //   icon: <UserCircleIcon />,
-  //   name: "User Profile",
-  //   path: "/profile",
-  // },
-  // {
-  //   name: "Forms",
-  //   icon: <ListIcon />,
-  //   subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
-  // },
-  // {
-  //   name: "Tables",
-  //   icon: <TableIcon />,
-  //   subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-  // },
-  // {
-  //   name: "Pages",
-  //   icon: <PageIcon />,
-  //   subItems: [
-  //     { name: "Blank Page", path: "/blank", pro: false },
-  //     { name: "404 Error", path: "/error-404", pro: false },
-  //   ],
-  // },
+  {
+    icon: <Package />,
+    name: "Hàng tồn kho",
+    path: "/hang-ton-kho",
+  },
 ];
 
 const othersItems = [
@@ -166,27 +170,24 @@ const AppSidebar = () => {
           {nav.subItems ? (
             <button
               onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group ${
-                openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? "menu-item-active"
-                  : "menu-item-inactive"
-              } cursor-pointer ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"}`}
+              className={`menu-item group ${openSubmenu?.type === menuType && openSubmenu?.index === index
+                ? "menu-item-active"
+                : "menu-item-inactive"
+                } cursor-pointer ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"}`}
             >
               <span
-                className={`menu-item-icon-size  ${
-                  openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? "menu-item-icon-active"
-                    : "menu-item-icon-inactive"
-                }`}
+                className={`menu-item-icon-size  ${openSubmenu?.type === menuType && openSubmenu?.index === index
+                  ? "menu-item-icon-active"
+                  : "menu-item-icon-inactive"
+                  }`}
               >
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && <span className="menu-item-text">{nav.name}</span>}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200 ${
-                    openSubmenu?.type === menuType && openSubmenu?.index === index ? "rotate-180 text-brand-500" : ""
-                  }`}
+                  className={`ml-auto w-5 h-5 transition-transform duration-200 ${openSubmenu?.type === menuType && openSubmenu?.index === index ? "rotate-180 text-brand-500" : ""
+                    }`}
                 />
               )}
             </button>
@@ -197,9 +198,8 @@ const AppSidebar = () => {
                 className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"}`}
               >
                 <span
-                  className={`menu-item-icon-size ${
-                    isActive(nav.path) ? "menu-item-icon-active" : "menu-item-icon-inactive"
-                  }`}
+                  className={`menu-item-icon-size ${isActive(nav.path) ? "menu-item-icon-active" : "menu-item-icon-inactive"
+                    }`}
                 >
                   {nav.icon}
                 </span>
@@ -225,26 +225,23 @@ const AppSidebar = () => {
                   <li key={subItem.name}>
                     <Link
                       to={subItem.path}
-                      className={`menu-dropdown-item ${
-                        isActive(subItem.path) ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"
-                      }`}
+                      className={`menu-dropdown-item ${isActive(subItem.path) ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"
+                        }`}
                     >
                       {subItem.name}
                       <span className="flex items-center gap-1 ml-auto">
                         {subItem.new && (
                           <span
-                            className={`ml-auto ${
-                              isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge`}
+                            className={`ml-auto ${isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
+                              } menu-dropdown-badge`}
                           >
                             new
                           </span>
                         )}
                         {subItem.pro && (
                           <span
-                            className={`ml-auto ${
-                              isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge`}
+                            className={`ml-auto ${isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
+                              } menu-dropdown-badge`}
                           >
                             pro
                           </span>
@@ -270,15 +267,14 @@ const AppSidebar = () => {
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
+      <div className={`py-8 flex justify-center ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
         <Link to="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              <img className="dark:hidden" src="/images/logo/logo.svg" alt="Logo" width={150} height={40} />
-              <img className="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" width={150} height={40} />
+              <img className="dark:hidden" src="/images/logo/genlive.jpg" alt="Logo" width={70} height={20} />
             </>
           ) : (
-            <img src="/images/logo/logo-icon.svg" alt="Logo" width={32} height={32} />
+            <img className="dark:hidden" src="/images/logo/genlive.jpg" alt="Logo" width={70} height={20} />
           )}
         </Link>
       </div>
@@ -287,9 +283,8 @@ const AppSidebar = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-                }`}
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+                  }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? "Menu" : <HorizontaLDots className="size-6" />}
               </h2>
