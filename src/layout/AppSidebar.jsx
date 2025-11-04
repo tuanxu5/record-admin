@@ -270,15 +270,22 @@ const AppSidebar = () => {
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={`py-8 flex justify-center ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
-        <Link to="/">
-          {isExpanded || isHovered || isMobileOpen ? (
-            <>
-              <img className="dark:hidden" src="/images/logo/genlive.jpg" alt="Logo" width={100} height={20} />
-            </>
-          ) : (
-            <img className="dark:hidden" src="/images/logo/genlive.jpg" alt="Logo" width={100} height={20} />
-          )}
+      <div
+        className={`py-6 flex items-center justify-center border-b border-gray-200 dark:border-gray-800 transition-all duration-300 ${isExpanded || isHovered || isMobileOpen ? "px-4" : "px-0"
+          }`}
+      >
+        <Link
+          to="/"
+          className="flex items-center justify-center w-full"
+        >
+          <img
+            src="/images/logo/genlive.jpg"
+            alt="Genlive Logo"
+            className={`transition-all duration-300 object-contain rounded-lg shadow-sm ${isExpanded || isHovered || isMobileOpen
+              ? "w-[60px] h-auto"
+              : "w-[45px] h-[45px]"
+              }`}
+          />
         </Link>
       </div>
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">

@@ -1,24 +1,21 @@
-import { useCallback, useEffect, useState, useMemo } from "react";
-import { toast } from "react-toastify";
-import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
-import { CalenderIcon } from "../../icons";
+import Flatpickr from "react-flatpickr";
 import useBangKeChungTu from "../../hooks/useBangKeChungTu";
 import { useTranslation } from "../../hooks/useTranslation";
+import { CalenderIcon } from "../../icons";
 import { translateText } from "../../service/translation";
 
 const BaoCaoTaiChinhPage = () => {
   const { t, language } = useTranslation();
   const [chartType, setChartType] = useState("bar");
-  const [periodType, setPeriodType] = useState("ngay"); // ngay, tuan, thang, nam
-
-  // Mặc định: từ 1/1 năm hiện tại đến ngày hiện tại
+  const [periodType, setPeriodType] = useState("ngay");
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const startOfYear = `${currentYear}-01-01`;
-  const today = currentDate.toISOString().split('T')[0]; // Format YYYY-MM-DD
+  const today = currentDate.toISOString().split('T')[0];
 
   const [dateRange, setDateRange] = useState({
     startDate: startOfYear,
@@ -30,11 +27,8 @@ const BaoCaoTaiChinhPage = () => {
   const [loading, setLoading] = useState(false);
 
   const bangKeChungTuMutation = useBangKeChungTu();
-
-  // Hàm gọi API để lấy dữ liệu
   const fetchData = useCallback(async (payload = {}) => {
     try {
-      // Luôn truyền các trường bắt buộc, nếu payload rỗng thì giá trị sẽ là rỗng
       const apiPayload = {
         configName: "bang_ke_chung_tu",
         ngay_ct1: payload.ngay_ct1 || dateRange.startDate || "",
@@ -44,75 +38,54 @@ const BaoCaoTaiChinhPage = () => {
         den_so: payload.den_so || "",
         ma_dvcs: payload.ma_dvcs || "",
       };
-      console.log("Gọi API với payload:", apiPayload);
       setLoading(true);
       const response = await bangKeChungTuMutation.mutateAsync(apiPayload);
       const rawData = Array.isArray(response)
         ? response
         : (response?.data || response?.rows || []);
-      const totalsData = Array.isArray(response?.totals)
-        ? (response.totals || [])
-        : [];
-      console.log("Dữ liệu nhận được từ API:", { rawData, totalsData });
       setData(rawData);
     } catch (error) {
       console.error("Lỗi khi tải dữ liệu:", error);
-      // Log chi tiết lỗi từ API
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        console.error("Response status:", error.response.status);
-        console.error("Response headers:", error.response.headers);
-        toast.error(`Lỗi ${error.response.status}: ${error.response.data?.message || error.response.data || t("errors.loadDataError")}`);
-      } else if (error.request) {
-        console.error("Request:", error.request);
-        toast.error(t("errors.noResponse"));
-      } else {
-        console.error("Error message:", error.message);
-        toast.error(t("errors.loadDataError"));
-      }
       setData([]);
-      } finally {
+    } finally {
       setLoading(false);
     }
-  }, [bangKeChungTuMutation, dateRange, t]);
-
-  // Dịch tự động data khi ngôn ngữ thay đổi
+  }, [bangKeChungTuMutation, dateRange.startDate, dateRange.endDate]);
   useEffect(() => {
     if (!data || data.length === 0) {
       setTranslatedData([]);
       return;
     }
-
-    // Nếu ngôn ngữ là tiếng Việt, không cần dịch
     if (language === "vi") {
       setTranslatedData(data);
       return;
     }
-
-    // Dịch tự động các field ten_kh và dien_giai
     const translateData = async () => {
       const translated = await Promise.all(
         data.map(async (row) => {
           const translatedRow = { ...row };
-          
-          // Dịch ten_kh
-          if (row.ten_kh && !row.ten_kh_zh && !row.ten_kh_vn) {
-            try {
-              translatedRow.ten_kh = await translateText(row.ten_kh, language);
-            } catch (error) {
-              console.warn("Failed to translate ten_kh:", error);
+          if (row.ten_kh && row.ten_kh.trim()) {
+            if (row.ten_kh_zh) {
+              translatedRow.ten_kh = row.ten_kh_zh;
+            } else {
+              try {
+                translatedRow.ten_kh = await translateText(row.ten_kh, language);
+              } catch (error) {
+                console.warn("Failed to translate ten_kh:", error);
+              }
             }
           }
-          
-          // Dịch dien_giai
-          if (row.dien_giai && !row.dien_giai_zh && !row.dien_giai_vn) {
-            try {
-              translatedRow.dien_giai = await translateText(row.dien_giai, language);
-            } catch (error) {
-              console.warn("Failed to translate dien_giai:", error);
+          if (row.dien_giai && row.dien_giai.trim()) {
+            if (row.dien_giai_zh) {
+              translatedRow.dien_giai = row.dien_giai_zh;
+            } else {
+              try {
+                translatedRow.dien_giai = await translateText(row.dien_giai, language);
+              } catch (error) {
+                console.warn("Failed to translate dien_giai:", error);
+              }
             }
           }
-          
           return translatedRow;
         })
       );
@@ -123,19 +96,18 @@ const BaoCaoTaiChinhPage = () => {
     translateData();
   }, [data, language]);
 
-  // Sử dụng translatedData nếu có, nếu không thì dùng data gốc
   const displayData = useMemo(() => {
     return translatedData.length > 0 ? translatedData : data;
   }, [translatedData, data]);
 
-  // Gọi API khi component mount với dateRange mặc định
   useEffect(() => {
     const payload = {
       ngay_ct1: dateRange.startDate,
       ngay_ct2: dateRange.endDate,
     };
     fetchData(payload);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleFilter = () => {
     const payload = {
@@ -143,15 +115,9 @@ const BaoCaoTaiChinhPage = () => {
       ngay_ct2: dateRange.endDate,
     };
     if (maTaiKhoan) payload.ma_tai_khoan = maTaiKhoan;
-    // Thêm các trường khác nếu cần
-    // payload.chung_tu_tu_so = ...;
-    // payload.den_so = ...;
-    // payload.ma_dvcs = ...;
-
     fetchData(payload);
   };
 
-  // Hàm lấy key theo period type
   const getPeriodKey = useCallback((dateString, type) => {
     if (!dateString) return "";
     try {
@@ -159,14 +125,11 @@ const BaoCaoTaiChinhPage = () => {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      
-      // Lấy tuần trong năm
       const getWeek = (d) => {
         const start = new Date(year, 0, 1);
         const days = Math.floor((d - start) / (24 * 60 * 60 * 1000));
         return Math.ceil((days + start.getDay() + 1) / 7);
       };
-
       switch (type) {
         case "ngay":
           return `${day.toString().padStart(2, "0")}/${month.toString().padStart(2, "0")}/${year}`;
@@ -186,12 +149,10 @@ const BaoCaoTaiChinhPage = () => {
     }
   }, [t]);
 
-  // Hàm nhóm dữ liệu ps_no theo period
   const groupDataByPeriod = useMemo(() => {
     if (!displayData || displayData.length === 0) return { labels: [], psNo: [] };
-
     const grouped = {};
-    
+
     displayData.forEach((item) => {
       const ngayCt = item.ngay_ct || item.ngay_ct_tu || "";
       if (!ngayCt) return;
@@ -205,9 +166,7 @@ const BaoCaoTaiChinhPage = () => {
       grouped[key] += psNo;
     });
 
-    // Sắp xếp theo thời gian
     const sortedKeys = Object.keys(grouped).sort((a, b) => {
-      // Parse để so sánh
       if (periodType === "ngay") {
         const [d1, m1, y1] = a.split("/").map(Number);
         const [d2, m2, y2] = b.split("/").map(Number);
@@ -227,15 +186,19 @@ const BaoCaoTaiChinhPage = () => {
       }
     });
 
-    const labels = sortedKeys;
-    const psNo = sortedKeys.map(key => grouped[key]);
+    // Nếu là theo ngày, chỉ lấy 15-20 ngày gần nhất
+    let finalKeys = sortedKeys;
+    if (periodType === "ngay" && sortedKeys.length > 20) {
+      finalKeys = sortedKeys.slice(-15); // Lấy 20 ngày gần nhất
+    }
+
+    const labels = finalKeys;
+    const psNo = finalKeys.map(key => grouped[key]);
 
     return { labels, psNo };
   }, [displayData, periodType, getPeriodKey]);
 
   const { labels, psNo } = groupDataByPeriod;
-
-  // Cấu hình ApexCharts cho ps_no
   const chartOptions = useMemo(() => ({
     chart: {
       type: chartType,
@@ -277,12 +240,11 @@ const BaoCaoTaiChinhPage = () => {
     xaxis: {
       categories: labels,
       title: {
-        text: t(`voucherListing.period.${
-          periodType === "ngay" ? "day" :
-          periodType === "tuan" ? "week" :
-          periodType === "thang" ? "month" :
-          "year"
-        }`),
+        text: t(`voucherListing.period.${periodType === "ngay" ? "day" :
+            periodType === "tuan" ? "week" :
+              periodType === "thang" ? "month" :
+                "year"
+          }`),
         style: {
           fontSize: "14px",
           fontWeight: "bold",
@@ -322,12 +284,11 @@ const BaoCaoTaiChinhPage = () => {
       },
     },
     title: {
-      text: `${t("voucherListing.chartTitle")} ${t(`voucherListing.period.${
-        periodType === "ngay" ? "day" :
-        periodType === "tuan" ? "week" :
-        periodType === "thang" ? "month" :
-        "year"
-      }`)}`,
+      text: `${t("voucherListing.chartTitle")} ${t(`voucherListing.period.${periodType === "ngay" ? "day" :
+          periodType === "tuan" ? "week" :
+            periodType === "thang" ? "month" :
+              "year"
+        }`)}`,
       align: "center",
       style: {
         fontSize: "20px",
@@ -511,41 +472,37 @@ const BaoCaoTaiChinhPage = () => {
         <div className="flex flex-wrap gap-2 mb-4 pb-4 border-b border-gray-200">
           <button
             onClick={() => setPeriodType("ngay")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              periodType === "ngay"
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "ngay"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+              }`}
           >
             {t("voucherListing.byDay")}
           </button>
           <button
             onClick={() => setPeriodType("tuan")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              periodType === "tuan"
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "tuan"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+              }`}
           >
             {t("voucherListing.byWeek")}
           </button>
           <button
             onClick={() => setPeriodType("thang")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              periodType === "thang"
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "thang"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+              }`}
           >
             {t("voucherListing.byMonth")}
           </button>
           <button
             onClick={() => setPeriodType("nam")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              periodType === "nam"
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "nam"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+              }`}
           >
             {t("voucherListing.byYear")}
           </button>
@@ -591,45 +548,45 @@ const BaoCaoTaiChinhPage = () => {
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
                     <div className="flex items-center gap-1 md:gap-2">
                       <span>{t("voucherListing.voucherNumber")}</span>
-                    </div>
+                  </div>
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
                     <div className="flex items-center gap-1 md:gap-2">
                       <span>{t("voucherListing.customerCode")}</span>
-                    </div>
+                </div>
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
                     <div className="flex items-center gap-1 md:gap-2">
                       <span>{t("voucherListing.customerName")}</span>
-                    </div>
+              </div>
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
                     <div className="flex items-center gap-1 md:gap-2">
                       <span>{t("voucherListing.description")}</span>
-                    </div>
+            </div>
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
                     <div className="flex items-center gap-1 md:gap-2">
                       <span>{t("voucherListing.account")}</span>
-                    </div>
-                  </th>
+      </div>
+                </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
                     <div className="flex items-center gap-1 md:gap-2">
                       <span>{t("voucherListing.contraAccount")}</span>
                     </div>
-                  </th>
+                </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
                     <div className="flex items-center justify-end gap-1 md:gap-2">
                       <span>{t("voucherListing.debit")}</span>
                     </div>
-                  </th>
+                </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
                     <div className="flex items-center justify-end gap-1 md:gap-2">
                       <span>{t("voucherListing.credit")}</span>
                     </div>
-                  </th>
-                </tr>
-              </thead>
+                </th>
+              </tr>
+            </thead>
               <tbody className="bg-white divide-y divide-dashed divide-gray-300">
                 {displayData.map((row, index) => {
                   const formatDate = (dateString) => {

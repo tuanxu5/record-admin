@@ -130,6 +130,7 @@ export const zh = {
     pieChart: "饼图",
     barChart: "柱状图",
     chartTitle: "收入、支出、余额图表",
+    amountDu: "对应账户名称",
     summary: {
       openingBalance: "期初余额",
       totalIncomeExpense: "总收支",

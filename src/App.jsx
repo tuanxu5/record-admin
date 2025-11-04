@@ -24,6 +24,7 @@ import BaoCaoTaiChinhPage from "./pages/bao-cao-tai-chinh";
 import BaoCaoThuChiPage from "./pages/bao-cao-thu-chi";
 import QuyTienMatPage from "./pages/von-bang-tien/QuyTienMat";
 import TienGuiBIDVPage from "./pages/von-bang-tien/TienGuiBIDV";
+import TienGuiViettinbankPage from "./pages/von-bang-tien/TienGuiViettinbank";
 
 export default function App() {
   return (
@@ -39,6 +40,7 @@ export default function App() {
             <Route index path="/bao-cao-nhanh" element={<BaoCaoNhanhPage />} />
             <Route path="/von-bang-tien/quy-tien-mat" element={<QuyTienMatPage />} />
             <Route path="/von-bang-tien/tien-gui-bidv" element={<TienGuiBIDVPage />} />
+            <Route path="/von-bang-tien/tien-gui-viettinbank" element={<TienGuiViettinbankPage />} />
             <Route index path="/bao-cao-phan-he" element={<Home />} />
             <Route index path="/bao-cao-ton-kho" element={<Home />} />
             <Route index path="/bao-cao-quan-tri" element={<Home />} />

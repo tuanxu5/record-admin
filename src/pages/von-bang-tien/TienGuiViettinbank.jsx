@@ -8,7 +8,7 @@ import { useVonBangTien } from "../../hooks/useVonBangTien";
 import { CalenderIcon } from "../../icons";
 import { translateText } from "../../service/translation";
 
-const TienGuiBIDVPage = () => {
+const TienGuiViettinbankPage = () => {
   const { t, language } = useTranslation();
   const [periodType, setPeriodType] = useState("ngay");
   const currentDate = new Date();
@@ -21,7 +21,7 @@ const TienGuiBIDVPage = () => {
     endDate: today,
   });
   const params = useMemo(() => ({
-    tk: '1121.1',
+    tk: '1121.2',
     ngay_ct1: dateRange.startDate,
     ngay_ct2: dateRange.endDate,
     ma_dvcs: 'CTY',
@@ -315,7 +315,7 @@ const TienGuiBIDVPage = () => {
     <div className="w-full space-y-4 md:space-y-6 p-2 md:p-4 lg:p-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6 text-center">
-          {t("sidebar.bidvDeposit")}
+          {t("sidebar.viettinbankDeposit")}
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
           {/* Từ ngày */}
@@ -382,7 +382,7 @@ const TienGuiBIDVPage = () => {
             <label className="block text-sm font-semibold text-gray-700 mb-2">{t("cashFund.account")}</label>
             <input
               type="text"
-              value="1121.1"
+              value="1121.2"
               disabled
               className="w-full p-2 md:p-3 border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
             />
@@ -582,5 +582,5 @@ const TienGuiBIDVPage = () => {
   );
 };
 
-export default TienGuiBIDVPage;
+export default TienGuiViettinbankPage;
 

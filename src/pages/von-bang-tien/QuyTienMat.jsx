@@ -12,19 +12,15 @@ const QuyTienMatPage = () => {
   const { t, language } = useTranslation();
   const [periodType, setPeriodType] = useState("ngay");
   const [chartType, setChartType] = useState("bar");
-
-  // Mặc định: từ 1/1 năm hiện tại đến ngày hiện tại
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const firstDayOfYear = `${currentYear}-01-01`;
-  const today = currentDate.toISOString().split('T')[0]; // Format YYYY-MM-DD
+  const today = currentDate.toISOString().split('T')[0]; 
 
   const [dateRange, setDateRange] = useState({
     startDate: firstDayOfYear,
     endDate: today,
   });
-
-  // Params cho API
   const params = useMemo(() => ({
     tk: '1111',
     ngay_ct1: dateRange.startDate,
@@ -33,60 +29,56 @@ const QuyTienMatPage = () => {
     store: 'Caso1',
     gop_tk: '1',
   }), [dateRange.startDate, dateRange.endDate]);
-
   const { data: response, isLoading, error } = useVonBangTien(params);
-
-  // Extract data từ response
   const data = useMemo(() => {
     if (!response) return [];
     return Array.isArray(response) ? response : (response?.data || response?.rows || []);
   }, [response]);
-
-  // Dịch tự động data khi ngôn ngữ thay đổi
   const [translatedData, setTranslatedData] = useState([]);
-
   useEffect(() => {
     if (!data || data.length === 0) {
       setTranslatedData([]);
       return;
     }
-
-    // Nếu ngôn ngữ là tiếng Việt, không cần dịch
     if (language === "vi") {
       setTranslatedData(data);
       return;
     }
-
-    // Dịch tự động các field ten_kh, ten_khach_hang và dien_giai
     const translateData = async () => {
       const translated = await Promise.all(
         data.map(async (row) => {
           const translatedRow = { ...row };
-
-          // Dịch ten_kh
-          if (row.ten_kh && !row.ten_kh_zh && !row.ten_kh_vn) {
-            try {
-              translatedRow.ten_kh = await translateText(row.ten_kh, language);
-            } catch (error) {
-              console.warn("Failed to translate ten_kh:", error);
+          if (row.ten_kh && row.ten_kh.trim()) {
+            if (row.ten_kh_zh) {
+              translatedRow.ten_kh = row.ten_kh_zh;
+            } else {
+              try {
+                translatedRow.ten_kh = await translateText(row.ten_kh, language);
+              } catch (error) {
+                console.warn("Failed to translate ten_kh:", error);
+              }
             }
           }
-
-          // Dịch ten_khach_hang (nếu có)
-          if (row.ten_khach_hang && !row.ten_khach_hang_zh && !row.ten_khach_hang_vn) {
-            try {
-              translatedRow.ten_khach_hang = await translateText(row.ten_khach_hang, language);
-            } catch (error) {
-              console.warn("Failed to translate ten_khach_hang:", error);
+          if (row.ten_khach_hang && row.ten_khach_hang.trim()) {
+            if (row.ten_khach_hang_zh) {
+              translatedRow.ten_khach_hang = row.ten_khach_hang_zh;
+            } else {
+              try {
+                translatedRow.ten_khach_hang = await translateText(row.ten_khach_hang, language);
+              } catch (error) {
+                console.warn("Failed to translate ten_khach_hang:", error);
+              }
             }
           }
-
-          // Dịch dien_giai
-          if (row.dien_giai && !row.dien_giai_zh && !row.dien_giai_vn) {
-            try {
-              translatedRow.dien_giai = await translateText(row.dien_giai, language);
-            } catch (error) {
-              console.warn("Failed to translate dien_giai:", error);
+          if (row.dien_giai && row.dien_giai.trim()) {
+            if (row.dien_giai_zh) {
+              translatedRow.dien_giai = row.dien_giai_zh;
+            } else {
+              try {
+                translatedRow.dien_giai = await translateText(row.dien_giai, language);
+              } catch (error) {
+                console.warn("Failed to translate dien_giai:", error);
+              }
             }
           }
 
@@ -100,19 +92,14 @@ const QuyTienMatPage = () => {
     translateData();
   }, [data, language]);
 
-  // Sử dụng translatedData nếu có, nếu không thì dùng data gốc
   const displayData = useMemo(() => {
     return translatedData.length > 0 ? translatedData : data;
   }, [translatedData, data]);
-
-  // Extract totals từ response
   const totals = useMemo(() => {
     if (!response) return null;
     const totalsArray = Array.isArray(response?.totals) ? response.totals : [];
     return totalsArray.length > 0 ? totalsArray[0] : null;
   }, [response]);
-
-  // Format ngày từ ISO string
   const formatDate = (dateString) => {
     if (!dateString) return "";
     try {
@@ -126,19 +113,16 @@ const QuyTienMatPage = () => {
     }
   };
 
-  // Format số tiền với dấu chấm làm phân cách hàng nghìn
   const formatAmount = (amount) => {
     if (!amount && amount !== 0) return "";
     return new Intl.NumberFormat("vi-VN").format(amount);
   };
 
-  // Format số tiền cho phần tổng hợp (luôn hiển thị, kể cả 0)
   const formatAmountForTotal = (amount) => {
     if (!amount && amount !== 0) return "0";
     return new Intl.NumberFormat("vi-VN").format(amount);
   };
 
-  // Hàm lấy key theo period type
   const getPeriodKey = useCallback((dateString, type) => {
     if (!dateString) return "";
     try {
@@ -146,8 +130,6 @@ const QuyTienMatPage = () => {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-
-      // Lấy tuần trong năm
       const getWeek = (d) => {
         const start = new Date(year, 0, 1);
         const days = Math.floor((d - start) / (24 * 60 * 60 * 1000));
@@ -173,7 +155,6 @@ const QuyTienMatPage = () => {
     }
   }, [t]);
 
-  // Hàm nhóm dữ liệu Thu, Chi, Số tồn theo period
   const groupDataByPeriod = useMemo(() => {
     if (!displayData || displayData.length === 0) return { labels: [], thu: [], chi: [], soTon: [] };
 
@@ -193,11 +174,8 @@ const QuyTienMatPage = () => {
       }
       grouped[key].thu += thu;
       grouped[key].chi += chi;
-      // Số tồn lấy giá trị cuối cùng của period
       grouped[key].soTon = soTon;
     });
-
-    // Sắp xếp theo thời gian
     const sortedKeys = Object.keys(grouped).sort((a, b) => {
       if (periodType === "ngay") {
         const [d1, m1, y1] = a.split("/").map(Number);
@@ -218,15 +196,20 @@ const QuyTienMatPage = () => {
       }
     });
 
-    const labels = sortedKeys;
-    const thu = sortedKeys.map(key => grouped[key].thu);
-    const chi = sortedKeys.map(key => grouped[key].chi);
-    const soTon = sortedKeys.map(key => grouped[key].soTon);
+    // Nếu là theo ngày, chỉ lấy 15-20 ngày gần nhất
+    let finalKeys = sortedKeys;
+    if (periodType === "ngay" && sortedKeys.length > 20) {
+      finalKeys = sortedKeys.slice(-20); // Lấy 20 ngày gần nhất
+    }
+
+    const labels = finalKeys;
+    const thu = finalKeys.map(key => grouped[key].thu);
+    const chi = finalKeys.map(key => grouped[key].chi);
+    const soTon = finalKeys.map(key => grouped[key].soTon);
 
     return { labels, thu, chi, soTon };
   }, [displayData, periodType, getPeriodKey]);
 
-  // Tính tổng cho pie chart
   const totalThu = useMemo(() => {
     return groupDataByPeriod.thu.reduce((sum, val) => sum + val, 0);
   }, [groupDataByPeriod]);
