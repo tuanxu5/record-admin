@@ -423,13 +423,16 @@ const BaoCaoTaiChinhPage = () => {
               <Flatpickr
                 value={dateRange.startDate}
                 onChange={(date) => {
-                  const formatted = date[0]?.toLocaleDateString("en-CA");
+                  const formatted = date[0]?.toISOString().split("T")[0];
                   setDateRange({ ...dateRange, startDate: formatted || "" });
                 }}
                 options={{
                   dateFormat: "Y-m-d",
                   locale: Vietnamese,
                   allowInput: true,
+                  maxDate: dateRange.endDate,
+                  disableMobile: false,
+                  clickOpens: true,
                 }}
                 placeholder={t("voucherListing.selectStartDate")}
                 className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
@@ -447,13 +450,16 @@ const BaoCaoTaiChinhPage = () => {
               <Flatpickr
                 value={dateRange.endDate}
                 onChange={(date) => {
-                  const formatted = date[0]?.toLocaleDateString("en-CA");
+                  const formatted = date[0]?.toISOString().split("T")[0];
                   setDateRange({ ...dateRange, endDate: formatted || "" });
                 }}
                 options={{
                   dateFormat: "Y-m-d",
                   locale: Vietnamese,
                   allowInput: true,
+                  minDate: dateRange.startDate,
+                  disableMobile: false,
+                  clickOpens: true,
                 }}
                 placeholder={t("voucherListing.selectEndDate")}
                 className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"

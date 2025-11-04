@@ -97,6 +97,11 @@ export const vi = {
       month: "Tháng",
       year: "Năm",
     },
+    summary: {
+      openingBalance: "Số dư đầu kỳ",
+      totalTransactions: "Tổng phát sinh trong kỳ",
+      endingDebitBalance: "Số dư nợ cuối kỳ",
+    },
   },
   cashFund: {
     title: "Quỹ Tiền Mặt",
@@ -124,6 +129,7 @@ export const vi = {
     chartType: "Loại biểu đồ",
     pieChart: "Biểu đồ tròn",
     barChart: "Biểu đồ cột",
+    amountDu: "Tên TK đối ứng",
     chartTitle: "Biểu đồ Thu, Chi, Số tồn theo",
     summary: {
       openingBalance: "Số tồn đầu",

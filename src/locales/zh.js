@@ -97,6 +97,11 @@ export const zh = {
       month: "月",
       year: "年",
     },
+    summary: {
+      openingBalance: "期初余额",
+      totalTransactions: "期间总发生额",
+      endingDebitBalance: "期末借方余额",
+    },
   },
   cashFund: {
     title: "现金基金",
