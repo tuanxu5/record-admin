@@ -1,11 +1,15 @@
-import { useMemo, useState } from "react";
-import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
-import { CalenderIcon } from "../../icons";
+import { useMemo, useState } from "react";
+import Chart from "react-apexcharts";
+import Flatpickr from "react-flatpickr";
 import { useVonBangTien } from "../../hooks/useVonBangTien";
+import { CalenderIcon } from "../../icons";
 
 const QuyTienMatPage = () => {
+  const [periodType, setPeriodType] = useState("ngay"); // ngay, tuan, thang, nam
+  const [chartType, setChartType] = useState("bar"); // bar, pie
+
   // Mặc định: từ 1/1 năm hiện tại đến ngày hiện tại
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
@@ -67,6 +71,327 @@ const QuyTienMatPage = () => {
     if (!amount && amount !== 0) return "0";
     return new Intl.NumberFormat("vi-VN").format(amount);
   };
+
+  // Hàm lấy key theo period type
+  const getPeriodKey = (dateString, type) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+
+      // Lấy tuần trong năm
+      const getWeek = (d) => {
+        const start = new Date(year, 0, 1);
+        const days = Math.floor((d - start) / (24 * 60 * 60 * 1000));
+        return Math.ceil((days + start.getDay() + 1) / 7);
+      };
+
+      switch (type) {
+        case "ngay":
+          return `${day.toString().padStart(2, "0")}/${month.toString().padStart(2, "0")}/${year}`;
+        case "tuan": {
+          const week = getWeek(date);
+          return `Tuần ${week}/${year}`;
+        }
+        case "thang":
+          return `${month}/${year}`;
+        case "nam":
+          return `${year}`;
+        default:
+          return `${day}/${month}/${year}`;
+      }
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Hàm nhóm dữ liệu Thu, Chi, Số tồn theo period
+  const groupDataByPeriod = useMemo(() => {
+    if (!data || data.length === 0) return { labels: [], thu: [], chi: [], soTon: [] };
+
+    const grouped = {};
+
+    data.forEach((item) => {
+      const ngayCt = item.ngay_ct || item.ngay_ct_tu || "";
+      if (!ngayCt) return;
+
+      const key = getPeriodKey(ngayCt, periodType);
+      const thu = parseFloat(item.thu || item.ps_no || item.so_tien_thu || 0);
+      const chi = parseFloat(item.chi || item.ps_co || item.so_tien_chi || 0);
+      const soTon = parseFloat(item.so_du || item.so_du || 0);
+
+      if (!grouped[key]) {
+        grouped[key] = { thu: 0, chi: 0, soTon: 0 };
+      }
+      grouped[key].thu += thu;
+      grouped[key].chi += chi;
+      // Số tồn lấy giá trị cuối cùng của period
+      grouped[key].soTon = soTon;
+    });
+
+    // Sắp xếp theo thời gian
+    const sortedKeys = Object.keys(grouped).sort((a, b) => {
+      if (periodType === "ngay") {
+        const [d1, m1, y1] = a.split("/").map(Number);
+        const [d2, m2, y2] = b.split("/").map(Number);
+        return new Date(y1, m1 - 1, d1) - new Date(y2, m2 - 1, d2);
+      } else if (periodType === "tuan") {
+        const [w1, y1] = a.match(/\d+/g).map(Number);
+        const [w2, y2] = b.match(/\d+/g).map(Number);
+        if (y1 !== y2) return y1 - y2;
+        return w1 - w2;
+      } else if (periodType === "thang") {
+        const [m1, y1] = a.split("/").map(Number);
+        const [m2, y2] = b.split("/").map(Number);
+        if (y1 !== y2) return y1 - y2;
+        return m1 - m2;
+      } else {
+        return Number(a) - Number(b);
+      }
+    });
+
+    const labels = sortedKeys;
+    const thu = sortedKeys.map(key => grouped[key].thu);
+    const chi = sortedKeys.map(key => grouped[key].chi);
+    const soTon = sortedKeys.map(key => grouped[key].soTon);
+
+    return { labels, thu, chi, soTon };
+  }, [data, periodType]);
+
+  // Tính tổng cho pie chart
+  const totalThu = useMemo(() => {
+    return groupDataByPeriod.thu.reduce((sum, val) => sum + val, 0);
+  }, [groupDataByPeriod]);
+
+  const totalChi = useMemo(() => {
+    return groupDataByPeriod.chi.reduce((sum, val) => sum + val, 0);
+  }, [groupDataByPeriod]);
+
+  const totalSoTon = useMemo(() => {
+    return groupDataByPeriod.soTon.length > 0 ? groupDataByPeriod.soTon[groupDataByPeriod.soTon.length - 1] : 0;
+  }, [groupDataByPeriod]);
+
+  // Cấu hình ApexCharts cho Thu, Chi, Số tồn
+  const chartOptions = useMemo(() => {
+    // Pie chart options
+    if (chartType === "pie") {
+      return {
+        chart: {
+          type: "pie",
+          height: 400,
+          fontFamily: "Inter, sans-serif",
+          toolbar: {
+            show: true,
+            tools: {
+              download: true,
+            },
+          },
+        },
+        series: [totalThu, totalChi, Math.abs(totalSoTon)],
+        labels: ["Thu", "Chi", "Số tồn"],
+        colors: ["#10B981", "#EF4444", "#3B82F6"],
+        legend: {
+          position: "bottom",
+          horizontalAlign: "center",
+          fontSize: "14px",
+          fontWeight: 500,
+        },
+        tooltip: {
+          y: {
+            formatter: function (value) {
+              return new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+                minimumFractionDigits: 0,
+              }).format(value);
+            },
+          },
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: function (val) {
+            return new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+              minimumFractionDigits: 0,
+              notation: "compact",
+            }).format(val);
+          },
+        },
+        title: {
+          text: `Tổng hợp Thu, Chi, Số tồn theo ${periodType === "ngay" ? "Ngày" : periodType === "tuan" ? "Tuần" : periodType === "thang" ? "Tháng" : "Năm"}`,
+          align: "center",
+          style: {
+            fontSize: "20px",
+            fontWeight: "bold",
+            color: "#1F2937",
+          },
+          margin: 20,
+        },
+      };
+    }
+
+    // Bar chart options
+    return {
+      chart: {
+        type: "bar",
+        height: 400,
+        fontFamily: "Inter, sans-serif",
+        toolbar: {
+          show: true,
+          tools: {
+            download: true,
+            selection: true,
+            zoom: true,
+            zoomin: true,
+            zoomout: true,
+            pan: true,
+            reset: true,
+          },
+        },
+        animations: {
+          enabled: true,
+          easing: "easeinout",
+          speed: 800,
+          animateGradually: {
+            enabled: true,
+            delay: 150,
+          },
+          dynamicAnimation: {
+            enabled: true,
+            speed: 350,
+          },
+        },
+      },
+      series: [
+        {
+          name: "Thu",
+          data: groupDataByPeriod.thu,
+          color: "#10B981",
+        },
+        {
+          name: "Chi",
+          data: groupDataByPeriod.chi,
+          color: "#EF4444",
+        },
+        {
+          name: "Số tồn",
+          data: groupDataByPeriod.soTon,
+          color: "#3B82F6",
+        },
+      ],
+      xaxis: {
+        categories: groupDataByPeriod.labels,
+        title: {
+          text: periodType === "ngay" ? "Ngày" : periodType === "tuan" ? "Tuần" : periodType === "thang" ? "Tháng" : "Năm",
+          style: {
+            fontSize: "14px",
+            fontWeight: "bold",
+            color: "#374151",
+          },
+        },
+        labels: {
+          style: {
+            colors: "#6B7280",
+            fontSize: "12px",
+          },
+          rotate: groupDataByPeriod.labels.length > 10 ? -45 : 0,
+        },
+      },
+      yaxis: {
+        title: {
+          text: "Số tiền (VND)",
+          style: {
+            fontSize: "14px",
+            fontWeight: "bold",
+            color: "#374151",
+          },
+        },
+        labels: {
+          style: {
+            colors: "#6B7280",
+            fontSize: "12px",
+          },
+          formatter: function (value) {
+            return new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+              minimumFractionDigits: 0,
+              notation: "compact",
+            }).format(value);
+          },
+        },
+      },
+      title: {
+        text: `Biểu đồ Thu, Chi, Số tồn theo ${periodType === "ngay" ? "Ngày" : periodType === "tuan" ? "Tuần" : periodType === "thang" ? "Tháng" : "Năm"}`,
+        align: "center",
+        style: {
+          fontSize: "20px",
+          fontWeight: "bold",
+          color: "#1F2937",
+        },
+        margin: 20,
+      },
+      legend: {
+        position: "top",
+        horizontalAlign: "center",
+        fontSize: "12px",
+        fontWeight: 500,
+        markers: {
+          width: 12,
+          height: 12,
+          radius: 12,
+        },
+      },
+      tooltip: {
+        shared: true,
+        intersect: false,
+        theme: "light",
+        style: {
+          fontSize: "12px",
+        },
+        y: {
+          formatter: function (value) {
+            return new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+              minimumFractionDigits: 0,
+            }).format(value);
+          },
+        },
+      },
+      grid: {
+        borderColor: "#E5E7EB",
+        strokeDashArray: 3,
+        xaxis: {
+          lines: {
+            show: true,
+          },
+        },
+        yaxis: {
+          lines: {
+            show: true,
+          },
+        },
+      },
+      fill: {
+        colors: ["#10B981", "#EF4444", "#3B82F6"],
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      plotOptions: {
+        bar: {
+          borderRadius: 4,
+          dataLabels: {
+            position: "top",
+          },
+        },
+      },
+    };
+  }, [chartType, groupDataByPeriod, totalThu, totalChi, totalSoTon, periodType]);
 
   return (
     <div className="w-full min-h-screen p-2 md:p-4">
@@ -143,6 +468,93 @@ const QuyTienMatPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Chart */}
+      <div className="bg-white rounded-xl shadow-lg p-3 md:p-4 mb-4 md:mb-6">
+        {/* Period Tabs và Chart Type */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-200">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setPeriodType("ngay")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "ngay"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+            >
+              Theo Ngày
+            </button>
+            <button
+              onClick={() => setPeriodType("tuan")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "tuan"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+            >
+              Theo Tuần
+            </button>
+            <button
+              onClick={() => setPeriodType("thang")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "thang"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+            >
+              Theo Tháng
+            </button>
+            <button
+              onClick={() => setPeriodType("nam")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "nam"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+            >
+              Theo Năm
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-semibold text-gray-700">Loại biểu đồ:</label>
+            <select
+              value={chartType}
+              onChange={(e) => setChartType(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-sm"
+            >
+              <option value="pie">🟣 Biểu đồ tròn</option>
+              <option value="bar">📊 Biểu đồ cột</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Chart */}
+        {chartType === "pie" ? (
+          (totalThu > 0 || totalChi > 0 || totalSoTon !== 0) ? (
+            <Chart
+              options={chartOptions}
+              series={chartOptions.series}
+              type="pie"
+              height={400}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-96 text-gray-500">
+              <p>Không có dữ liệu để hiển thị biểu đồ</p>
+            </div>
+          )
+        ) : (
+          groupDataByPeriod.labels.length > 0 && (groupDataByPeriod.thu.length > 0 || groupDataByPeriod.chi.length > 0 || groupDataByPeriod.soTon.length > 0) ? (
+            <Chart
+              options={chartOptions}
+              series={chartOptions.series}
+              type="bar"
+              height={400}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-96 text-gray-500">
+              <p>Không có dữ liệu để hiển thị biểu đồ</p>
+            </div>
+          )
+        )}
+      </div>
+
+      {/* Table */}
       <div className="bg-white rounded-xl shadow-lg p-3 md:p-4 lg:p-6">
         <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">📋 Chi tiết Quỹ Tiền Mặt</h3>
         {isLoading ? (

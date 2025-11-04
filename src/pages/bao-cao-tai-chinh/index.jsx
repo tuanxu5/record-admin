@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { toast } from "react-toastify";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
+import Chart from "react-apexcharts";
 import { CalenderIcon } from "../../icons";
 import useBangKeChungTu from "../../hooks/useBangKeChungTu";
 
 const BaoCaoTaiChinhPage = () => {
-  const [chartType, setChartType] = useState("line");
+  const [chartType, setChartType] = useState("bar");
+  const [periodType, setPeriodType] = useState("ngay"); // ngay, tuan, thang, nam
 
   // Mặc định: từ 1/1 năm hiện tại đến ngày hiện tại
   const currentDate = new Date();
@@ -93,22 +95,92 @@ const BaoCaoTaiChinhPage = () => {
     fetchData(payload);
   };
 
-  // Chuẩn bị dữ liệu cho biểu đồ từ API response
-  const prepareChartData = () => {
-    if (!data || data.length === 0) return { labels: [], revenues: [], costs: [], profits: [] };
+  // Hàm lấy key theo period type
+  const getPeriodKey = (dateString, type) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      
+      // Lấy tuần trong năm
+      const getWeek = (d) => {
+        const start = new Date(year, 0, 1);
+        const days = Math.floor((d - start) / (24 * 60 * 60 * 1000));
+        return Math.ceil((days + start.getDay() + 1) / 7);
+      };
 
-    const labels = data.map(item => item.period || item.ngay_ct || item.ten_khoan || `Item ${data.indexOf(item) + 1}`);
-    const revenues = data.map(item => item.revenue || item.thu_nhap || item.so_tien_thu || 0);
-    const costs = data.map(item => item.cost || item.chi_phi || item.so_tien_chi || 0);
-    const profits = revenues.map((rev, idx) => rev - costs[idx]);
-
-    return { labels, revenues, costs, profits };
+      switch (type) {
+        case "ngay":
+          return `${day.toString().padStart(2, "0")}/${month.toString().padStart(2, "0")}/${year}`;
+        case "tuan": {
+          const week = getWeek(date);
+          return `Tuần ${week}/${year}`;
+        }
+        case "thang":
+          return `${month}/${year}`;
+        case "nam":
+          return `${year}`;
+        default:
+          return `${day}/${month}/${year}`;
+      }
+    } catch {
+      return dateString;
+    }
   };
 
-  const { labels, revenues, costs, profits } = prepareChartData();
+  // Hàm nhóm dữ liệu ps_no theo period
+  const groupDataByPeriod = useMemo(() => {
+    if (!data || data.length === 0) return { labels: [], psNo: [] };
 
-  // Cấu hình ApexCharts
-  const chartOptions = {
+    const grouped = {};
+    
+    data.forEach((item) => {
+      const ngayCt = item.ngay_ct || item.ngay_ct_tu || "";
+      if (!ngayCt) return;
+
+      const key = getPeriodKey(ngayCt, periodType);
+      const psNo = parseFloat(item.ps_no || 0);
+
+      if (!grouped[key]) {
+        grouped[key] = 0;
+      }
+      grouped[key] += psNo;
+    });
+
+    // Sắp xếp theo thời gian
+    const sortedKeys = Object.keys(grouped).sort((a, b) => {
+      // Parse để so sánh
+      if (periodType === "ngay") {
+        const [d1, m1, y1] = a.split("/").map(Number);
+        const [d2, m2, y2] = b.split("/").map(Number);
+        return new Date(y1, m1 - 1, d1) - new Date(y2, m2 - 1, d2);
+      } else if (periodType === "tuan") {
+        const [w1, y1] = a.match(/\d+/g).map(Number);
+        const [w2, y2] = b.match(/\d+/g).map(Number);
+        if (y1 !== y2) return y1 - y2;
+        return w1 - w2;
+      } else if (periodType === "thang") {
+        const [m1, y1] = a.split("/").map(Number);
+        const [m2, y2] = b.split("/").map(Number);
+        if (y1 !== y2) return y1 - y2;
+        return m1 - m2;
+      } else {
+        return Number(a) - Number(b);
+      }
+    });
+
+    const labels = sortedKeys;
+    const psNo = sortedKeys.map(key => grouped[key]);
+
+    return { labels, psNo };
+  }, [data, periodType]);
+
+  const { labels, psNo } = groupDataByPeriod;
+
+  // Cấu hình ApexCharts cho ps_no
+  const chartOptions = useMemo(() => ({
     chart: {
       type: chartType,
       height: 400,
@@ -141,25 +213,15 @@ const BaoCaoTaiChinhPage = () => {
     },
     series: [
       {
-        name: "Thu nhập",
-        data: revenues,
-        color: "#10B981",
-      },
-      {
-        name: "Chi phí",
-        data: costs,
+        name: "Phát sinh nợ (PS Nợ)",
+        data: psNo,
         color: "#EF4444",
-      },
-      {
-        name: "Lợi nhuận",
-        data: profits,
-        color: "#3B82F6",
       },
     ],
     xaxis: {
       categories: labels,
       title: {
-        text: "Thời gian",
+        text: periodType === "ngay" ? "Ngày" : periodType === "tuan" ? "Tuần" : periodType === "thang" ? "Tháng" : "Năm",
         style: {
           fontSize: "14px",
           fontWeight: "bold",
@@ -171,6 +233,7 @@ const BaoCaoTaiChinhPage = () => {
           colors: "#6B7280",
           fontSize: "12px",
         },
+        rotate: labels.length > 10 ? -45 : 0,
       },
     },
     yaxis: {
@@ -198,7 +261,7 @@ const BaoCaoTaiChinhPage = () => {
       },
     },
     title: {
-      text: "Biểu đồ Thu Chi Theo Quý",
+      text: `Biểu đồ Phát Sinh Nợ (PS Nợ) theo ${periodType === "ngay" ? "Ngày" : periodType === "tuan" ? "Tuần" : periodType === "thang" ? "Tháng" : "Năm"}`,
       align: "center",
       style: {
         fontSize: "20px",
@@ -219,8 +282,8 @@ const BaoCaoTaiChinhPage = () => {
       },
     },
     tooltip: {
-      shared: true,
-      intersect: false,
+      shared: false,
+      intersect: true,
       theme: "light",
       style: {
         fontSize: "12px",
@@ -265,6 +328,7 @@ const BaoCaoTaiChinhPage = () => {
         opacityTo: 0.05,
         stops: [50, 0, 100],
       },
+      colors: chartType === "bar" ? ["#EF4444"] : undefined,
     },
     dataLabels: {
       enabled: false,
@@ -277,134 +341,7 @@ const BaoCaoTaiChinhPage = () => {
         },
       },
     },
-  };
-
-  // Component ApexChart đơn giản
-  const ApexChart = ({ options, series, type, height }) => {
-    useEffect(() => {
-      // Tạo chart container
-      const chartContainer = document.getElementById("apex-chart");
-      if (!chartContainer) return;
-
-      // Xóa chart cũ nếu có
-      chartContainer.innerHTML = "";
-
-      // Tính toán giá trị max trước
-      const maxValue = Math.max(...revenues, ...costs, ...profits.map(Math.abs));
-
-      // Tạo chart mới bằng SVG đơn giản (mock ApexCharts)
-      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("width", "100%");
-      svg.setAttribute("height", height || "400");
-      svg.setAttribute("viewBox", "0 0 800 400");
-
-      // Vẽ grid và labels trục Y
-      for (let i = 0; i <= 10; i++) {
-        const y = 40 + i * 32;
-
-        // Vẽ đường grid ngang
-        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", "60");
-        line.setAttribute("y1", y);
-        line.setAttribute("x2", "740");
-        line.setAttribute("y2", y);
-        line.setAttribute("stroke", "#E5E7EB");
-        line.setAttribute("stroke-width", "1");
-        svg.appendChild(line);
-
-        // Thêm labels trục Y (cột mốc giá trị)
-        const value = (maxValue * (10 - i)) / 10;
-        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", "55");
-        text.setAttribute("y", y + 4);
-        text.setAttribute("text-anchor", "end");
-        text.setAttribute("font-size", "10");
-        text.setAttribute("fill", "#6B7280");
-        text.textContent = new Intl.NumberFormat("vi-VN", {
-          style: "currency",
-          currency: "VND",
-          minimumFractionDigits: 0,
-          notation: "compact",
-        }).format(value);
-        svg.appendChild(text);
-      }
-      const chartWidth = 680;
-      const chartHeight = 320;
-      const pointWidth = chartWidth / (labels.length - 1 || 1);
-
-      series.forEach((serie, serieIndex) => {
-        const color = serie.color;
-
-        if (type === "line") {
-          // Vẽ đường
-          let pathData = "";
-          serie.data.forEach((value, index) => {
-            const x = 60 + index * pointWidth;
-            const y = 360 - (value / maxValue) * chartHeight;
-            if (index === 0) {
-              pathData += `M ${x} ${y}`;
-            } else {
-              pathData += ` L ${x} ${y}`;
-            }
-          });
-
-          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          path.setAttribute("d", pathData);
-          path.setAttribute("stroke", color);
-          path.setAttribute("stroke-width", "3");
-          path.setAttribute("fill", "none");
-          svg.appendChild(path);
-
-          // Vẽ điểm
-          serie.data.forEach((value, index) => {
-            const x = 60 + index * pointWidth;
-            const y = 360 - (value / maxValue) * chartHeight;
-
-            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            circle.setAttribute("cx", x);
-            circle.setAttribute("cy", y);
-            circle.setAttribute("r", "4");
-            circle.setAttribute("fill", color);
-            svg.appendChild(circle);
-          });
-        } else {
-          // Vẽ cột
-          const barWidth = (pointWidth * 0.6) / series.length;
-          serie.data.forEach((value, index) => {
-            const x = 60 + index * pointWidth - (series.length * barWidth) / 2 + serieIndex * barWidth;
-            const y = 360 - (value / maxValue) * chartHeight;
-            const height = (value / maxValue) * chartHeight;
-
-            const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rect.setAttribute("x", x);
-            rect.setAttribute("y", y);
-            rect.setAttribute("width", barWidth);
-            rect.setAttribute("height", height);
-            rect.setAttribute("fill", color);
-            rect.setAttribute("rx", "2");
-            svg.appendChild(rect);
-          });
-        }
-      });
-
-      // Thêm labels trục X
-      labels.forEach((label, index) => {
-        const x = 60 + index * pointWidth;
-        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", x);
-        text.setAttribute("y", "385");
-        text.setAttribute("text-anchor", "middle");
-        text.setAttribute("font-size", "12");
-        text.setAttribute("fill", "#6B7280");
-        text.textContent = label;
-        svg.appendChild(text);
-      });
-
-      chartContainer.appendChild(svg);
-    }, [options, series, type, height]);
-
-    return <div id="apex-chart" className="w-full"></div>;
-  };
+  }), [chartType, labels, psNo, periodType]);
 
   return (
     <div className="w-full min-h-screen p-2 md:p-4">
@@ -481,8 +418,8 @@ const BaoCaoTaiChinhPage = () => {
                 onChange={(e) => setChartType(e.target.value)}
                 className="w-full p-2 md:p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-sm"
               >
-                <option value="line">📈 Biểu đồ đường</option>
                 <option value="bar">📊 Biểu đồ cột</option>
+                <option value="line">📈 Biểu đồ đường</option>
               </select>
             </div>
             <button
@@ -498,7 +435,63 @@ const BaoCaoTaiChinhPage = () => {
 
       {/* Chart */}
       <div className="bg-white rounded-xl shadow-lg p-3 md:p-4 mb-4 md:mb-6">
-        <ApexChart options={chartOptions} series={chartOptions.series} type={chartType} height="400" />
+        {/* Period Tabs */}
+        <div className="flex flex-wrap gap-2 mb-4 pb-4 border-b border-gray-200">
+          <button
+            onClick={() => setPeriodType("ngay")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              periodType === "ngay"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            Theo Ngày
+          </button>
+          <button
+            onClick={() => setPeriodType("tuan")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              periodType === "tuan"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            Theo Tuần
+          </button>
+          <button
+            onClick={() => setPeriodType("thang")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              periodType === "thang"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            Theo Tháng
+          </button>
+          <button
+            onClick={() => setPeriodType("nam")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              periodType === "nam"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            Theo Năm
+          </button>
+        </div>
+
+        {/* Chart */}
+        {labels.length > 0 && psNo.length > 0 ? (
+          <Chart
+            options={chartOptions}
+            series={chartOptions.series}
+            type={chartType}
+            height={400}
+          />
+        ) : (
+          <div className="flex items-center justify-center h-96 text-gray-500">
+            <p>Không có dữ liệu để hiển thị biểu đồ</p>
+          </div>
+        )}
       </div>
       {/* Bảng kê chứng từ */}
       <div className="bg-white rounded-xl shadow-lg p-3 md:p-4 lg:p-6">
