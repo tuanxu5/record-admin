@@ -1,14 +1,17 @@
 import "flatpickr/dist/flatpickr.min.css";
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import Flatpickr from "react-flatpickr";
+import { useTranslation } from "../../hooks/useTranslation";
 import { useVonBangTien } from "../../hooks/useVonBangTien";
 import { CalenderIcon } from "../../icons";
+import { translateText } from "../../service/translation";
 
 const QuyTienMatPage = () => {
-  const [periodType, setPeriodType] = useState("ngay"); // ngay, tuan, thang, nam
-  const [chartType, setChartType] = useState("bar"); // bar, pie
+  const { t, language } = useTranslation();
+  const [periodType, setPeriodType] = useState("ngay"); 
+  const [chartType, setChartType] = useState("bar"); 
 
   // Mặc định: từ 1/1 năm hiện tại đến ngày hiện tại
   const currentDate = new Date();
@@ -38,6 +41,69 @@ const QuyTienMatPage = () => {
     if (!response) return [];
     return Array.isArray(response) ? response : (response?.data || response?.rows || []);
   }, [response]);
+
+  // Dịch tự động data khi ngôn ngữ thay đổi
+  const [translatedData, setTranslatedData] = useState([]);
+
+  useEffect(() => {
+    if (!data || data.length === 0) {
+      setTranslatedData([]);
+      return;
+    }
+
+    // Nếu ngôn ngữ là tiếng Việt, không cần dịch
+    if (language === "vi") {
+      setTranslatedData(data);
+      return;
+    }
+
+    // Dịch tự động các field ten_kh, ten_khach_hang và dien_giai
+    const translateData = async () => {
+      const translated = await Promise.all(
+        data.map(async (row) => {
+          const translatedRow = { ...row };
+
+          // Dịch ten_kh
+          if (row.ten_kh && !row.ten_kh_zh && !row.ten_kh_vn) {
+            try {
+              translatedRow.ten_kh = await translateText(row.ten_kh, language);
+            } catch (error) {
+              console.warn("Failed to translate ten_kh:", error);
+            }
+          }
+
+          // Dịch ten_khach_hang (nếu có)
+          if (row.ten_khach_hang && !row.ten_khach_hang_zh && !row.ten_khach_hang_vn) {
+            try {
+              translatedRow.ten_khach_hang = await translateText(row.ten_khach_hang, language);
+            } catch (error) {
+              console.warn("Failed to translate ten_khach_hang:", error);
+            }
+          }
+
+          // Dịch dien_giai
+          if (row.dien_giai && !row.dien_giai_zh && !row.dien_giai_vn) {
+            try {
+              translatedRow.dien_giai = await translateText(row.dien_giai, language);
+            } catch (error) {
+              console.warn("Failed to translate dien_giai:", error);
+            }
+          }
+
+          return translatedRow;
+        })
+      );
+
+      setTranslatedData(translated);
+    };
+
+    translateData();
+  }, [data, language]);
+
+  // Sử dụng translatedData nếu có, nếu không thì dùng data gốc
+  const displayData = useMemo(() => {
+    return translatedData.length > 0 ? translatedData : data;
+  }, [translatedData, data]);
 
   // Extract totals từ response
   const totals = useMemo(() => {
@@ -73,7 +139,7 @@ const QuyTienMatPage = () => {
   };
 
   // Hàm lấy key theo period type
-  const getPeriodKey = (dateString, type) => {
+  const getPeriodKey = useCallback((dateString, type) => {
     if (!dateString) return "";
     try {
       const date = new Date(dateString);
@@ -93,7 +159,7 @@ const QuyTienMatPage = () => {
           return `${day.toString().padStart(2, "0")}/${month.toString().padStart(2, "0")}/${year}`;
         case "tuan": {
           const week = getWeek(date);
-          return `Tuần ${week}/${year}`;
+          return `${t("cashFund.period.week")} ${week}/${year}`;
         }
         case "thang":
           return `${month}/${year}`;
@@ -105,15 +171,15 @@ const QuyTienMatPage = () => {
     } catch {
       return dateString;
     }
-  };
+  }, [t]);
 
   // Hàm nhóm dữ liệu Thu, Chi, Số tồn theo period
   const groupDataByPeriod = useMemo(() => {
-    if (!data || data.length === 0) return { labels: [], thu: [], chi: [], soTon: [] };
+    if (!displayData || displayData.length === 0) return { labels: [], thu: [], chi: [], soTon: [] };
 
     const grouped = {};
 
-    data.forEach((item) => {
+    displayData.forEach((item) => {
       const ngayCt = item.ngay_ct || item.ngay_ct_tu || "";
       if (!ngayCt) return;
 
@@ -158,7 +224,7 @@ const QuyTienMatPage = () => {
     const soTon = sortedKeys.map(key => grouped[key].soTon);
 
     return { labels, thu, chi, soTon };
-  }, [data, periodType]);
+  }, [displayData, periodType, getPeriodKey]);
 
   // Tính tổng cho pie chart
   const totalThu = useMemo(() => {
@@ -172,10 +238,7 @@ const QuyTienMatPage = () => {
   const totalSoTon = useMemo(() => {
     return groupDataByPeriod.soTon.length > 0 ? groupDataByPeriod.soTon[groupDataByPeriod.soTon.length - 1] : 0;
   }, [groupDataByPeriod]);
-
-  // Cấu hình ApexCharts cho Thu, Chi, Số tồn
   const chartOptions = useMemo(() => {
-    // Pie chart options
     if (chartType === "pie") {
       return {
         chart: {
@@ -190,7 +253,7 @@ const QuyTienMatPage = () => {
           },
         },
         series: [totalThu, totalChi, Math.abs(totalSoTon)],
-        labels: ["Thu", "Chi", "Số tồn"],
+        labels: [t("cashFund.income"), t("cashFund.expense"), t("cashFund.balance")],
         colors: ["#10B981", "#EF4444", "#3B82F6"],
         legend: {
           position: "bottom",
@@ -221,7 +284,11 @@ const QuyTienMatPage = () => {
           },
         },
         title: {
-          text: `Tổng hợp Thu, Chi, Số tồn theo ${periodType === "ngay" ? "Ngày" : periodType === "tuan" ? "Tuần" : periodType === "thang" ? "Tháng" : "Năm"}`,
+          text: `${t("cashFund.chartTitle")} ${t(`cashFund.period.${periodType === "ngay" ? "day" :
+            periodType === "tuan" ? "week" :
+              periodType === "thang" ? "month" :
+                "year"
+            }`)}`,
           align: "center",
           style: {
             fontSize: "20px",
@@ -232,8 +299,6 @@ const QuyTienMatPage = () => {
         },
       };
     }
-
-    // Bar chart options
     return {
       chart: {
         type: "bar",
@@ -267,17 +332,17 @@ const QuyTienMatPage = () => {
       },
       series: [
         {
-          name: "Thu",
+          name: t("cashFund.income"),
           data: groupDataByPeriod.thu,
           color: "#10B981",
         },
         {
-          name: "Chi",
+          name: t("cashFund.expense"),
           data: groupDataByPeriod.chi,
           color: "#EF4444",
         },
         {
-          name: "Số tồn",
+          name: t("cashFund.balance"),
           data: groupDataByPeriod.soTon,
           color: "#3B82F6",
         },
@@ -285,7 +350,11 @@ const QuyTienMatPage = () => {
       xaxis: {
         categories: groupDataByPeriod.labels,
         title: {
-          text: periodType === "ngay" ? "Ngày" : periodType === "tuan" ? "Tuần" : periodType === "thang" ? "Tháng" : "Năm",
+          text: t(`cashFund.period.${periodType === "ngay" ? "day" :
+            periodType === "tuan" ? "week" :
+              periodType === "thang" ? "month" :
+                "year"
+            }`),
           style: {
             fontSize: "14px",
             fontWeight: "bold",
@@ -302,7 +371,7 @@ const QuyTienMatPage = () => {
       },
       yaxis: {
         title: {
-          text: "Số tiền (VND)",
+          text: t("common.amount"),
           style: {
             fontSize: "14px",
             fontWeight: "bold",
@@ -325,7 +394,11 @@ const QuyTienMatPage = () => {
         },
       },
       title: {
-        text: `Biểu đồ Thu, Chi, Số tồn theo ${periodType === "ngay" ? "Ngày" : periodType === "tuan" ? "Tuần" : periodType === "thang" ? "Tháng" : "Năm"}`,
+        text: `${t("cashFund.chartTitle")} ${t(`cashFund.period.${periodType === "ngay" ? "day" :
+          periodType === "tuan" ? "week" :
+            periodType === "thang" ? "month" :
+              "year"
+          }`)}`,
         align: "center",
         style: {
           fontSize: "20px",
@@ -391,16 +464,16 @@ const QuyTienMatPage = () => {
         },
       },
     };
-  }, [chartType, groupDataByPeriod, totalThu, totalChi, totalSoTon, periodType]);
+  }, [chartType, groupDataByPeriod, totalThu, totalChi, totalSoTon, periodType, t]);
 
   return (
     <div className="w-full min-h-screen p-2 md:p-4">
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-4 md:mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6 text-center">💰 Quỹ Tiền Mặt</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6 text-center">💰 {t("cashFund.title")}</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Từ ngày</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t("cashFund.fromDate")}</label>
             <div className="relative">
               <Flatpickr
                 value={dateRange.startDate}
@@ -413,7 +486,7 @@ const QuyTienMatPage = () => {
                   locale: Vietnamese,
                   allowInput: true,
                 }}
-                placeholder="Chọn ngày bắt đầu"
+                placeholder={t("voucherListing.selectStartDate")}
                 className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
                 disabled={isLoading}
               />
@@ -424,7 +497,7 @@ const QuyTienMatPage = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Đến ngày</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t("cashFund.toDate")}</label>
             <div className="relative">
               <Flatpickr
                 value={dateRange.endDate}
@@ -437,7 +510,7 @@ const QuyTienMatPage = () => {
                   locale: Vietnamese,
                   allowInput: true,
                 }}
-                placeholder="Chọn ngày kết thúc"
+                placeholder={t("voucherListing.selectEndDate")}
                 className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
                 disabled={isLoading}
               />
@@ -446,19 +519,8 @@ const QuyTienMatPage = () => {
               </div>
             </div>
           </div>
-
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Mã ĐVCS</label>
-            <input
-              type="text"
-              value="CTY"
-              disabled
-              className="w-full p-2 md:p-3 border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Tài khoản</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t("cashFund.account")}</label>
             <input
               type="text"
               value="1111"
@@ -477,49 +539,49 @@ const QuyTienMatPage = () => {
             <button
               onClick={() => setPeriodType("ngay")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "ngay"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
             >
-              Theo Ngày
+              {t("cashFund.byDay")}
             </button>
             <button
               onClick={() => setPeriodType("tuan")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "tuan"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
             >
-              Theo Tuần
+              {t("cashFund.byWeek")}
             </button>
             <button
               onClick={() => setPeriodType("thang")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "thang"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
             >
-              Theo Tháng
+              {t("cashFund.byMonth")}
             </button>
             <button
               onClick={() => setPeriodType("nam")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "nam"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
             >
-              Theo Năm
+              {t("cashFund.byYear")}
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold text-gray-700">Loại biểu đồ:</label>
+            <label className="text-sm font-semibold text-gray-700">{t("cashFund.chartType")}:</label>
             <select
               value={chartType}
               onChange={(e) => setChartType(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-sm"
             >
-              <option value="pie">🟣 Biểu đồ tròn</option>
-              <option value="bar">📊 Biểu đồ cột</option>
+              <option value="pie">🟣 {t("cashFund.pieChart")}</option>
+              <option value="bar">📊 {t("cashFund.barChart")}</option>
             </select>
           </div>
         </div>
@@ -535,7 +597,7 @@ const QuyTienMatPage = () => {
             />
           ) : (
             <div className="flex items-center justify-center h-96 text-gray-500">
-              <p>Không có dữ liệu để hiển thị biểu đồ</p>
+              <p>{t("common.noData")}</p>
             </div>
           )
         ) : (
@@ -548,7 +610,7 @@ const QuyTienMatPage = () => {
             />
           ) : (
             <div className="flex items-center justify-center h-96 text-gray-500">
-              <p>Không có dữ liệu để hiển thị biểu đồ</p>
+              <p>{t("common.noData")}</p>
             </div>
           )
         )}
@@ -556,64 +618,64 @@ const QuyTienMatPage = () => {
 
       {/* Table */}
       <div className="bg-white rounded-xl shadow-lg p-3 md:p-4 lg:p-6">
-        <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">📋 Chi tiết Quỹ Tiền Mặt</h3>
+        <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">📋 {t("cashFund.detail")}</h3>
         {isLoading ? (
           <div className="text-center py-8">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-2 text-gray-600">Đang tải dữ liệu...</p>
+            <p className="mt-2 text-gray-600">{t("common.loading")}</p>
           </div>
         ) : error ? (
           <div className="text-center py-8 text-red-500">
-            <p>Có lỗi khi tải dữ liệu!</p>
+            <p>{t("errors.loadDataError")}</p>
           </div>
-        ) : data.length > 0 ? (
+        ) : displayData.length > 0 ? (
           <div className="overflow-x-auto -mx-2 md:mx-0">
             <table className="min-w-full border-collapse">
               <thead>
                 <tr className="bg-gray-100 border-b border-gray-300">
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Ngày c.từ
+                    {t("cashFund.voucherDate")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Ngày lập c.từ
+                    {t("cashFund.voucherCreateDate")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Mã c.từ
+                    {t("cashFund.voucherCode")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Số c.từ
+                    {t("cashFund.voucherNumber")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Ông bà
+                    {t("cashFund.person")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Mã khách
+                    {t("cashFund.customerCode")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Tên khách hàng
+                    {t("cashFund.customerName")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Diễn giải
+                    {t("cashFund.description")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Thu
+                    {t("cashFund.income")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Chi
+                    {t("cashFund.expense")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Số tồn
+                    {t("cashFund.balance")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
-                    Mã dự án
+                    {t("cashFund.projectCode")}
                   </th>
                   <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Mã c.từ
+                    {t("cashFund.voucherCode")}
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-dashed divide-gray-300">
-                {data.map((row, index) => {
+                {displayData.map((row, index) => {
                   const ngayCt = formatDate(row.ngay_ct || row.ngay_ct_tu);
                   const ngayLapCt = formatDate(row.ngay_lct || row.ngay_lap_cti);
                   const maCt = row.ma_ct || row.ma_cto || "";
@@ -664,7 +726,7 @@ const QuyTienMatPage = () => {
           </div>
         ) : (
           <div className="text-center py-8 text-gray-500">
-            <p>Không có dữ liệu để hiển thị</p>
+            <p>{t("common.noData")}</p>
           </div>
         )}
 
@@ -676,7 +738,7 @@ const QuyTienMatPage = () => {
                 <tbody>
                   <tr className="bg-blue-50 border-b border-gray-300">
                     <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 border-r border-gray-300">
-                      Số tồn đầu:
+                      {t("cashFund.summary.openingBalance")}:
                     </td>
                     <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right border-r border-gray-300">
                       {formatAmountForTotal(totals.no_dk || 0)}
@@ -687,7 +749,7 @@ const QuyTienMatPage = () => {
                   </tr>
                   <tr className="bg-blue-50 border-b border-gray-300">
                     <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 border-r border-gray-300">
-                      Tổng số thu, chi:
+                      {t("cashFund.summary.totalIncomeExpense")}:
                     </td>
                     <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right border-r border-gray-300">
                       {formatAmountForTotal(totals.ps_no || 0)}
@@ -698,7 +760,7 @@ const QuyTienMatPage = () => {
                   </tr>
                   <tr className="bg-blue-50">
                     <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 border-r border-gray-300">
-                      Số tồn cuối:
+                      {t("cashFund.summary.closingBalance")}:
                     </td>
                     <td className={`px-3 py-2 text-xs md:text-sm text-right border-r border-gray-300 ${(totals.no_ck || 0) < 0 ? "text-red-600" : "text-gray-900"}`}>
                       {formatAmountForTotal(totals.no_ck || 0)}

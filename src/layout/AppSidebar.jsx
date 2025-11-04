@@ -7,113 +7,116 @@ import {
   TrendingUp,
   Wallet
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 // Assume these icons are imported from an icon library
 
 import { useSidebar } from "../hooks/useSidebar";
+import { useTranslation } from "../hooks/useTranslation";
 import { BoxCubeIcon, ChevronDownIcon, HorizontaLDots, PieChartIcon, PlugInIcon } from "../icons";
-
-const navItems = [
-  {
-    icon: <Calendar />,
-    name: "Giao dịch trong ngày",
-    subItems: [
-      { name: "Bảng kê chứng từ", path: "/bao-cao-tai-chinh", pro: false },
-      { name: "Tổng thu", path: "/giao-dich-trong-ngay/tong-thu", pro: false },
-      { name: "Tổng chi", path: "/giao-dich-trong-ngay/tong-chi", pro: false },
-      { name: "Số ca làm việc", path: "/giao-dich-trong-ngay/so-ca-lam-viec", pro: false },
-      { name: "Quà thưởng nhân viên", path: "/giao-dich-trong-ngay/qua-thuong-nhan-vien", pro: false },
-      { name: "Số tiền chi trả theo công tác", path: "/giao-dich-trong-ngay/chi-tra-cong-tac", pro: false },
-    ],
-  },
-  {
-    icon: <Wallet />,
-    name: "Vốn bằng tiền",
-    subItems: [
-      { name: "Quỹ tiền mặt", path: "/von-bang-tien/quy-tien-mat", pro: false },
-      { name: "Tiền gửi NH BIDV", path: "/von-bang-tien/tien-gui-bidv", pro: false },
-      { name: "Tiền gửi NH ViettinBank", path: "/von-bang-tien/tien-gui-viettinbank", pro: false },
-    ],
-  },
-  {
-    icon: <TrendingDown />,
-    name: "Chi phí",
-    subItems: [
-      { name: "Chi phí theo khoản mục", path: "/chi-phi/chi-phi-theo-khoan-muc", pro: false },
-      { name: "Chi phí lương", path: "/chi-phi/chi-phi-luong", pro: false },
-      { name: "Chi phí văn phòng", path: "/chi-phi/chi-phi-van-phong", pro: false },
-    ],
-  },
-  {
-    icon: <TrendingUp />,
-    name: "Doanh thu",
-    subItems: [
-      { name: "Doanh thu theo nhân viên Taler", path: "/doanh-thu/doanh-thu-taler", pro: false },
-      { name: "Doanh thu khác", path: "/doanh-thu/doanh-thu-khac", pro: false },
-    ],
-  },
-  {
-    icon: <Receipt />,
-    name: "Công nợ",
-    subItems: [
-      { name: "Công nợ phải thu", path: "/cong-no/cong-no-phai-thu", pro: false },
-      { name: "Công nợ phải trả", path: "/cong-no/cong-no-phai-tra", pro: false },
-    ],
-  },
-  {
-    icon: <Target />,
-    name: "Kế hoạch",
-    subItems: [
-      { name: "Doanh thu", path: "/ke-hoach/doanh-thu", pro: false },
-      { name: "Chi phí", path: "/ke-hoach/chi-phi", pro: false },
-    ],
-  },
-  {
-    icon: <Package />,
-    name: "Hàng tồn kho",
-    path: "/hang-ton-kho",
-  },
-];
-
-const othersItems = [
-  {
-    icon: <PieChartIcon />,
-    name: "Charts",
-    subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false },
-    ],
-  },
-  {
-    icon: <BoxCubeIcon />,
-    name: "UI Elements",
-    subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
-    ],
-  },
-  {
-    icon: <PlugInIcon />,
-    name: "Authentication",
-    subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
-    ],
-  },
-];
 
 const AppSidebar = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [subMenuHeight, setSubMenuHeight] = useState({});
   const subMenuRefs = useRef({});
+
+  // Generate navItems dynamically from translations
+  const navItems = useMemo(() => [
+    {
+      icon: <Calendar />,
+      name: t("sidebar.dailyTransactions"),
+      subItems: [
+        { name: t("sidebar.voucherListing"), path: "/bao-cao-tai-chinh", pro: false },
+        { name: t("sidebar.totalIncome"), path: "/giao-dich-trong-ngay/tong-thu", pro: false },
+        { name: t("sidebar.totalExpense"), path: "/giao-dich-trong-ngay/tong-chi", pro: false },
+        { name: t("sidebar.workShifts"), path: "/giao-dich-trong-ngay/so-ca-lam-viec", pro: false },
+        { name: t("sidebar.staffRewards"), path: "/giao-dich-trong-ngay/qua-thuong-nhan-vien", pro: false },
+        { name: t("sidebar.workTripPayments"), path: "/giao-dich-trong-ngay/chi-tra-cong-tac", pro: false },
+      ],
+    },
+    {
+      icon: <Wallet />,
+      name: t("sidebar.cashFund"),
+      subItems: [
+        { name: t("sidebar.cashFundDetail"), path: "/von-bang-tien/quy-tien-mat", pro: false },
+        { name: t("sidebar.bidvDeposit"), path: "/von-bang-tien/tien-gui-bidv", pro: false },
+        { name: t("sidebar.viettinbankDeposit"), path: "/von-bang-tien/tien-gui-viettinbank", pro: false },
+      ],
+    },
+    {
+      icon: <TrendingDown />,
+      name: t("sidebar.costs"),
+      subItems: [
+        { name: t("sidebar.costByCategory"), path: "/chi-phi/chi-phi-theo-khoan-muc", pro: false },
+        { name: t("sidebar.salaryCost"), path: "/chi-phi/chi-phi-luong", pro: false },
+        { name: t("sidebar.officeCost"), path: "/chi-phi/chi-phi-van-phong", pro: false },
+      ],
+    },
+    {
+      icon: <TrendingUp />,
+      name: t("sidebar.revenue"),
+      subItems: [
+        { name: t("sidebar.talerRevenue"), path: "/doanh-thu/doanh-thu-taler", pro: false },
+        { name: t("sidebar.otherRevenue"), path: "/doanh-thu/doanh-thu-khac", pro: false },
+      ],
+    },
+    {
+      icon: <Receipt />,
+      name: t("sidebar.debt"),
+      subItems: [
+        { name: t("sidebar.receivables"), path: "/cong-no/cong-no-phai-thu", pro: false },
+        { name: t("sidebar.payables"), path: "/cong-no/cong-no-phai-tra", pro: false },
+      ],
+    },
+    {
+      icon: <Target />,
+      name: t("sidebar.plan"),
+      subItems: [
+        { name: t("sidebar.revenuePlan"), path: "/ke-hoach/doanh-thu", pro: false },
+        { name: t("sidebar.costPlan"), path: "/ke-hoach/chi-phi", pro: false },
+      ],
+    },
+    {
+      icon: <Package />,
+      name: t("sidebar.inventory"),
+      path: "/hang-ton-kho",
+    },
+  ], [t]);
+
+  const othersItems = useMemo(() => [
+    {
+      icon: <PieChartIcon />,
+      name: "Charts",
+      subItems: [
+        { name: "Line Chart", path: "/line-chart", pro: false },
+        { name: "Bar Chart", path: "/bar-chart", pro: false },
+      ],
+    },
+    {
+      icon: <BoxCubeIcon />,
+      name: "UI Elements",
+      subItems: [
+        { name: "Alerts", path: "/alerts", pro: false },
+        { name: "Avatar", path: "/avatars", pro: false },
+        { name: "Badge", path: "/badge", pro: false },
+        { name: "Buttons", path: "/buttons", pro: false },
+        { name: "Images", path: "/images", pro: false },
+        { name: "Videos", path: "/videos", pro: false },
+      ],
+    },
+    {
+      icon: <PlugInIcon />,
+      name: "Authentication",
+      subItems: [
+        { name: "Sign In", path: "/signin", pro: false },
+        { name: "Sign Up", path: "/signup", pro: false },
+      ],
+    },
+  ], []);
 
   // const isActive = (path: string) => location.pathname === path;
   const isActive = useCallback((path) => location.pathname === path, [location.pathname]);
@@ -140,7 +143,7 @@ const AppSidebar = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [location, isActive]);
+  }, [location, isActive, navItems, othersItems]);
 
   useEffect(() => {
     if (openSubmenu !== null) {
@@ -271,10 +274,10 @@ const AppSidebar = () => {
         <Link to="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              <img className="dark:hidden" src="/images/logo/genlive.jpg" alt="Logo" width={70} height={20} />
+              <img className="dark:hidden" src="/images/logo/genlive.jpg" alt="Logo" width={100} height={20} />
             </>
           ) : (
-            <img className="dark:hidden" src="/images/logo/genlive.jpg" alt="Logo" width={70} height={20} />
+            <img className="dark:hidden" src="/images/logo/genlive.jpg" alt="Logo" width={100} height={20} />
           )}
         </Link>
       </div>

@@ -7,6 +7,7 @@ import App from "./App.jsx";
 import { AppWrapper } from "./components/common/PageMeta.jsx";
 import "./index.css";
 import { ThemeProvider } from "./provider/ThemeProvider.jsx";
+import { LanguageProvider } from "./provider/LanguageProvider.jsx";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -24,11 +25,13 @@ if (!rootElement) throw new Error("Root element not found");
 createRoot(rootElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AppWrapper>
-          <App />
-        </AppWrapper>
-      </ThemeProvider>
+      <LanguageProvider>
+        <ThemeProvider>
+          <AppWrapper>
+            <App />
+          </AppWrapper>
+        </ThemeProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   </StrictMode>
 );
