@@ -15,6 +15,7 @@ export default function Home() {
     const quyTienMat = data.quyTienMat || 0;
     const tienGuiBIDV = data.tienGuiBIDV || 0;
     const tienGuiViettinbank = data.tienGuiViettinbank || 0;
+    const total = quyTienMat + tienGuiBIDV + tienGuiViettinbank;
 
     return {
       chart: {
@@ -42,25 +43,29 @@ export default function Home() {
         fontWeight: 500,
       },
       tooltip: {
+        theme: "light",
+        style: {
+          fontSize: "14px",
+        },
+        fillSeriesColor: false,
+        marker: {
+          show: true,
+        },
         y: {
           formatter: function (value) {
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(2) : 0;
             return new Intl.NumberFormat("vi-VN", {
               style: "currency",
               currency: "VND",
               minimumFractionDigits: 0,
-            }).format(value);
+            }).format(value) + ` (${percentage}%)`;
           },
         },
       },
       dataLabels: {
         enabled: true,
         formatter: function (val) {
-          return new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-            minimumFractionDigits: 0,
-            notation: "compact",
-          }).format(val);
+          return val.toFixed(1) + "%";
         },
       },
       title: {
@@ -70,7 +75,6 @@ export default function Home() {
     };
   }, [cashAndDeposits.data, t]);
 
-  // Chart 2: Doanh thu theo taler (Bar Chart)
   const revenueByTalerChartOptions = useMemo(() => {
     const data = revenueByTaler.data || {};
     const labels = data.labels || [];
@@ -152,6 +156,15 @@ export default function Home() {
         show: false,
       },
       tooltip: {
+        theme: "light",
+        style: {
+          fontSize: "14px",
+          fontWeight: "bold",
+        },
+        fillSeriesColor: false,
+        marker: {
+          show: true,
+        },
         y: {
           formatter: function (value) {
             return new Intl.NumberFormat("vi-VN", {
@@ -277,6 +290,15 @@ export default function Home() {
         show: false,
       },
       tooltip: {
+        theme: "light",
+        style: {
+          fontSize: "14px",
+          fontWeight: "bold",
+        },
+        fillSeriesColor: false,
+        marker: {
+          show: true,
+        },
         y: {
           formatter: function (value) {
             return new Intl.NumberFormat("vi-VN", {
