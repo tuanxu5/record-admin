@@ -11,6 +11,7 @@ import { translateText } from "../../service/translation";
 const TienGuiBIDVPage = () => {
   const { t, language } = useTranslation();
   const [periodType, setPeriodType] = useState("ngay");
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const firstDayOfYear = `${currentYear}-01-01`;
@@ -20,6 +21,14 @@ const TienGuiBIDVPage = () => {
     startDate: firstDayOfYear,
     endDate: today,
   });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const params = useMemo(() => ({
     tk: '1121.1',
     ngay_ct1: dateRange.startDate,
@@ -222,7 +231,7 @@ const TienGuiBIDVPage = () => {
     return {
       chart: {
         type: "bar",
-        height: 400,
+        height: isMobile ? 350 : 400,
         fontFamily: "Inter, sans-serif",
         toolbar: {
           show: true,
@@ -309,7 +318,7 @@ const TienGuiBIDVPage = () => {
         },
       },
     };
-  }, [labels, psNo, psCo, periodType, t]);
+  }, [labels, psNo, psCo, periodType, t, isMobile]);
 
   return (
     <div className="w-full space-y-4 md:space-y-6 p-2 md:p-4 lg:p-6 overflow-x-hidden">
@@ -419,8 +428,8 @@ const TienGuiBIDVPage = () => {
             </div>
           </div>
         </div>
-        <div className="w-full overflow-x-auto">
-          <Chart options={chartOptions} series={chartOptions.series} type="bar" height={400} />
+        <div className="w-full overflow-x-auto overflow-y-visible pb-4">
+          <Chart options={chartOptions} series={chartOptions.series} type="bar" height={isMobile ? 350 : 400} />
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { useAuth } from "../../hooks/useAuth";
@@ -6,10 +6,34 @@ import { Dropdown } from "../ui/dropdown/Dropdown";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const [position, setPosition] = useState({ top: 0, right: 0 });
+  const buttonRef = useRef(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  function toggleDropdown() {
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const updatePosition = () => {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setPosition({
+          top: rect.bottom + 4,
+          right: window.innerWidth - rect.right
+        });
+      };
+
+      updatePosition();
+      window.addEventListener('scroll', updatePosition, true);
+      window.addEventListener('resize', updatePosition);
+
+      return () => {
+        window.removeEventListener('scroll', updatePosition, true);
+        window.removeEventListener('resize', updatePosition);
+      };
+    }
+  }, [isOpen]);
+
+  function toggleDropdown(e) {
+    e.stopPropagation();
     setIsOpen(!isOpen);
   }
 
@@ -24,8 +48,12 @@ export default function UserDropdown() {
     closeDropdown();
   };
   return (
-    <div className="relative">
-      <button onClick={toggleDropdown} className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400">
+    <div className="relative z-[99999]">
+      <button 
+        ref={buttonRef}
+        onClick={toggleDropdown} 
+        className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
+      >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
           <img src="/images/user/owner.jpg" alt="User" />
         </span>
@@ -55,7 +83,8 @@ export default function UserDropdown() {
       <Dropdown
         isOpen={isOpen}
         onClose={closeDropdown}
-        className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+        position={position}
+        className="flex w-[260px] flex-col rounded-2xl p-3"
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">

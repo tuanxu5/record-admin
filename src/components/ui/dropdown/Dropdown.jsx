@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 
-export const Dropdown = ({ isOpen, onClose, children, className = "" }) => {
+export const Dropdown = ({ isOpen, onClose, children, className = "", position }) => {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
+    if (!isOpen) return;
+    
     const handleClickOutside = (event) => {
       if (
         dropdownRef.current &&
@@ -13,19 +15,33 @@ export const Dropdown = ({ isOpen, onClose, children, className = "" }) => {
         onClose();
       }
     };
+    setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside);
+    }, 0);
 
-    document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [onClose]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const style = position 
+    ? { 
+        position: 'fixed',
+        top: `${position.top}px`,
+        right: `${position.right}px`,
+        zIndex: 999999
+      }
+    : {
+        zIndex: 999999
+      };
 
   return (
     <div
       ref={dropdownRef}
-      className={`absolute z-40  right-0 mt-2  rounded-xl border border-gray-200 bg-white  shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark ${className}`}
+      className={`${position ? 'fixed' : 'absolute'} z-99999 ${!position ? 'right-0 top-full mt-1' : ''} rounded-xl border border-gray-200 bg-white shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark ${className}`}
+      style={style}
     >
       {children}
     </div>

@@ -1,20 +1,20 @@
 import {
+  Briefcase,
+  FileText,
   Receipt,
   Target,
   TrendingDown,
   TrendingUp,
-  Wallet,
   UserCircle,
-  FileText,
-  Zap,
-  Briefcase
+  Wallet,
+  Zap
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 
+import { useAuth } from "../hooks/useAuth";
 import { useSidebar } from "../hooks/useSidebar";
 import { useTranslation } from "../hooks/useTranslation";
-import { useAuth } from "../hooks/useAuth";
 import { BoxCubeIcon, ChevronDownIcon, HorizontaLDots, PieChartIcon, PlugInIcon } from "../icons";
 
 const AppSidebar = () => {
@@ -296,7 +296,7 @@ const AppSidebar = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-6 flex items-center justify-center border-b border-gray-200 dark:border-gray-800 transition-all duration-300 ${isExpanded || isHovered || isMobileOpen ? "px-4" : "px-0"
+        className={`hidden lg:flex py-2 items-center justify-center border-b border-gray-200 dark:border-gray-800 transition-all duration-300 ${isExpanded || isHovered || isMobileOpen ? "px-4" : "px-0"
           }`}
       >
         <Link
@@ -313,7 +313,7 @@ const AppSidebar = () => {
           />
         </Link>
       </div>
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear pb-6" style={{ maxHeight: 'calc(100vh - 4rem - 80px)' }}>
+      <div className="flex flex-col overflow-y-auto duration-300 ease-linear pb-6 lg:max-h-[calc(100vh-4rem-80px)] max-h-[calc(100vh-4rem-20px)]">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
             <div>

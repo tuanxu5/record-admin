@@ -12,7 +12,7 @@ export default function AuthLayout({ children }) {
             <GridShape />
             <div className="flex flex-col items-center max-w-xs">
               <Link to="/" className="block mb-4">
-                <img width={400} height={48} src="/images/logo/genlive.jpg" alt="Logo" />
+                <img width={400} height={48} src="/images/logo/genlive.jpg" alt="Logo" className="transition-all duration-300 object-contain rounded-lg shadow-sm" />
               </Link>
             </div>
           </div>
