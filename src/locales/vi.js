@@ -43,6 +43,7 @@ export const vi = {
     expenses: "Các Khoản Chi",
     expenseCategories: "Danh mục chi phí",
     kpiPlan: "Kế Hoạch KPI",
+    total: "Tổng cộng",
   },
   sidebar: {
     quickReport: "Báo cáo nhanh",

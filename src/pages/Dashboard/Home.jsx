@@ -353,21 +353,22 @@ export default function Home() {
       />
       {/* Header Section */}
       <div className="text-center">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg p-5 md:p-6 mb-4 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-amber-900 to-red-900 rounded-xl shadow-lg p-5 md:p-6 mb-4 relative overflow-hidden">
           {/* Decorative background elements */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
 
           <div className="relative z-5">
-            <div className="flex items-center justify-center mb-3">
+            <div className="flex items-center justify-center mb-3 gap-4">
               <div className="bg-white bg-opacity-20 rounded-full p-2.5">
                 <BarChart3 className="w-6 h-6 md:w-7 md:h-7 text-white" />
               </div>
+              <h1 className="text-2xl md:text-2xl font-bold text-white ">
+                {t("dashboard.title")}
+              </h1>
             </div>
-            <h1 className="text-2xl md:text-2xl font-bold text-white mb-2">
-              {t("dashboard.title")}
-            </h1>
-            <p className="text-blue-100 text-sm md:text-base max-w-2xl mx-auto">
+
+            <p className="text-red-100 text-sm md:text-base max-w-2xl mx-auto">
               {t("dashboard.description")}
             </p>
           </div>
@@ -391,12 +392,32 @@ export default function Home() {
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
               </div>
             ) : (
-              <Chart
-                options={cashAndDepositsChartOptions}
-                series={cashAndDepositsChartOptions.series}
-                type="pie"
-                height={400}
-              />
+              <>
+                <Chart
+                  options={cashAndDepositsChartOptions}
+                  series={cashAndDepositsChartOptions.series}
+                  type="pie"
+                  height={400}
+                />
+                <div className="mt-6 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-6 justify-center">
+                    <span className="text-s font-semibold text-gray-700 dark:text-gray-300">
+                      {t("dashboard.total")} :
+                    </span>
+                    <span className="text-lg font-bold text-red-900 dark:text-white">
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                        minimumFractionDigits: 0,
+                      }).format(
+                        (cashAndDeposits.data?.quyTienMat || 0) +
+                        (cashAndDeposits.data?.tienGuiBIDV || 0) +
+                        (cashAndDeposits.data?.tienGuiViettinbank || 0)
+                      )}
+                    </span>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>

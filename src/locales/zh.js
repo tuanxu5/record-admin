@@ -43,6 +43,7 @@ export const zh = {
     expenses: "支出项目",
     expenseCategories: "支出类别",
     kpiPlan: "KPI计划",
+    total: "总计",
   },
   sidebar: {
     quickReport: "快速报告",
