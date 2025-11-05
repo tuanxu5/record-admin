@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { LanguageSwitcher } from "../components/common/LanguageSwitcher";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
-import NotificationDropdown from "../components/header/NotificationDropdown";
 import UserDropdown from "../components/header/UserDropdown";
 import { useSidebar } from "../hooks/useSidebar";
 
@@ -93,20 +92,21 @@ const AppHeader = () => {
         </div>
         <div
           className={`${isApplicationMenuOpen ? "flex" : "hidden"
-            } items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}
+            } items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:px-0 lg:shadow-none`}
         >
-          <div className="flex items-center gap-2 2xsm:gap-3">
-            {/* <!-- Language Switcher --> */}
+          {/* <!-- Language Switcher - Left --> */}
+          <div className="flex items-center">
             <LanguageSwitcher />
+          </div>
+          
+          {/* <!-- Right side: Theme Toggle and User Dropdown --> */}
+          <div className="flex items-center gap-2 2xsm:gap-3">
             {/* <!-- Dark Mode Toggler --> */}
             <ThemeToggleButton />
-            {/* <!-- Dark Mode Toggler --> */}
-            <NotificationDropdown />
-            {/* <!-- Notification Menu Area --> */}
-          </div>
-          {/* <!-- User Area --> */}
-          <div className="relative overflow-visible z-99999">
-            <UserDropdown />
+            {/* <!-- User Area --> */}
+            <div className="relative overflow-visible z-99999">
+              <UserDropdown />
+            </div>
           </div>
         </div>
       </div>
