@@ -1,13 +1,13 @@
 import {
-  Calendar,
-  Package,
   Receipt,
   Target,
   TrendingDown,
   TrendingUp,
   Wallet,
   UserCircle,
-  FileText
+  FileText,
+  Zap,
+  Briefcase
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
@@ -29,16 +29,14 @@ const AppSidebar = () => {
   const navItems = useMemo(() => {
     const items = [
       {
-        icon: <Calendar />,
-        name: t("sidebar.dailyTransactions"),
-        subItems: [
-          { name: t("sidebar.voucherListing"), path: "/bao-cao-tai-chinh", pro: false },
-          { name: t("sidebar.totalIncome"), path: "/giao-dich-trong-ngay/tong-thu", pro: false },
-          { name: t("sidebar.totalExpense"), path: "/giao-dich-trong-ngay/tong-chi", pro: false },
-          { name: t("sidebar.workShifts"), path: "/giao-dich-trong-ngay/so-ca-lam-viec", pro: false },
-          { name: t("sidebar.staffRewards"), path: "/giao-dich-trong-ngay/qua-thuong-nhan-vien", pro: false },
-          { name: t("sidebar.workTripPayments"), path: "/giao-dich-trong-ngay/chi-tra-cong-tac", pro: false },
-        ],
+        icon: <Zap />,
+        name: t("sidebar.quickReport"),
+        path: "/bao-cao-nhanh",
+      },
+      {
+        icon: <FileText />,
+        name: t("sidebar.voucherListing"),
+        path: "/bao-cao-tai-chinh",
       },
       {
         icon: <Wallet />,
@@ -83,11 +81,6 @@ const AppSidebar = () => {
         ],
       },
       {
-        icon: <Package />,
-        name: t("sidebar.inventory"),
-        path: "/hang-ton-kho",
-      },
-      {
         icon: <FileText />,
         name: t("sidebar.financialReport"),
         subItems: [
@@ -101,6 +94,11 @@ const AppSidebar = () => {
         icon: <TrendingUp />,
         name: t("sidebar.financialAnalysis"),
         path: "/phan-tich-tai-chinh",
+      },
+      {
+        icon: <Briefcase />,
+        name: t("sidebar.officeSupplies"),
+        path: "/cong-cu-dung-cu-do-van-phong",
       },
     ];
     if (isAdmin()) {
@@ -290,7 +288,7 @@ const AppSidebar = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-[calc(100vh-4rem)] lg:h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
         ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
@@ -315,7 +313,7 @@ const AppSidebar = () => {
           />
         </Link>
       </div>
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
+      <div className="flex flex-col overflow-y-auto duration-300 ease-linear pb-6" style={{ maxHeight: 'calc(100vh - 4rem - 80px)' }}>
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
             <div>

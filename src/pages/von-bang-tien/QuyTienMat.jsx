@@ -450,9 +450,9 @@ const QuyTienMatPage = () => {
   }, [chartType, groupDataByPeriod, totalThu, totalChi, totalSoTon, periodType, t]);
 
   return (
-    <div className="w-full min-h-screen p-2 md:p-4">
+    <div className="w-full min-h-screen p-2 md:p-4 overflow-x-hidden">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-4 md:mb-6">
+      <div className="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-4 md:mb-6 max-w-full overflow-x-hidden">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6 text-center">💰 {t("cashFund.title")}</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
           <div>
@@ -521,7 +521,7 @@ const QuyTienMatPage = () => {
       </div>
 
       {/* Chart */}
-      <div className="bg-white rounded-xl shadow-lg p-3 md:p-4 mb-4 md:mb-6">
+      <div className="bg-white rounded-xl shadow-lg p-3 md:p-4 mb-4 md:mb-6 max-w-full overflow-x-hidden">
         {/* Period Tabs và Chart Type */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-200">
           <div className="flex flex-wrap gap-2">
@@ -578,12 +578,14 @@ const QuyTienMatPage = () => {
         {/* Chart */}
         {chartType === "pie" ? (
           (totalThu > 0 || totalChi > 0 || totalSoTon !== 0) ? (
-            <Chart
-              options={chartOptions}
-              series={chartOptions.series}
-              type="pie"
-              height={400}
-            />
+            <div className="w-full overflow-x-auto">
+              <Chart
+                options={chartOptions}
+                series={chartOptions.series}
+                type="pie"
+                height={400}
+              />
+            </div>
           ) : (
             <div className="flex items-center justify-center h-96 text-gray-500">
               <p>{t("common.noData")}</p>
@@ -591,12 +593,14 @@ const QuyTienMatPage = () => {
           )
         ) : (
           groupDataByPeriod.labels.length > 0 && (groupDataByPeriod.thu.length > 0 || groupDataByPeriod.chi.length > 0 || groupDataByPeriod.soTon.length > 0) ? (
-            <Chart
-              options={chartOptions}
-              series={chartOptions.series}
-              type="bar"
-              height={400}
-            />
+            <div className="w-full overflow-x-auto">
+              <Chart
+                options={chartOptions}
+                series={chartOptions.series}
+                type="bar"
+                height={400}
+              />
+            </div>
           ) : (
             <div className="flex items-center justify-center h-96 text-gray-500">
               <p>{t("common.noData")}</p>
@@ -606,7 +610,7 @@ const QuyTienMatPage = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-lg p-3 md:p-4 lg:p-6">
+      <div className="bg-white rounded-xl shadow-lg p-3 md:p-4 lg:p-6 max-w-full overflow-x-hidden">
         <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">📋 {t("cashFund.detail")}</h3>
         {isLoading ? (
           <div className="text-center py-8">

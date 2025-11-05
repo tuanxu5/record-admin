@@ -113,7 +113,7 @@ export default function ListAccountPage() {
         title="Danh Sách Tài Khoản | Record Admin"
         description="Quản lý danh sách tài khoản"
       />
-      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark max-w-full overflow-x-hidden">
         <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark flex items-center justify-between">
           <h3 className="font-semibold text-black dark:text-white">Danh Sách Tài Khoản</h3>
           <Link to="/quan-ly-tai-khoan/them-tai-khoan">

@@ -312,8 +312,8 @@ const TienGuiBIDVPage = () => {
   }, [labels, psNo, psCo, periodType, t]);
 
   return (
-    <div className="w-full space-y-4 md:space-y-6 p-2 md:p-4 lg:p-6">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+    <div className="w-full space-y-4 md:space-y-6 p-2 md:p-4 lg:p-6 overflow-x-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6 max-w-full overflow-x-hidden">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6 text-center">
           {t("sidebar.bidvDeposit")}
         </h1>
@@ -391,7 +391,7 @@ const TienGuiBIDVPage = () => {
       </div>
 
       {/* Chart Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6 max-w-full overflow-x-hidden">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
           <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">
             {t("voucherListing.chartTitle")}
@@ -419,11 +419,13 @@ const TienGuiBIDVPage = () => {
             </div>
           </div>
         </div>
-        <Chart options={chartOptions} series={chartOptions.series} type="bar" height={400} />
+        <div className="w-full overflow-x-auto">
+          <Chart options={chartOptions} series={chartOptions.series} type="bar" height={400} />
+        </div>
       </div>
 
       {/* Table Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6 max-w-full overflow-x-hidden">
         <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4">
           {t("cashFund.detail")}
         </h2>

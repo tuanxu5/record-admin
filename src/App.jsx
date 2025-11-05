@@ -47,6 +47,7 @@ export default function App() {
             <Route path="/von-bang-tien/tien-gui-viettinbank" element={<TienGuiViettinbankPage />} />
             <Route path="/quan-ly-tai-khoan/them-tai-khoan" element={<AddAccountPage />} />
             <Route path="/quan-ly-tai-khoan/danh-sach" element={<ListAccountPage />} />
+            <Route path="/cong-cu-dung-cu-do-van-phong" element={<Home />} />
             <Route path="/bao-cao-tai-chinh/bang-can-doi-so-phat-sinh-tai-khoan" element={<Home />} />
             <Route path="/bao-cao-tai-chinh/bang-can-doi-ke-toan" element={<Home />} />
             <Route path="/bao-cao-tai-chinh/ket-qua-hoat-dong-san-xuat-kinh-doanh" element={<Home />} />

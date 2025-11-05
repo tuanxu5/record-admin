@@ -66,7 +66,7 @@ export default function AddAccountPage() {
         title="Thêm Tài Khoản | Record Admin"
         description="Thêm tài khoản mới vào hệ thống"
       />
-      <div className="rounded-md border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className="rounded-md border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark max-w-full overflow-x-hidden">
         <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
           <h3 className="font-semibold text-black dark:text-white">Thêm Tài Khoản</h3>
         </div>
