@@ -8,6 +8,7 @@ import { AppWrapper } from "./components/common/PageMeta.jsx";
 import "./index.css";
 import { ThemeProvider } from "./provider/ThemeProvider.jsx";
 import { LanguageProvider } from "./provider/LanguageProvider.jsx";
+import { AuthProvider } from "./provider/AuthProvider.jsx";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -27,9 +28,11 @@ createRoot(rootElement).render(
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <ThemeProvider>
-          <AppWrapper>
-            <App />
-          </AppWrapper>
+          <AuthProvider>
+            <AppWrapper>
+              <App />
+            </AppWrapper>
+          </AuthProvider>
         </ThemeProvider>
       </LanguageProvider>
     </QueryClientProvider>

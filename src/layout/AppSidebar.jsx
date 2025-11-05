@@ -5,87 +5,117 @@ import {
   Target,
   TrendingDown,
   TrendingUp,
-  Wallet
+  Wallet,
+  UserCircle,
+  FileText
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
-// Assume these icons are imported from an icon library
 
 import { useSidebar } from "../hooks/useSidebar";
 import { useTranslation } from "../hooks/useTranslation";
+import { useAuth } from "../hooks/useAuth";
 import { BoxCubeIcon, ChevronDownIcon, HorizontaLDots, PieChartIcon, PlugInIcon } from "../icons";
 
 const AppSidebar = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
   const { t } = useTranslation();
+  const { isAdmin } = useAuth();
 
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [subMenuHeight, setSubMenuHeight] = useState({});
   const subMenuRefs = useRef({});
+  const navItems = useMemo(() => {
+    const items = [
+      {
+        icon: <Calendar />,
+        name: t("sidebar.dailyTransactions"),
+        subItems: [
+          { name: t("sidebar.voucherListing"), path: "/bao-cao-tai-chinh", pro: false },
+          { name: t("sidebar.totalIncome"), path: "/giao-dich-trong-ngay/tong-thu", pro: false },
+          { name: t("sidebar.totalExpense"), path: "/giao-dich-trong-ngay/tong-chi", pro: false },
+          { name: t("sidebar.workShifts"), path: "/giao-dich-trong-ngay/so-ca-lam-viec", pro: false },
+          { name: t("sidebar.staffRewards"), path: "/giao-dich-trong-ngay/qua-thuong-nhan-vien", pro: false },
+          { name: t("sidebar.workTripPayments"), path: "/giao-dich-trong-ngay/chi-tra-cong-tac", pro: false },
+        ],
+      },
+      {
+        icon: <Wallet />,
+        name: t("sidebar.cashFund"),
+        subItems: [
+          { name: t("sidebar.cashFundDetail"), path: "/von-bang-tien/quy-tien-mat", pro: false },
+          { name: t("sidebar.bidvDeposit"), path: "/von-bang-tien/tien-gui-bidv", pro: false },
+          { name: t("sidebar.viettinbankDeposit"), path: "/von-bang-tien/tien-gui-viettinbank", pro: false },
+        ],
+      },
+      {
+        icon: <TrendingDown />,
+        name: t("sidebar.costs"),
+        subItems: [
+          { name: t("sidebar.costByCategory"), path: "/chi-phi/chi-phi-theo-khoan-muc", pro: false },
+          { name: t("sidebar.salaryCost"), path: "/chi-phi/chi-phi-luong", pro: false },
+          { name: t("sidebar.officeCost"), path: "/chi-phi/chi-phi-van-phong", pro: false },
+        ],
+      },
+      {
+        icon: <TrendingUp />,
+        name: t("sidebar.revenue"),
+        subItems: [
+          { name: t("sidebar.talerRevenue"), path: "/doanh-thu/doanh-thu-taler", pro: false },
+          { name: t("sidebar.otherRevenue"), path: "/doanh-thu/doanh-thu-khac", pro: false },
+        ],
+      },
+      {
+        icon: <Receipt />,
+        name: t("sidebar.debt"),
+        subItems: [
+          { name: t("sidebar.receivables"), path: "/cong-no/cong-no-phai-thu", pro: false },
+          { name: t("sidebar.payables"), path: "/cong-no/cong-no-phai-tra", pro: false },
+        ],
+      },
+      {
+        icon: <Target />,
+        name: t("sidebar.plan"),
+        subItems: [
+          { name: t("sidebar.revenuePlan"), path: "/ke-hoach/doanh-thu", pro: false },
+          { name: t("sidebar.costPlan"), path: "/ke-hoach/chi-phi", pro: false },
+        ],
+      },
+      {
+        icon: <Package />,
+        name: t("sidebar.inventory"),
+        path: "/hang-ton-kho",
+      },
+      {
+        icon: <FileText />,
+        name: t("sidebar.financialReport"),
+        subItems: [
+          { name: t("sidebar.balanceSheetAccounts"), path: "/bao-cao-tai-chinh/bang-can-doi-so-phat-sinh-tai-khoan", pro: false },
+          { name: t("sidebar.balanceSheet"), path: "/bao-cao-tai-chinh/bang-can-doi-ke-toan", pro: false },
+          { name: t("sidebar.businessResult"), path: "/bao-cao-tai-chinh/ket-qua-hoat-dong-san-xuat-kinh-doanh", pro: false },
+          { name: t("sidebar.cashFlow"), path: "/bao-cao-tai-chinh/luu-chuyen-tien-te", pro: false },
+        ],
+      },
+      {
+        icon: <TrendingUp />,
+        name: t("sidebar.financialAnalysis"),
+        path: "/phan-tich-tai-chinh",
+      },
+    ];
+    if (isAdmin()) {
+      items.push({
+        icon: <UserCircle />,
+        name: t("sidebar.accountManagement"),
+        subItems: [
+          { name: t("sidebar.addAccount"), path: "/quan-ly-tai-khoan/them-tai-khoan", pro: false },
+          { name: t("sidebar.listAccount"), path: "/quan-ly-tai-khoan/danh-sach", pro: false },
+        ],
+      });
+    }
 
-  // Generate navItems dynamically from translations
-  const navItems = useMemo(() => [
-    {
-      icon: <Calendar />,
-      name: t("sidebar.dailyTransactions"),
-      subItems: [
-        { name: t("sidebar.voucherListing"), path: "/bao-cao-tai-chinh", pro: false },
-        { name: t("sidebar.totalIncome"), path: "/giao-dich-trong-ngay/tong-thu", pro: false },
-        { name: t("sidebar.totalExpense"), path: "/giao-dich-trong-ngay/tong-chi", pro: false },
-        { name: t("sidebar.workShifts"), path: "/giao-dich-trong-ngay/so-ca-lam-viec", pro: false },
-        { name: t("sidebar.staffRewards"), path: "/giao-dich-trong-ngay/qua-thuong-nhan-vien", pro: false },
-        { name: t("sidebar.workTripPayments"), path: "/giao-dich-trong-ngay/chi-tra-cong-tac", pro: false },
-      ],
-    },
-    {
-      icon: <Wallet />,
-      name: t("sidebar.cashFund"),
-      subItems: [
-        { name: t("sidebar.cashFundDetail"), path: "/von-bang-tien/quy-tien-mat", pro: false },
-        { name: t("sidebar.bidvDeposit"), path: "/von-bang-tien/tien-gui-bidv", pro: false },
-        { name: t("sidebar.viettinbankDeposit"), path: "/von-bang-tien/tien-gui-viettinbank", pro: false },
-      ],
-    },
-    {
-      icon: <TrendingDown />,
-      name: t("sidebar.costs"),
-      subItems: [
-        { name: t("sidebar.costByCategory"), path: "/chi-phi/chi-phi-theo-khoan-muc", pro: false },
-        { name: t("sidebar.salaryCost"), path: "/chi-phi/chi-phi-luong", pro: false },
-        { name: t("sidebar.officeCost"), path: "/chi-phi/chi-phi-van-phong", pro: false },
-      ],
-    },
-    {
-      icon: <TrendingUp />,
-      name: t("sidebar.revenue"),
-      subItems: [
-        { name: t("sidebar.talerRevenue"), path: "/doanh-thu/doanh-thu-taler", pro: false },
-        { name: t("sidebar.otherRevenue"), path: "/doanh-thu/doanh-thu-khac", pro: false },
-      ],
-    },
-    {
-      icon: <Receipt />,
-      name: t("sidebar.debt"),
-      subItems: [
-        { name: t("sidebar.receivables"), path: "/cong-no/cong-no-phai-thu", pro: false },
-        { name: t("sidebar.payables"), path: "/cong-no/cong-no-phai-tra", pro: false },
-      ],
-    },
-    {
-      icon: <Target />,
-      name: t("sidebar.plan"),
-      subItems: [
-        { name: t("sidebar.revenuePlan"), path: "/ke-hoach/doanh-thu", pro: false },
-        { name: t("sidebar.costPlan"), path: "/ke-hoach/chi-phi", pro: false },
-      ],
-    },
-    {
-      icon: <Package />,
-      name: t("sidebar.inventory"),
-      path: "/hang-ton-kho",
-    },
-  ], [t]);
+    return items;
+  }, [t, isAdmin]);
 
   const othersItems = useMemo(() => [
     {
@@ -117,10 +147,7 @@ const AppSidebar = () => {
       ],
     },
   ], []);
-
-  // const isActive = (path: string) => location.pathname === path;
   const isActive = useCallback((path) => location.pathname === path, [location.pathname]);
-
   useEffect(() => {
     let submenuMatched = false;
     ["main", "others"].forEach((menuType) => {
@@ -300,19 +327,8 @@ const AppSidebar = () => {
               </h2>
               {renderMenuItems(navItems, "main")}
             </div>
-            {/* <div className="">
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? "Others" : <HorizontaLDots />}
-              </h2>
-              {renderMenuItems(othersItems, "others")}
-            </div> */}
           </div>
         </nav>
-        {/* {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null} */}
       </div>
     </aside>
   );

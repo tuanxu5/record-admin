@@ -1,6 +1,7 @@
 import { Outlet } from "react-router";
 import { useSidebar } from "../hooks/useSidebar";
 import { SidebarProvider } from "../provider/SidebarProvider";
+import ProtectedRoute from "../components/auth/ProtectedRoute";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 import Backdrop from "./Backdrop";
@@ -29,9 +30,11 @@ const LayoutContent = () => {
 
 const AppLayout = () => {
   return (
-    <SidebarProvider>
-      <LayoutContent />
-    </SidebarProvider>
+    <ProtectedRoute>
+      <SidebarProvider>
+        <LayoutContent />
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 };
 

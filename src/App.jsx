@@ -1,4 +1,6 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import AppLayout from "./layout/AppLayout";
 import SignIn from "./pages/AuthPages/SignIn";
@@ -25,6 +27,8 @@ import BaoCaoThuChiPage from "./pages/bao-cao-thu-chi";
 import QuyTienMatPage from "./pages/von-bang-tien/QuyTienMat";
 import TienGuiBIDVPage from "./pages/von-bang-tien/TienGuiBIDV";
 import TienGuiViettinbankPage from "./pages/von-bang-tien/TienGuiViettinbank";
+import AddAccountPage from "./pages/quan-ly-tai-khoan/AddAccountPage";
+import ListAccountPage from "./pages/quan-ly-tai-khoan/ListAccountPage";
 
 export default function App() {
   return (
@@ -41,6 +45,13 @@ export default function App() {
             <Route path="/von-bang-tien/quy-tien-mat" element={<QuyTienMatPage />} />
             <Route path="/von-bang-tien/tien-gui-bidv" element={<TienGuiBIDVPage />} />
             <Route path="/von-bang-tien/tien-gui-viettinbank" element={<TienGuiViettinbankPage />} />
+            <Route path="/quan-ly-tai-khoan/them-tai-khoan" element={<AddAccountPage />} />
+            <Route path="/quan-ly-tai-khoan/danh-sach" element={<ListAccountPage />} />
+            <Route path="/bao-cao-tai-chinh/bang-can-doi-so-phat-sinh-tai-khoan" element={<Home />} />
+            <Route path="/bao-cao-tai-chinh/bang-can-doi-ke-toan" element={<Home />} />
+            <Route path="/bao-cao-tai-chinh/ket-qua-hoat-dong-san-xuat-kinh-doanh" element={<Home />} />
+            <Route path="/bao-cao-tai-chinh/luu-chuyen-tien-te" element={<Home />} />
+            <Route path="/phan-tich-tai-chinh" element={<Home />} />
             <Route index path="/bao-cao-phan-he" element={<Home />} />
             <Route index path="/bao-cao-ton-kho" element={<Home />} />
             <Route index path="/bao-cao-quan-tri" element={<Home />} />
@@ -73,6 +84,19 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        style={{ zIndex: 999999 }}
+      />
     </>
   );
 }
