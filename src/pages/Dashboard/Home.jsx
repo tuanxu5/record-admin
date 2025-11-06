@@ -40,7 +40,8 @@ export default function Home() {
         bar: {
           horizontal: false,
           columnWidth: "60%",
-          borderRadius: 4,
+          borderRadius: 8,
+          borderRadiusApplication: "end",
           dataLabels: {
             position: "top",
           },
@@ -129,6 +130,19 @@ export default function Home() {
       {
         name: t("dashboard.top5Highest"),
         data: data,
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: 'vertical',
+            shadeIntensity: 0.5,
+            gradientToColors: ['#059669'],
+            inverseColors: false,
+            opacityFrom: 1,
+            opacityTo: 0.8,
+            stops: [0, 100]
+          }
+        }
       },
     ];
   }, [topCustomers.data, t]);
@@ -151,7 +165,8 @@ export default function Home() {
         bar: {
           horizontal: false,
           columnWidth: "60%",
-          borderRadius: 4,
+          borderRadius: 8,
+          borderRadiusApplication: "end",
           dataLabels: {
             position: "top",
           },
@@ -240,6 +255,19 @@ export default function Home() {
       {
         name: t("dashboard.top5Lowest"),
         data: data,
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: 'vertical',
+            shadeIntensity: 0.5,
+            gradientToColors: ['#dc2626'],
+            inverseColors: false,
+            opacityFrom: 1,
+            opacityTo: 0.8,
+            stops: [0, 100]
+          }
+        }
       },
     ];
   }, [topCustomers.data, t]);
@@ -255,13 +283,10 @@ export default function Home() {
     return {
       chart: {
         type: "pie",
-        height: 350,
+        height: 280,
         fontFamily: "Inter, sans-serif",
         toolbar: {
-          show: true,
-          tools: {
-            download: true,
-          },
+          show: false,
         },
       },
       series: [quyTienMat, tienGuiBIDV, tienGuiViettinbank],
@@ -317,17 +342,15 @@ export default function Home() {
         height: 300,
         fontFamily: "Inter, sans-serif",
         toolbar: {
-          show: true,
-          tools: {
-            download: true,
-          },
+          show: false,
         },
       },
       plotOptions: {
         bar: {
           horizontal: false,
           columnWidth: "55%",
-          borderRadius: 4,
+          borderRadius: 8,
+          borderRadiusApplication: "end",
           dataLabels: {
             position: "top",
           },
@@ -344,7 +367,6 @@ export default function Home() {
       xaxis: {
         categories: labels,
         title: {
-          text: t("dashboard.month"),
           style: {
             fontSize: "14px",
             fontWeight: "bold",
@@ -387,11 +409,7 @@ export default function Home() {
       },
       colors: ["#10B981", "#3B82F6", "#EF4444"],
       legend: {
-        show: true,
-        position: "top",
-        horizontalAlign: "right",
-        fontSize: "14px",
-        fontWeight: 500,
+        show: false,
       },
       tooltip: {
         theme: "light",
@@ -444,14 +462,53 @@ export default function Home() {
       {
         name: t("dashboard.revenue"),
         data: data.revenue || [],
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: 'vertical',
+            shadeIntensity: 0.5,
+            gradientToColors: ['#059669'],
+            inverseColors: false,
+            opacityFrom: 1,
+            opacityTo: 0.8,
+            stops: [0, 100]
+          }
+        }
       },
       {
         name: t("dashboard.kpi"),
         data: data.kpi || [],
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: 'vertical',
+            shadeIntensity: 0.5,
+            gradientToColors: ['#2563eb'],
+            inverseColors: false,
+            opacityFrom: 1,
+            opacityTo: 0.8,
+            stops: [0, 100]
+          }
+        }
       },
       {
         name: t("dashboard.expenses"),
         data: data.expenses || [],
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: 'vertical',
+            shadeIntensity: 0.5,
+            gradientToColors: ['#dc2626'],
+            inverseColors: false,
+            opacityFrom: 1,
+            opacityTo: 0.8,
+            stops: [0, 100]
+          }
+        }
       },
     ];
   }, [revenueKPIExpenses.data, t]);
@@ -465,8 +522,6 @@ export default function Home() {
       expenses: (data.expenses || []).reduce((sum, val) => sum + (val || 0), 0),
     };
   }, [revenueKPIExpenses.data]);
-
-  // Chart 3: Các khoản chi (Bar Chart)
   const expensesChartOptions = useMemo(() => {
     const data = expenses.data || {};
     const labels = data.labels || [];
@@ -477,17 +532,15 @@ export default function Home() {
         height: 380,
         fontFamily: "Inter, sans-serif",
         toolbar: {
-          show: true,
-          tools: {
-            download: true,
-          },
+          show: false,
         },
       },
       plotOptions: {
         bar: {
           horizontal: false,
           columnWidth: "45%",
-          borderRadius: 4,
+          borderRadius: 8,
+          borderRadiusApplication: "end",
         },
       },
       dataLabels: {
@@ -542,8 +595,17 @@ export default function Home() {
         },
       },
       fill: {
-        opacity: 1,
-        colors: ["#EF4444"],
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          type: 'vertical',
+          shadeIntensity: 0.5,
+          gradientToColors: ['#dc2626'],
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 0.8,
+          stops: [0, 100]
+        }
       },
       colors: ["#EF4444"],
       legend: {
@@ -596,6 +658,19 @@ export default function Home() {
       {
         name: t("sidebar.costs"),
         data: data.data || [],
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: 'vertical',
+            shadeIntensity: 0.5,
+            gradientToColors: ['#dc2626'],
+            inverseColors: false,
+            opacityFrom: 1,
+            opacityTo: 0.8,
+            stops: [0, 100]
+          }
+        }
       },
     ];
   }, [expenses.data, t]);
@@ -643,20 +718,42 @@ export default function Home() {
               </h3>
             </div>
             {isLoading ? (
-              <div className="flex items-center justify-center h-[250px] lg:h-[350px]">
+              <div className="flex items-center justify-center h-[200px] lg:h-[280px]">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-center">
                 {/* Biểu đồ bên trái */}
-                <div className="flex justify-center lg:justify-center">
+                <div className="flex flex-col items-center justify-center w-full">
                   <Chart
                     options={cashAndDepositsChartOptions}
                     series={cashAndDepositsChartOptions.series}
                     type="pie"
-                    height={isMobile ? 250 : 350}
+                    height={isMobile ? 200 : 280}
                   />
+
+                  {/* Tổng cộng dưới biểu đồ */}
+                  <div className=" border-t border-gray-200 dark:border-gray-700 w-full text-center">
+                    <div className="flex items-center gap-2 justify-center mt-3">
+                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        {t("dashboard.total")}:
+                      </span>
+                      <span className="text-lg font-bold text-red-900 dark:text-white">
+                        {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                          minimumFractionDigits: 0,
+                        }).format(
+                          (cashAndDeposits.data?.quyTienMat || 0) +
+                          (cashAndDeposits.data?.tienGuiBIDV || 0) +
+                          (cashAndDeposits.data?.tienGuiViettinbank || 0)
+                        )}
+                      </span>
+                    </div>
+                  </div>
                 </div>
+
+
                 {/* Chú thích và tổng bên phải */}
                 <div className="flex flex-col gap-4 ml-12">
                   {/* Chú thích */}
@@ -708,24 +805,7 @@ export default function Home() {
                     </div>
                   </div>
                   {/* Tổng */}
-                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        {t("dashboard.total")}:
-                      </span>
-                      <span className="text-lg font-bold text-red-900 dark:text-white">
-                        {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                          minimumFractionDigits: 0,
-                        }).format(
-                          (cashAndDeposits.data?.quyTienMat || 0) +
-                          (cashAndDeposits.data?.tienGuiBIDV || 0) +
-                          (cashAndDeposits.data?.tienGuiViettinbank || 0)
-                        )}
-                      </span>
-                    </div>
-                  </div>
+
                 </div>
               </div>
             )}
@@ -814,7 +894,7 @@ export default function Home() {
         </div>
 
         {/* Chart 3: Các khoản chi (Bar Chart) */}
-        <div className="col-span-12 lg:col-span-6 lg:h-[520px]">
+        <div className="col-span-12 lg:col-span-6 lg:h-[620px]">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-3 md:p-4 lg:p-6 border border-gray-100 dark:border-gray-700 lg:h-full">
             <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
               <div className="bg-red-100 dark:bg-red-900 rounded-lg p-1.5">
@@ -833,14 +913,14 @@ export default function Home() {
                 options={expensesChartOptions}
                 series={expensesSeries}
                 type="bar"
-                height={isMobile ? 300 : 380}
+                height={isMobile ? 300 : 480}
               />
             )}
           </div>
         </div>
 
         {/* Chart 4: Top 5 Khách hàng doanh thu cao nhất và thấp nhất */}
-        <div className="col-span-12 lg:col-span-6 lg:h-[520px]">
+        <div className="col-span-12 lg:col-span-6 lg:h-[620px]">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-3 md:p-4 lg:p-6 border border-gray-100 dark:border-gray-700 lg:h-full flex flex-col">
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
               <div className="bg-purple-100 dark:bg-purple-900 rounded-lg p-1.5">
