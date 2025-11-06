@@ -76,6 +76,7 @@ const AppSidebar = () => {
         icon: <Target />,
         name: t("sidebar.plan"),
         subItems: [
+          { name: t("sidebar.keHoachManagement"), path: "/ke-hoach", pro: false },
           { name: t("sidebar.revenuePlan"), path: "/ke-hoach/doanh-thu", pro: false },
           { name: t("sidebar.costPlan"), path: "/ke-hoach/chi-phi", pro: false },
         ],

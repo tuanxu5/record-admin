@@ -31,6 +31,20 @@ export const useDashboardData = () => {
         staleTime: 1000 * 60 * 5,
     });
 
+    const revenueKPIExpensesQuery = useQuery({
+        queryKey: ["dashboard", "revenueKPIExpenses"],
+        queryFn: async () => {
+            try {
+                const data = await dashboardService.getRevenueKPIExpenses();
+                return data;
+            } catch (error) {
+                toast.error("Lỗi khi tải dữ liệu doanh thu/KPI/chi phí!");
+                throw error;
+            }
+        },
+        staleTime: 1000 * 60 * 5,
+    });
+
     const expensesQuery = useQuery({
         queryKey: ["dashboard", "expenses"],
         queryFn: async () => {
@@ -49,7 +63,7 @@ export const useDashboardData = () => {
         queryKey: ["dashboard", "kpiPlan"],
         queryFn: async () => {
             try {
-                const data = await dashboardService.getKPIPlan();
+                const data = await dashboardService.getRevenueKPIExpenses();
                 return data;
             } catch (error) {
                 toast.error("Lỗi khi tải dữ liệu kế hoạch KPI!");
@@ -59,12 +73,31 @@ export const useDashboardData = () => {
         staleTime: 1000 * 60 * 5,
     });
 
+    const topCustomersQuery = useQuery({
+        queryKey: ["dashboard", "topCustomers"],
+        queryFn: async () => {
+            try {
+                console.log("Fetching top customers data...");
+                const data = await dashboardService.getTopCustomersByRevenue();
+                console.log("Top customers data received:", data);
+                return data;
+            } catch (error) {
+                console.error("Error fetching top customers:", error);
+                toast.error("Lỗi khi tải dữ liệu top khách hàng!");
+                throw error;
+            }
+        },
+        staleTime: 1000 * 60 * 5,
+    });
+
     return {
         cashAndDeposits: cashAndDepositsQuery,
         revenueByTaler: revenueByTalerQuery,
+        revenueKPIExpenses: revenueKPIExpensesQuery,
         expenses: expensesQuery,
         kpiPlan: kpiPlanQuery,
-        isLoading: cashAndDepositsQuery.isLoading || revenueByTalerQuery.isLoading || expensesQuery.isLoading || kpiPlanQuery.isLoading,
+        topCustomers: topCustomersQuery,
+        isLoading: cashAndDepositsQuery.isLoading || revenueByTalerQuery.isLoading || revenueKPIExpensesQuery.isLoading || expensesQuery.isLoading || kpiPlanQuery.isLoading || topCustomersQuery.isLoading,
     };
 };
 

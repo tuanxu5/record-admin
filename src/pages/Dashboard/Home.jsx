@@ -1,5 +1,5 @@
-import { BarChart3, PieChart, Target, TrendingUp } from "lucide-react";
-import { useMemo } from "react";
+import { ArrowDown, ArrowUp, BarChart3, PieChart, TrendingUp, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import PageMeta from "../../components/common/PageMeta";
 import { useDashboardData } from "../../hooks/useDashboard";
@@ -7,7 +7,242 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 export default function Home() {
   const { t } = useTranslation();
-  const { cashAndDeposits, revenueByTaler, expenses, kpiPlan, isLoading } = useDashboardData();
+  const { cashAndDeposits, revenueKPIExpenses, expenses, topCustomers, isLoading } = useDashboardData();
+  const isTopCustomersLoading = topCustomers.isLoading;
+  const topCustomersError = topCustomers.error;
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Chart options cho Top 5 cao nhất
+  const top5HighestChartOptions = useMemo(() => {
+    const top5Highest = topCustomers.data?.top5Highest || [];
+    const labels = top5Highest.map((c) => c.tenKh || c.maKh || `KH #${c.rank}`).reverse();
+
+    return {
+      chart: {
+        type: "bar",
+        height: 220,
+        fontFamily: "Inter, sans-serif",
+        toolbar: {
+          show: false,
+        },
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: "60%",
+          borderRadius: 4,
+          dataLabels: {
+            position: "top",
+          },
+        },
+      },
+      colors: ["#10b981"],
+      dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+          if (val === 0) return "";
+          return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            minimumFractionDigits: 0,
+            notation: "compact",
+          }).format(val);
+        },
+        style: {
+          fontSize: "10px",
+          fontWeight: 600,
+          colors: ["#fff"],
+        },
+      },
+      xaxis: {
+        categories: labels,
+        labels: {
+          style: {
+            fontSize: "10px",
+            colors: ["#6b7280"],
+          },
+          rotate: -45,
+          rotateAlways: false,
+          trim: false,
+        },
+      },
+      yaxis: {
+        labels: {
+          style: {
+            fontSize: "10px",
+          },
+          formatter: function (val) {
+            return new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+              minimumFractionDigits: 0,
+              notation: "compact",
+            }).format(val);
+          },
+        },
+      },
+      tooltip: {
+        y: {
+          formatter: function (val) {
+            return new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+              minimumFractionDigits: 0,
+            }).format(val);
+          },
+        },
+      },
+      grid: {
+        borderColor: "#E5E7EB",
+        strokeDashArray: 3,
+        xaxis: {
+          lines: {
+            show: true,
+          },
+        },
+        yaxis: {
+          lines: {
+            show: true,
+          },
+        },
+      },
+      legend: {
+        show: false,
+      },
+    };
+  }, [topCustomers.data]);
+
+  const top5HighestChartSeries = useMemo(() => {
+    const top5Highest = topCustomers.data?.top5Highest || [];
+    const data = top5Highest.map((c) => c.totalRevenue || 0).reverse();
+    return [
+      {
+        name: t("dashboard.top5Highest"),
+        data: data,
+      },
+    ];
+  }, [topCustomers.data, t]);
+
+  // Chart options cho Top 5 thấp nhất
+  const top5LowestChartOptions = useMemo(() => {
+    const top5Lowest = topCustomers.data?.top5Lowest || [];
+    const labels = top5Lowest.map((c) => c.tenKh || c.maKh || `KH #${c.rank}`);
+
+    return {
+      chart: {
+        type: "bar",
+        height: 220,
+        fontFamily: "Inter, sans-serif",
+        toolbar: {
+          show: false,
+        },
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: "60%",
+          borderRadius: 4,
+          dataLabels: {
+            position: "top",
+          },
+        },
+      },
+      colors: ["#ef4444"],
+      dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+          if (val === 0) return "";
+          return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            minimumFractionDigits: 0,
+            notation: "compact",
+          }).format(val);
+        },
+        style: {
+          fontSize: "10px",
+          fontWeight: 600,
+          colors: ["#fff"],
+        },
+      },
+      xaxis: {
+        categories: labels,
+        labels: {
+          style: {
+            fontSize: "10px",
+            colors: ["#6b7280"],
+          },
+          rotate: -45,
+          rotateAlways: false,
+          trim: false,
+        },
+      },
+      yaxis: {
+        labels: {
+          style: {
+            fontSize: "10px",
+          },
+          formatter: function (val) {
+            return new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+              minimumFractionDigits: 0,
+              notation: "compact",
+            }).format(val);
+          },
+        },
+      },
+      tooltip: {
+        y: {
+          formatter: function (val) {
+            return new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+              minimumFractionDigits: 0,
+            }).format(val);
+          },
+        },
+      },
+      grid: {
+        borderColor: "#E5E7EB",
+        strokeDashArray: 3,
+        xaxis: {
+          lines: {
+            show: true,
+          },
+        },
+        yaxis: {
+          lines: {
+            show: true,
+          },
+        },
+      },
+      legend: {
+        show: false,
+      },
+    };
+  }, [topCustomers.data]);
+
+  const top5LowestChartSeries = useMemo(() => {
+    const top5Lowest = topCustomers.data?.top5Lowest || [];
+    const data = top5Lowest.map((c) => c.totalRevenue || 0);
+    return [
+      {
+        name: t("dashboard.top5Lowest"),
+        data: data,
+      },
+    ];
+  }, [topCustomers.data, t]);
 
   // Chart 1: Tiền và tiền gửi (Pie Chart)
   const cashAndDepositsChartOptions = useMemo(() => {
@@ -20,7 +255,7 @@ export default function Home() {
     return {
       chart: {
         type: "pie",
-        height: 300,
+        height: 350,
         fontFamily: "Inter, sans-serif",
         toolbar: {
           show: true,
@@ -37,10 +272,7 @@ export default function Home() {
       ],
       colors: ["#10B981", "#3B82F6", "#F59E0B"],
       legend: {
-        position: "bottom",
-        horizontalAlign: "center",
-        fontSize: "14px",
-        fontWeight: 500,
+        show: false,
       },
       tooltip: {
         theme: "light",
@@ -75,8 +307,8 @@ export default function Home() {
     };
   }, [cashAndDeposits.data, t]);
 
-  const revenueByTalerChartOptions = useMemo(() => {
-    const data = revenueByTaler.data || {};
+  const revenueKPIExpensesChartOptions = useMemo(() => {
+    const data = revenueKPIExpenses.data || {};
     const labels = data.labels || [];
 
     return {
@@ -96,6 +328,9 @@ export default function Home() {
           horizontal: false,
           columnWidth: "55%",
           borderRadius: 4,
+          dataLabels: {
+            position: "top",
+          },
         },
       },
       dataLabels: {
@@ -109,7 +344,7 @@ export default function Home() {
       xaxis: {
         categories: labels,
         title: {
-          text: t("dashboard.taler"),
+          text: t("dashboard.month"),
           style: {
             fontSize: "14px",
             fontWeight: "bold",
@@ -149,11 +384,14 @@ export default function Home() {
       },
       fill: {
         opacity: 1,
-        colors: ["#465FFF"],
       },
-      colors: ["#465FFF"],
+      colors: ["#10B981", "#3B82F6", "#EF4444"],
       legend: {
-        show: false,
+        show: true,
+        position: "top",
+        horizontalAlign: "right",
+        fontSize: "14px",
+        fontWeight: 500,
       },
       tooltip: {
         theme: "light",
@@ -166,7 +404,11 @@ export default function Home() {
           show: true,
         },
         y: {
-          formatter: function (value) {
+          formatter: function (value, { seriesIndex }) {
+            // KPI là số lượng nên không format tiền tệ
+            if (seriesIndex === 1) {
+              return value.toString();
+            }
             return new Intl.NumberFormat("vi-VN", {
               style: "currency",
               currency: "VND",
@@ -194,17 +436,35 @@ export default function Home() {
         },
       },
     };
-  }, [revenueByTaler.data, t]);
+  }, [revenueKPIExpenses.data, t]);
 
-  const revenueByTalerSeries = useMemo(() => {
-    const data = revenueByTaler.data || {};
+  const revenueKPIExpensesSeries = useMemo(() => {
+    const data = revenueKPIExpenses.data || {};
     return [
       {
         name: t("dashboard.revenue"),
-        data: data.data || [],
+        data: data.revenue || [],
+      },
+      {
+        name: t("dashboard.kpi"),
+        data: data.kpi || [],
+      },
+      {
+        name: t("dashboard.expenses"),
+        data: data.expenses || [],
       },
     ];
-  }, [revenueByTaler.data, t]);
+  }, [revenueKPIExpenses.data, t]);
+
+  // Tính tổng của từng loại
+  const totals = useMemo(() => {
+    const data = revenueKPIExpenses.data || {};
+    return {
+      revenue: (data.revenue || []).reduce((sum, val) => sum + (val || 0), 0),
+      kpi: (data.kpi || []).reduce((sum, val) => sum + (val || 0), 0),
+      expenses: (data.expenses || []).reduce((sum, val) => sum + (val || 0), 0),
+    };
+  }, [revenueKPIExpenses.data]);
 
   // Chart 3: Các khoản chi (Bar Chart)
   const expensesChartOptions = useMemo(() => {
@@ -214,7 +474,7 @@ export default function Home() {
     return {
       chart: {
         type: "bar",
-        height: 300,
+        height: 380,
         fontFamily: "Inter, sans-serif",
         toolbar: {
           show: true,
@@ -226,7 +486,7 @@ export default function Home() {
       plotOptions: {
         bar: {
           horizontal: false,
-          columnWidth: "55%",
+          columnWidth: "45%",
           borderRadius: 4,
         },
       },
@@ -340,11 +600,6 @@ export default function Home() {
     ];
   }, [expenses.data, t]);
 
-  // Chart 4: Kế hoạch KPI (Progress Bars)
-  const kpiData = useMemo(() => {
-    return kpiPlan.data?.kpis || [];
-  }, [kpiPlan.data]);
-
   return (
     <>
       <PageMeta
@@ -353,114 +608,224 @@ export default function Home() {
       />
       {/* Header Section */}
       <div className="text-center">
-        <div className="bg-gradient-to-r from-amber-900 to-red-900 rounded-xl shadow-lg p-5 md:p-6 mb-4 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-amber-700 to-red-600 rounded-xl shadow-lg p-4 md:p-5 lg:p-6 mb-4 relative overflow-hidden">
           {/* Decorative background elements */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
 
           <div className="relative z-5">
-            <div className="flex items-center justify-center mb-3 gap-4">
-              <div className="bg-white bg-opacity-20 rounded-full p-2.5">
-                <BarChart3 className="w-6 h-6 md:w-7 md:h-7 text-white" />
+            <div className="flex items-center justify-center mb-2 md:mb-3 gap-2 md:gap-4">
+              <div className="bg-white bg-opacity-20 rounded-full p-2 md:p-2.5">
+                <BarChart3 className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-white" />
               </div>
-              <h1 className="text-2xl md:text-2xl font-bold text-white ">
+              <h1 className="text-xl md:text-2xl font-bold text-white">
                 {t("dashboard.title")}
               </h1>
             </div>
 
-            <p className="text-red-100 text-sm md:text-base max-w-2xl mx-auto">
+            <p className="text-red-100 text-xs md:text-sm lg:text-base max-w-2xl mx-auto px-2">
               {t("dashboard.description")}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-4 md:gap-6">
+      <div className="grid grid-cols-12 gap-4 md:gap-8">
         {/* Chart 1: Tiền và tiền gửi (Pie Chart) */}
-        <div className="col-span-12 lg:col-span-6 h-[550px]">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 md:p-6 border border-gray-100 dark:border-gray-700 h-full">
+        <div className="col-span-12 lg:col-span-6 lg:h-[420px]">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-3 md:p-4 lg:p-6 border border-gray-100 dark:border-gray-700 lg:h-full">
             <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
               <div className="bg-green-100 dark:bg-green-900 rounded-lg p-1.5">
                 <PieChart className="w-5 h-5 text-green-600 dark:text-green-400" />
               </div>
-              <h3 className="text-base font-semibold text-gray-800 dark:text-white">
+              <h3 className="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
                 {t("dashboard.cashAndDeposits")}
               </h3>
             </div>
             {isLoading ? (
-              <div className="flex items-center justify-center h-[400px]">
+              <div className="flex items-center justify-center h-[250px] lg:h-[350px]">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
               </div>
             ) : (
-              <>
-                <Chart
-                  options={cashAndDepositsChartOptions}
-                  series={cashAndDepositsChartOptions.series}
-                  type="pie"
-                  height={400}
-                />
-                <div className="mt-6 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-6 justify-center">
-                    <span className="text-s font-semibold text-gray-700 dark:text-gray-300">
-                      {t("dashboard.total")} :
-                    </span>
-                    <span className="text-lg font-bold text-red-900 dark:text-white">
-                      {new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                        minimumFractionDigits: 0,
-                      }).format(
-                        (cashAndDeposits.data?.quyTienMat || 0) +
-                        (cashAndDeposits.data?.tienGuiBIDV || 0) +
-                        (cashAndDeposits.data?.tienGuiViettinbank || 0)
-                      )}
-                    </span>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-center">
+                {/* Biểu đồ bên trái */}
+                <div className="flex justify-center lg:justify-center">
+                  <Chart
+                    options={cashAndDepositsChartOptions}
+                    series={cashAndDepositsChartOptions.series}
+                    type="pie"
+                    height={isMobile ? 250 : 350}
+                  />
+                </div>
+                {/* Chú thích và tổng bên phải */}
+                <div className="flex flex-col gap-4 ml-12">
+                  {/* Chú thích */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 rounded-full bg-[#10B981]"></div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {t("sidebar.cashFundDetail")}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                            minimumFractionDigits: 0,
+                          }).format(cashAndDeposits.data?.quyTienMat || 0)}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 rounded-full bg-[#3B82F6]"></div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {t("sidebar.bidvDeposit")}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                            minimumFractionDigits: 0,
+                          }).format(cashAndDeposits.data?.tienGuiBIDV || 0)}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 rounded-full bg-[#F59E0B]"></div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {t("sidebar.viettinbankDeposit")}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                            minimumFractionDigits: 0,
+                          }).format(cashAndDeposits.data?.tienGuiViettinbank || 0)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Tổng */}
+                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        {t("dashboard.total")}:
+                      </span>
+                      <span className="text-lg font-bold text-red-900 dark:text-white">
+                        {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                          minimumFractionDigits: 0,
+                        }).format(
+                          (cashAndDeposits.data?.quyTienMat || 0) +
+                          (cashAndDeposits.data?.tienGuiBIDV || 0) +
+                          (cashAndDeposits.data?.tienGuiViettinbank || 0)
+                        )}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Chart 2: Doanh thu theo taler (Bar Chart) */}
-        <div className="col-span-12 lg:col-span-6 h-[550px]">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 md:p-6 border border-gray-100 dark:border-gray-700 h-full">
+        {/* Chart 2: Doanh thu, KPI và Chi phí theo tháng (Bar Chart - 3 cột) */}
+        <div className="col-span-12 lg:col-span-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-3 md:p-4 lg:p-6 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
               <div className="bg-blue-100 dark:bg-blue-900 rounded-lg p-1.5">
                 <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
-              <h3 className="text-base font-semibold text-gray-800 dark:text-white">
-                {t("dashboard.revenueByTaler")}
+              <h3 className="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+                {t("dashboard.revenueKPICost")}
               </h3>
             </div>
             {isLoading ? (
-              <div className="flex items-center justify-center h-[400px]">
+              <div className="flex items-center justify-center h-[250px] lg:h-[300px]">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
               </div>
             ) : (
-              <Chart
-                options={revenueByTalerChartOptions}
-                series={revenueByTalerSeries}
-                type="bar"
-                height={400}
-              />
+              <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4 items-center">
+                {/* Biểu đồ bên trái */}
+                <div className="flex justify-center lg:justify-start w-full">
+                  <div className="w-full">
+                    <Chart
+                      options={revenueKPIExpensesChartOptions}
+                      series={revenueKPIExpensesSeries}
+                      type="bar"
+                      height={isMobile ? 250 : 300}
+                      width="100%"
+                    />
+                  </div>
+                </div>
+                {/* Chú thích và tổng bên phải */}
+                <div className="flex flex-col gap-4">
+                  {/* Chú thích */}
+                  <div className="space-y-3 ml-12">
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 rounded bg-[#10B981]"></div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {t("dashboard.revenue")}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                            minimumFractionDigits: 0,
+                          }).format(totals.revenue)}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 rounded bg-[#3B82F6]"></div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {t("dashboard.kpi")}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {totals.kpi.toLocaleString("vi-VN")} đ
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 rounded bg-[#EF4444]"></div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {t("dashboard.expenses")}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                            minimumFractionDigits: 0,
+                          }).format(totals.expenses)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
 
         {/* Chart 3: Các khoản chi (Bar Chart) */}
-        <div className="col-span-12 lg:col-span-6 h-[550px]">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 md:p-6 border border-gray-100 dark:border-gray-700 h-full">
+        <div className="col-span-12 lg:col-span-6 lg:h-[520px]">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-3 md:p-4 lg:p-6 border border-gray-100 dark:border-gray-700 lg:h-full">
             <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
               <div className="bg-red-100 dark:bg-red-900 rounded-lg p-1.5">
                 <BarChart3 className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
-              <h3 className="text-base font-semibold text-gray-800 dark:text-white">
+              <h3 className="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
                 {t("dashboard.expenses")}
               </h3>
             </div>
             {isLoading ? (
-              <div className="flex items-center justify-center h-[400px]">
+              <div className="flex items-center justify-center h-[300px] lg:h-[380px]">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
               </div>
             ) : (
@@ -468,73 +833,305 @@ export default function Home() {
                 options={expensesChartOptions}
                 series={expensesSeries}
                 type="bar"
-                height={400}
+                height={isMobile ? 300 : 380}
               />
             )}
           </div>
         </div>
 
-        {/* Chart 4: Kế hoạch KPI (Progress Bars) */}
-        <div className="col-span-12 lg:col-span-6 h-[550px]">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 md:p-6 border border-gray-100 dark:border-gray-700 h-full">
+        {/* Chart 4: Top 5 Khách hàng doanh thu cao nhất và thấp nhất */}
+        <div className="col-span-12 lg:col-span-6 lg:h-[520px]">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-3 md:p-4 lg:p-6 border border-gray-100 dark:border-gray-700 lg:h-full flex flex-col">
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
               <div className="bg-purple-100 dark:bg-purple-900 rounded-lg p-1.5">
-                <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
-              <h3 className="text-base font-semibold text-gray-800 dark:text-white">
-                {t("dashboard.kpiPlan")}
+              <h3 className="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+                {t("dashboard.topCustomers")}
               </h3>
             </div>
-            {isLoading ? (
-              <div className="flex items-center justify-center h-[400px]">
+            {isTopCustomersLoading ? (
+              <div className="flex items-center justify-center flex-1 min-h-[400px] lg:min-h-0">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
               </div>
+            ) : topCustomersError ? (
+              <div className="flex items-center justify-center flex-1 min-h-[400px] lg:min-h-0">
+                <div className="text-center text-gray-500 dark:text-gray-400">
+                  <p className="text-sm">{t("errors.loadDataError")}</p>
+                  <p className="text-xs mt-2">{topCustomersError.message}</p>
+                </div>
+              </div>
             ) : (
-              <div className="space-y-6">
-                {kpiData.map((kpi, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        {kpi.name}
-                      </span>
-                      <span className="text-sm font-bold text-gray-900 dark:text-white">
-                        {kpi.percentage}%
-                      </span>
+              <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 flex-1 overflow-hidden">
+                {/* Mobile: Đan xen - Desktop: Bên trái */}
+                <div className="flex flex-col overflow-hidden gap-4">
+                  {/* Biểu đồ Top 5 cao nhất */}
+                  <div className="flex flex-col overflow-hidden">
+                    <div className="flex items-center gap-2 mb-2">
+                      <ArrowUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        {t("dashboard.top5Highest")}
+                      </h4>
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
-                      <div
-                        className={`h-4 rounded-full transition-all duration-500 ${kpi.percentage >= 80
-                          ? "bg-green-500"
-                          : kpi.percentage >= 60
-                            ? "bg-yellow-500"
-                            : "bg-red-500"
-                          }`}
-                        style={{ width: `${kpi.percentage}%` }}
-                      ></div>
+                    {topCustomers.data?.top5Highest && topCustomers.data.top5Highest.length > 0 ? (
+                      <Chart
+                        options={top5HighestChartOptions}
+                        series={top5HighestChartSeries}
+                        type="bar"
+                        height={isMobile ? 180 : 220}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-[220px] text-gray-500 dark:text-gray-400 text-sm">
+                        {t("common.noData")}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Chi tiết Top 5 cao nhất - Mobile */}
+                  <div className="flex flex-col overflow-hidden lg:hidden">
+                    <div className="flex items-center gap-2 mb-3">
+                      <ArrowUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        {t("dashboard.top5Highest")}
+                      </h4>
                     </div>
-                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                      <span>
-                        {typeof kpi.actual === "number" && kpi.actual > 1000
-                          ? new Intl.NumberFormat("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                            minimumFractionDigits: 0,
-                            notation: "compact",
-                          }).format(kpi.actual)
-                          : kpi.actual}
-                        {" / "}
-                        {typeof kpi.target === "number" && kpi.target > 1000
-                          ? new Intl.NumberFormat("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                            minimumFractionDigits: 0,
-                            notation: "compact",
-                          }).format(kpi.target)
-                          : kpi.target}
-                      </span>
+                    <div className="space-y-2 overflow-y-auto pr-2">
+                      {topCustomers.data?.top5Highest && topCustomers.data.top5Highest.length > 0 ? (
+                        topCustomers.data.top5Highest.map((customer, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/10 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/20 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <span className="text-sm font-bold text-green-600 dark:text-green-400 w-8">
+                                #{customer.rank}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-gray-800 dark:text-white truncate">
+                                  {customer.tenKh || customer.maKh || "N/A"}
+                                </div>
+                                {customer.kpiCompletionRate !== null && customer.kpiCompletionRate !== undefined && (
+                                  <div className={`text-xs font-medium mt-1 ${customer.kpiCompletionRate >= 100
+                                    ? "text-green-600 dark:text-green-400"
+                                    : customer.kpiCompletionRate >= 80
+                                      ? "text-yellow-600 dark:text-yellow-400"
+                                      : "text-red-600 dark:text-red-400"
+                                    }`}>
+                                    KPI: {customer.kpiCompletionRate}%
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-right ml-2">
+                              <div className="text-sm font-bold text-green-600 dark:text-green-400">
+                                {new Intl.NumberFormat("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                  minimumFractionDigits: 0,
+                                  notation: "compact",
+                                }).format(customer.totalRevenue)}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="py-4 text-gray-500 dark:text-gray-400 text-sm">
+                          {t("common.noData")}
+                        </div>
+                      )}
                     </div>
                   </div>
-                ))}
+
+                  {/* Biểu đồ Top 5 thấp nhất */}
+                  <div className="flex flex-col overflow-hidden">
+                    <div className="flex items-center gap-2 mb-2">
+                      <ArrowDown className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        {t("dashboard.top5Lowest")}
+                      </h4>
+                    </div>
+                    {topCustomers.data?.top5Lowest && topCustomers.data.top5Lowest.length > 0 ? (
+                      <Chart
+                        options={top5LowestChartOptions}
+                        series={top5LowestChartSeries}
+                        type="bar"
+                        height={isMobile ? 180 : 220}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-[220px] text-gray-500 dark:text-gray-400 text-sm">
+                        {t("common.noData")}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Chi tiết Top 5 thấp nhất - Mobile */}
+                  <div className="flex flex-col overflow-hidden lg:hidden">
+                    <div className="flex items-center gap-2 mb-3">
+                      <ArrowDown className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        {t("dashboard.top5Lowest")}
+                      </h4>
+                    </div>
+                    <div className="space-y-2 overflow-y-auto pr-2">
+                      {topCustomers.data?.top5Lowest && topCustomers.data.top5Lowest.length > 0 ? (
+                        topCustomers.data.top5Lowest.map((customer, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/10 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <span className="text-sm font-bold text-red-600 dark:text-red-400 w-8">
+                                #{customer.rank}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-gray-800 dark:text-white truncate">
+                                  {customer.tenKh || customer.maKh || "N/A"}
+                                </div>
+                                {customer.kpiCompletionRate !== null && customer.kpiCompletionRate !== undefined && (
+                                  <div className={`text-xs font-medium mt-1 ${customer.kpiCompletionRate >= 100
+                                    ? "text-green-600 dark:text-green-400"
+                                    : customer.kpiCompletionRate >= 80
+                                      ? "text-yellow-600 dark:text-yellow-400"
+                                      : "text-red-600 dark:text-red-400"
+                                    }`}>
+                                    KPI: {customer.kpiCompletionRate}%
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-right ml-2">
+                              <div className="text-sm font-bold text-red-600 dark:text-red-400">
+                                {new Intl.NumberFormat("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                  minimumFractionDigits: 0,
+                                  notation: "compact",
+                                }).format(customer.totalRevenue)}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="py-4 text-gray-500 dark:text-gray-400 text-sm">
+                          {t("common.noData")}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop: Bên phải - Danh sách chi tiết */}
+                <div className="hidden lg:flex flex-col overflow-hidden space-y-4">
+                  {/* Top 5 cao nhất */}
+                  <div className="flex flex-col overflow-hidden flex-1">
+                    <div className="flex items-center gap-2 mb-3">
+                      <ArrowUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        {t("dashboard.top5Highest")}
+                      </h4>
+                    </div>
+                    <div className="space-y-2 overflow-y-auto flex-1 pr-2">
+                      {topCustomers.data?.top5Highest && topCustomers.data.top5Highest.length > 0 ? (
+                        topCustomers.data.top5Highest.map((customer, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/10 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/20 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <span className="text-sm font-bold text-green-600 dark:text-green-400 w-8">
+                                #{customer.rank}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-gray-800 dark:text-white truncate">
+                                  {customer.tenKh || customer.maKh || "N/A"}
+                                </div>
+                                {customer.kpiCompletionRate !== null && customer.kpiCompletionRate !== undefined && (
+                                  <div className={`text-xs font-medium mt-1 ${customer.kpiCompletionRate >= 100
+                                    ? "text-green-600 dark:text-green-400"
+                                    : customer.kpiCompletionRate >= 80
+                                      ? "text-yellow-600 dark:text-yellow-400"
+                                      : "text-red-600 dark:text-red-400"
+                                    }`}>
+                                    KPI: {customer.kpiCompletionRate}%
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-right ml-2">
+                              <div className="text-sm font-bold text-green-600 dark:text-green-400">
+                                {new Intl.NumberFormat("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                  minimumFractionDigits: 0,
+                                  notation: "compact",
+                                }).format(customer.totalRevenue)}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="py-4 text-gray-500 dark:text-gray-400 text-sm">
+                          {t("common.noData")}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Top 5 thấp nhất */}
+                  <div className="flex flex-col overflow-hidden flex-1">
+                    <div className="flex items-center gap-2 mb-3">
+                      <ArrowDown className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        {t("dashboard.top5Lowest")}
+                      </h4>
+                    </div>
+                    <div className="space-y-2 overflow-y-auto flex-1 pr-2">
+                      {topCustomers.data?.top5Lowest && topCustomers.data.top5Lowest.length > 0 ? (
+                        topCustomers.data.top5Lowest.map((customer, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/10 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <span className="text-sm font-bold text-red-600 dark:text-red-400 w-8">
+                                #{customer.rank}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-gray-800 dark:text-white truncate">
+                                  {customer.tenKh || customer.maKh || "N/A"}
+                                </div>
+                                {customer.kpiCompletionRate !== null && customer.kpiCompletionRate !== undefined && (
+                                  <div className={`text-xs font-medium mt-1 ${customer.kpiCompletionRate >= 100
+                                    ? "text-green-600 dark:text-green-400"
+                                    : customer.kpiCompletionRate >= 80
+                                      ? "text-yellow-600 dark:text-yellow-400"
+                                      : "text-red-600 dark:text-red-400"
+                                    }`}>
+                                    KPI: {customer.kpiCompletionRate}%
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-right ml-2">
+                              <div className="text-sm font-bold text-red-600 dark:text-red-400">
+                                {new Intl.NumberFormat("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                  minimumFractionDigits: 0,
+                                  notation: "compact",
+                                }).format(customer.totalRevenue)}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="py-4 text-gray-500 dark:text-gray-400 text-sm">
+                          {t("common.noData")}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>

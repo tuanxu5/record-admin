@@ -1,8 +1,5 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
-
-// Cache để lưu các bản dịch đã dịch (persistent trong localStorage)
 const getTranslationCache = () => {
   try {
     const cached = localStorage.getItem("translation_cache");
@@ -31,23 +28,18 @@ const saveTranslationCache = (cache) => {
  */
 export const translateText = async (text, targetLang) => {
   if (!text || !text.trim()) return text;
-
-  // Nếu ngôn ngữ đích là tiếng Việt và text đã là tiếng Việt, return nguyên
   if (targetLang === "vi") {
     return text;
   }
 
   const translationCache = getTranslationCache();
 
-  // Kiểm tra cache trước
   const cacheKey = `${text}_${targetLang}`;
   if (translationCache.has(cacheKey)) {
     return translationCache.get(cacheKey);
   }
 
   try {
-    // Sử dụng Google Translate API không chính thức (miễn phí)
-    // Endpoint: https://translate.googleapis.com/translate_a/single
     const sourceLang = "vi";
     const targetLangCode = targetLang === "zh" ? "zh-CN" : targetLang;
 
@@ -61,14 +53,13 @@ export const translateText = async (text, targetLang) => {
           dt: "t",
           q: text,
         },
-        timeout: 10000, // 10 seconds timeout
+        timeout: 10000,
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         },
       }
     );
 
-    // Parse response từ Google Translate
     let translatedText = text;
     if (response.data && Array.isArray(response.data) && response.data[0]) {
       const translatedArray = response.data[0];
@@ -80,19 +71,16 @@ export const translateText = async (text, targetLang) => {
       }
     }
 
-    // Nếu không có kết quả dịch, return text gốc
     if (!translatedText || translatedText === text) {
       return text;
     }
 
-    // Lưu vào cache
     translationCache.set(cacheKey, translatedText);
     saveTranslationCache(translationCache);
 
     return translatedText;
   } catch (error) {
     console.warn("Google Translate failed, returning original text:", error.message);
-    // Nếu dịch thất bại, return text gốc
     return text;
   }
 };
