@@ -321,8 +321,23 @@ export default function Home() {
       },
       dataLabels: {
         enabled: true,
-        formatter: function (val) {
-          return val.toFixed(1) + "%";
+        formatter: function (val, opts) {
+          const series = opts.series || opts.w.globals.series;
+          const seriesIndex = opts.seriesIndex !== undefined ? opts.seriesIndex : opts.dataPointIndex;
+          const value = series[seriesIndex];
+          const total = series.reduce((sum, v) => sum + (v || 0), 0);
+          const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+          return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            minimumFractionDigits: 0,
+            notation: "compact",
+          }).format(value) + `\n(${percentage}%)`;
+        },
+        style: {
+          fontSize: "11px",
+          fontWeight: 600,
+          colors: ["#fff"],
         },
       },
       title: {
@@ -357,7 +372,25 @@ export default function Home() {
         },
       },
       dataLabels: {
-        enabled: false,
+        enabled: true,
+        formatter: function (val, { seriesIndex }) {
+          // KPI là số lượng nên không format tiền tệ
+          if (seriesIndex === 1) {
+            return val.toLocaleString("vi-VN");
+          }
+          return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            minimumFractionDigits: 0,
+            notation: "compact",
+          }).format(val);
+        },
+        style: {
+          fontSize: "11px",
+          fontWeight: 600,
+          colors: ["#fff"],
+        },
+        offsetY: -5,
       },
       stroke: {
         show: true,
@@ -544,7 +577,21 @@ export default function Home() {
         },
       },
       dataLabels: {
-        enabled: false,
+        enabled: true,
+        formatter: function (val) {
+          return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            minimumFractionDigits: 0,
+            notation: "compact",
+          }).format(val);
+        },
+        style: {
+          fontSize: "11px",
+          fontWeight: 600,
+          colors: ["#fff"],
+        },
+        offsetY: -5,
       },
       stroke: {
         show: true,
