@@ -31,7 +31,7 @@ export default function Home() {
       chart: {
         type: "bar",
         height: 220,
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "Outfit, sans-serif",
         toolbar: {
           show: false,
         },
@@ -103,10 +103,10 @@ export default function Home() {
             currency: "VND",
             minimumFractionDigits: 0,
           }).format(value);
-          return `<div class="apexcharts-tooltip-title" style="font-family: Inter, sans-serif; font-size: 12px;"></div>
+          return `<div class="apexcharts-tooltip-title" style="font-family: Outfit, sans-serif; font-size: 12px;"></div>
                   <div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;">
                     <span class="apexcharts-tooltip-marker" style="background-color: #10b981;"></span>
-                    <div class="apexcharts-tooltip-text" style="font-family: Inter, sans-serif; font-size: 12px;">
+                    <div class="apexcharts-tooltip-text" style="font-family: Outfit, sans-serif; font-size: 12px;">
                       <div class="apexcharts-tooltip-y-group">
                         <span class="apexcharts-tooltip-text-y-label">${customerName}: </span>
                         <span class="apexcharts-tooltip-text-y-value">${formattedValue}</span>
@@ -168,7 +168,7 @@ export default function Home() {
       chart: {
         type: "bar",
         height: 220,
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "Outfit, sans-serif",
         toolbar: {
           show: false,
         },
@@ -240,10 +240,10 @@ export default function Home() {
             currency: "VND",
             minimumFractionDigits: 0,
           }).format(value);
-          return `<div class="apexcharts-tooltip-title" style="font-family: Inter, sans-serif; font-size: 12px;"></div>
+          return `<div class="apexcharts-tooltip-title" style="font-family: Outfit, sans-serif; font-size: 12px;"></div>
                   <div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;">
                     <span class="apexcharts-tooltip-marker" style="background-color: #ef4444;"></span>
-                    <div class="apexcharts-tooltip-text" style="font-family: Inter, sans-serif; font-size: 12px;">
+                    <div class="apexcharts-tooltip-text" style="font-family: Outfit, sans-serif; font-size: 12px;">
                       <div class="apexcharts-tooltip-y-group">
                         <span class="apexcharts-tooltip-text-y-label">${customerName}: </span>
                         <span class="apexcharts-tooltip-text-y-value">${formattedValue}</span>
@@ -308,7 +308,7 @@ export default function Home() {
       chart: {
         type: "pie",
         height: 280,
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "Outfit, sans-serif",
         toolbar: {
           show: false,
         },
@@ -379,7 +379,7 @@ export default function Home() {
       chart: {
         type: "bar",
         height: 300,
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "Outfit, sans-serif",
         toolbar: {
           show: false,
         },
@@ -587,7 +587,7 @@ export default function Home() {
       chart: {
         type: "bar",
         height: 380,
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "Outfit, sans-serif",
         toolbar: {
           show: false,
         },

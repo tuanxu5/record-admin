@@ -148,16 +148,16 @@ const dashboardService = {
                     // Sử dụng thangdk và nam thay vì ngay
                     const thangdk = item.thangdk;
                     const nam = item.nam;
-                    
+
                     if (!thangdk || !nam) return;
-                    
+
                     // Tạo key từ thangdk và nam: "MM/YYYY"
                     const key = `${String(thangdk).padStart(2, "0")}/${nam}`;
-                    
+
                     if (!grouped[key]) {
                         grouped[key] = 0;
                     }
-                    
+
                     // Parse KPI - có thể là string với định dạng "5,000,000.00"
                     let kpiValue = 0;
                     if (item.kpi) {
@@ -168,7 +168,7 @@ const dashboardService = {
                             kpiValue = parseFloat(item.kpi) || 0;
                         }
                     }
-                    
+
                     grouped[key] += kpiValue;
                 });
                 return {
@@ -179,13 +179,13 @@ const dashboardService = {
             const revenueGrouped = groupByMonth(revenueData, "ps_co");
             const expenseGrouped = groupByMonth(expenseData, "ps_no");
             const kpiGrouped = groupKPIBymonth(kpiData);
-            
+
             // Lấy tất cả các tháng từ KPI data để hiển thị
             // Nếu không có KPI data, dùng tháng hiện tại
-            const allMonths = kpiGrouped.labels.length > 0 
-                ? kpiGrouped.labels 
+            const allMonths = kpiGrouped.labels.length > 0
+                ? kpiGrouped.labels
                 : [currentMonthKey];
-            
+
             // Đảm bảo có đủ các tháng từ revenue và expense
             const allLabelsSet = new Set([
                 ...revenueGrouped.labels,
@@ -193,7 +193,7 @@ const dashboardService = {
                 ...allMonths
             ]);
             const labels = Array.from(allLabelsSet).sort();
-            
+
             const revenue = labels.map(month => {
                 const index = revenueGrouped.labels.indexOf(month);
                 return index >= 0 ? revenueGrouped.data[index] : 0;
@@ -345,10 +345,10 @@ const dashboardService = {
                 const kpiKey = `${normalizedMaKh}_${currentMonth}_${currentYear}`;
                 const kpiTarget = kpiMap[kpiKey] || 0;
                 customer.kpiTarget = kpiTarget;
-                customer.kpiCompletionRate = kpiTarget > 0 
-                    ? Math.round((customer.totalRevenue / kpiTarget) * 100) 
+                customer.kpiCompletionRate = kpiTarget > 0
+                    ? Math.round((customer.totalRevenue / kpiTarget) * 100)
                     : null;
-                
+
                 console.log(`Customer ${customer.tenKh || customer.maKh}: maKh="${customer.maKh}", normalized="${normalizedMaKh}", kpiKey="${kpiKey}", kpiTarget=${kpiTarget}, rate=${customer.kpiCompletionRate}`);
             });
 
@@ -392,12 +392,7 @@ const dashboardService = {
     getCapitalContribution: async () => {
         // Định nghĩa 3 thành viên
         const members = [
-            {
-                name: "Nguyễn Đăng Dương",
-                nameZh: "阮登阳",
-                ma_kh: "DUONGND",
-                totalAmount: 50000000,
-            },
+
             {
                 name: "Công ty cổ phần công nghệ Gentech",
                 nameZh: "Gentech 科技股份公司",
@@ -410,13 +405,15 @@ const dashboardService = {
                 ma_kh: "HIEPGV",
                 totalAmount: 1673000000,
             },
+            {
+                name: "Nguyễn Đăng Dương",
+                nameZh: "阮登阳",
+                ma_kh: "DUONGND",
+                totalAmount: 50000000,
+            },
         ];
-
-        // Tính ngày bắt đầu (1/1/2025) và ngày hiện tại
         const currentDate = new Date();
         const startDate = "2025-01-01";
-
-        // Helper function to format date in local timezone (avoid UTC conversion issues)
         const formatDateLocal = (date) => {
             if (!date) return "";
             const d = new Date(date);
@@ -427,41 +424,28 @@ const dashboardService = {
         };
 
         const today = formatDateLocal(currentDate);
-
-        // Lấy dữ liệu từ API bảng kê chứng từ cho từng thành viên
         const membersData = await Promise.all(
             members.map(async (member) => {
                 try {
-                    // Gọi API bảng kê chứng từ với tk=41111 và ma_kh của thành viên
-                    // Lấy từ ngày 1/1/2025 đến ngày hiện tại
                     const response = await bangKeChungTuService.getData({
                         configName: "bang_ke_chung_tu",
-                        ngay_ct1: startDate, // Từ ngày 1/1/2025
-                        ngay_ct2: today, // Đến ngày hiện tại
-                        ma_tai_khoan: "411", // Tài khoản vốn chủ sở hữu (Cổ phiếu phổ thông có quyền biểu quyết)
-                        ma_kh: member.ma_kh, // Mã khách hàng của thành viên
+                        ngay_ct1: startDate, 
+                        ngay_ct2: today, 
+                        ma_tai_khoan: "411",
+                        ma_kh: member.ma_kh, 
                         ma_dvcs: "",
                     });
-
-                    // Xử lý dữ liệu trả về
                     let rawData = Array.isArray(response)
                         ? response
                         : response?.data || response?.rows || [];
-
-                    // Lọc dữ liệu theo ma_kh (trim để loại bỏ khoảng trắng)
-                    // Vì ma_kh từ API có thể có khoảng trắng ở cuối
                     const memberMaKhTrimmed = member.ma_kh.trim();
                     rawData = rawData.filter((item) => {
                         const itemMaKh = (item.ma_kh || "").trim();
                         return itemMaKh === memberMaKhTrimmed;
                     });
-
-                    // Tính tổng ps_co (số tiền góp vốn hiện tại)
                     const totalContribution = rawData.reduce((sum, item) => {
                         return sum + parseFloat(item.ps_co || 0);
                     }, 0);
-
-                    // Lấy chi tiết các lần góp vốn từ chứng từ
                     const contributions = rawData
                         .filter((item) => parseFloat(item.ps_co || 0) > 0)
                         .map((item) => ({
@@ -472,7 +456,6 @@ const dashboardService = {
                             ngay_ct: item.ngay_ct || item.ngay_ct_tu || "",
                         }))
                         .sort((a, b) => {
-                            // Sắp xếp theo ngày
                             const dateA = new Date(a.date);
                             const dateB = new Date(b.date);
                             return dateA - dateB;

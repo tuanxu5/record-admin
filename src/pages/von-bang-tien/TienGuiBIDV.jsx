@@ -243,7 +243,7 @@ const TienGuiBIDVPage = () => {
       chart: {
         type: "bar",
         height: isMobile ? 350 : 400,
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "Outfit, sans-serif",
         toolbar: {
           show: true,
           tools: {

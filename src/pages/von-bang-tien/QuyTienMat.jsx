@@ -238,7 +238,7 @@ const QuyTienMatPage = () => {
         chart: {
           type: "pie",
           height: 400,
-          fontFamily: "Inter, sans-serif",
+          fontFamily: "Outfit, sans-serif",
           toolbar: {
             show: true,
             tools: {
@@ -297,7 +297,7 @@ const QuyTienMatPage = () => {
       chart: {
         type: "bar",
         height: 400,
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "Outfit, sans-serif",
         toolbar: {
           show: true,
           tools: {

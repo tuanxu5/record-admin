@@ -247,7 +247,7 @@ const BaoCaoTaiChinhPage = () => {
     chart: {
       type: chartType,
       height: 400,
-      fontFamily: "Inter, sans-serif",
+      fontFamily: "Outfit, sans-serif",
       toolbar: {
         show: true,
         tools: {

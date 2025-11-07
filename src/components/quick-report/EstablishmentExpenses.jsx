@@ -17,7 +17,7 @@ export default function EstablishmentExpenses({ data, isLoading }) {
             chart: {
                 type: "bar",
                 height: 300,
-                fontFamily: "Inter, sans-serif",
+                fontFamily: "Outfit, sans-serif",
                 toolbar: {
                     show: true,
                     tools: {

@@ -5,14 +5,20 @@
 @tailwind utilities;
 
 @layer base {
+  * {
+    font-family: "Outfit", sans-serif;
+  }
   body {
     @apply relative text-base font-normal z-1 bg-gray-50 font-outfit overflow-x-hidden;
+    font-family: "Outfit", sans-serif;
   }
   html {
     @apply overflow-x-hidden;
+    font-family: "Outfit", sans-serif;
   }
   #root {
     @apply overflow-x-hidden;
+    font-family: "Outfit", sans-serif;
   }
 }
 

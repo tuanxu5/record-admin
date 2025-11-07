@@ -6,6 +6,7 @@ export default {
   theme: {
     fontFamily: {
       outfit: ["Outfit", "sans-serif"],
+      sans: ["Outfit", "sans-serif"],
     },
     screens: {
       "2xsm": "375px",

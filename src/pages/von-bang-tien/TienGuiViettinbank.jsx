@@ -233,7 +233,7 @@ const TienGuiViettinbankPage = () => {
       chart: {
         type: "bar",
         height: 400,
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "Outfit, sans-serif",
         toolbar: {
           show: true,
           tools: {
