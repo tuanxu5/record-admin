@@ -93,14 +93,26 @@ export default function Home() {
         },
       },
       tooltip: {
-        y: {
-          formatter: function (val) {
-            return new Intl.NumberFormat("vi-VN", {
-              style: "currency",
-              currency: "VND",
-              minimumFractionDigits: 0,
-            }).format(val);
-          },
+        custom: function({ series, seriesIndex, dataPointIndex }) {
+          const top5Highest = topCustomers.data?.top5Highest || [];
+          const labels = top5Highest.map((c) => c.tenKh || c.maKh || `KH #${c.rank}`).reverse();
+          const customerName = labels[dataPointIndex] || '';
+          const value = series[seriesIndex][dataPointIndex];
+          const formattedValue = new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            minimumFractionDigits: 0,
+          }).format(value);
+          return `<div class="apexcharts-tooltip-title" style="font-family: Inter, sans-serif; font-size: 12px;"></div>
+                  <div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;">
+                    <span class="apexcharts-tooltip-marker" style="background-color: #10b981;"></span>
+                    <div class="apexcharts-tooltip-text" style="font-family: Inter, sans-serif; font-size: 12px;">
+                      <div class="apexcharts-tooltip-y-group">
+                        <span class="apexcharts-tooltip-text-y-label">${customerName}: </span>
+                        <span class="apexcharts-tooltip-text-y-value">${formattedValue}</span>
+                      </div>
+                    </div>
+                  </div>`;
         },
       },
       grid: {
@@ -218,14 +230,26 @@ export default function Home() {
         },
       },
       tooltip: {
-        y: {
-          formatter: function (val) {
-            return new Intl.NumberFormat("vi-VN", {
-              style: "currency",
-              currency: "VND",
-              minimumFractionDigits: 0,
-            }).format(val);
-          },
+        custom: function({ series, seriesIndex, dataPointIndex }) {
+          const top5Lowest = topCustomers.data?.top5Lowest || [];
+          const labels = top5Lowest.map((c) => c.tenKh || c.maKh || `KH #${c.rank}`);
+          const customerName = labels[dataPointIndex] || '';
+          const value = series[seriesIndex][dataPointIndex];
+          const formattedValue = new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            minimumFractionDigits: 0,
+          }).format(value);
+          return `<div class="apexcharts-tooltip-title" style="font-family: Inter, sans-serif; font-size: 12px;"></div>
+                  <div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;">
+                    <span class="apexcharts-tooltip-marker" style="background-color: #ef4444;"></span>
+                    <div class="apexcharts-tooltip-text" style="font-family: Inter, sans-serif; font-size: 12px;">
+                      <div class="apexcharts-tooltip-y-group">
+                        <span class="apexcharts-tooltip-text-y-label">${customerName}: </span>
+                        <span class="apexcharts-tooltip-text-y-value">${formattedValue}</span>
+                      </div>
+                    </div>
+                  </div>`;
         },
       },
       grid: {

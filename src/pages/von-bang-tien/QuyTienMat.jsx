@@ -12,10 +12,21 @@ const QuyTienMatPage = () => {
   const { t, language } = useTranslation();
   const [periodType, setPeriodType] = useState("ngay");
   const [chartType, setChartType] = useState("bar");
+  
+  // Helper function to format date in local timezone (avoid UTC conversion issues)
+  const formatDateLocal = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+  
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const firstDayOfYear = `${currentYear}-01-01`;
-  const today = currentDate.toISOString().split('T')[0]; 
+  const today = formatDateLocal(currentDate); 
 
   const [dateRange, setDateRange] = useState({
     startDate: firstDayOfYear,
@@ -461,8 +472,8 @@ const QuyTienMatPage = () => {
               <Flatpickr
                 value={dateRange.startDate}
                 onChange={(date) => {
-                  const formatted = date[0]?.toISOString().split("T")[0];
-                  setDateRange({ ...dateRange, startDate: formatted || "" });
+                  const formatted = date[0] ? formatDateLocal(date[0]) : "";
+                  setDateRange((prev) => ({ ...prev, startDate: formatted }));
                 }}
                 options={{
                   dateFormat: "Y-m-d",
@@ -488,8 +499,8 @@ const QuyTienMatPage = () => {
               <Flatpickr
                 value={dateRange.endDate}
                 onChange={(date) => {
-                  const formatted = date[0]?.toISOString().split("T")[0];
-                  setDateRange({ ...dateRange, endDate: formatted || "" });
+                  const formatted = date[0] ? formatDateLocal(date[0]) : "";
+                  setDateRange((prev) => ({ ...prev, endDate: formatted }));
                 }}
                 options={{
                   dateFormat: "Y-m-d",

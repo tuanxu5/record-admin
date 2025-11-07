@@ -1,29 +1,33 @@
+import { TrendingUp, Users } from "lucide-react";
 import { useMemo } from "react";
-import { Users, TrendingUp } from "lucide-react";
 import { useTranslation } from "../../hooks/useTranslation";
 
 export default function CapitalContribution({ data, isLoading }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
 
     const membersData = useMemo(() => {
         if (!data?.members) return [];
-        
+
         return data.members.map((member) => {
-            const currentAmount = member.contributions.reduce(
-                (sum, contrib) => sum + (contrib.amount || 0),
-                0
-            );
-            const percentage = member.totalAmount > 0 
+            // Sử dụng currentAmount từ API (đã được tính từ tổng ps_co)
+            const currentAmount = member.currentAmount || 0;
+            const percentage = member.totalAmount > 0
                 ? ((currentAmount / member.totalAmount) * 100).toFixed(2)
                 : 0;
 
+            // Chọn tên theo ngôn ngữ hiện tại
+            const displayName = language === "zh" && member.nameZh 
+                ? member.nameZh 
+                : member.name;
+
             return {
                 ...member,
+                displayName,
                 currentAmount,
                 percentage: parseFloat(percentage),
             };
         });
-    }, [data]);
+    }, [data, language]);
 
     if (isLoading) {
         return (
@@ -51,7 +55,7 @@ export default function CapitalContribution({ data, isLoading }) {
                     <div key={index} className="space-y-3">
                         <div className="flex items-center justify-between">
                             <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                {member.name}
+                                {t("quickReport.member")} {index + 1} : {member.displayName || member.name}
                             </h4>
                             <div className="flex items-center gap-2">
                                 <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
@@ -102,20 +106,31 @@ export default function CapitalContribution({ data, isLoading }) {
                                     {member.contributions.map((contrib, contribIndex) => (
                                         <div
                                             key={contribIndex}
-                                            className="flex items-center justify-between text-xs bg-gray-50 dark:bg-gray-700/30 rounded px-3 py-2"
+                                            className="flex flex-col gap-1 text-xs bg-gray-50 dark:bg-gray-700/30 rounded px-3 py-2"
                                         >
-                                            <span className="text-gray-600 dark:text-gray-400">
-                                                {contrib.date
-                                                    ? new Date(contrib.date).toLocaleDateString("vi-VN")
-                                                    : `Lần ${contribIndex + 1}`}
-                                            </span>
-                                            <span className="font-semibold text-gray-800 dark:text-white">
-                                                {new Intl.NumberFormat("vi-VN", {
-                                                    style: "currency",
-                                                    currency: "VND",
-                                                    minimumFractionDigits: 0,
-                                                }).format(contrib.amount)}
-                                            </span>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-gray-600 dark:text-gray-400">
+                                                    {contrib.date
+                                                        ? new Date(contrib.date).toLocaleDateString(
+                                                            language === "zh" ? "zh-CN" : "vi-VN"
+                                                        )
+                                                        : language === "zh"
+                                                            ? `第 ${contribIndex + 1} 次`
+                                                            : `Lần ${contribIndex + 1}`}
+                                                </span>
+                                                <span className="font-semibold text-gray-800 dark:text-white">
+                                                    {new Intl.NumberFormat("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                        minimumFractionDigits: 0,
+                                                    }).format(contrib.amount)}
+                                                </span>
+                                            </div>
+                                            {contrib.dien_giai && (
+                                                <div className="text-xs text-gray-500 dark:text-gray-500 truncate">
+                                                    {contrib.dien_giai}
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -126,13 +141,12 @@ export default function CapitalContribution({ data, isLoading }) {
                         <div className="mt-2">
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                                 <div
-                                    className={`h-2 rounded-full transition-all duration-500 ${
-                                        member.percentage >= 100
-                                            ? "bg-green-500"
-                                            : member.percentage >= 50
+                                    className={`h-2 rounded-full transition-all duration-500 ${member.percentage >= 100
+                                        ? "bg-green-500"
+                                        : member.percentage >= 50
                                             ? "bg-blue-500"
                                             : "bg-yellow-500"
-                                    }`}
+                                        }`}
                                     style={{ width: `${Math.min(member.percentage, 100)}%` }}
                                 ></div>
                             </div>

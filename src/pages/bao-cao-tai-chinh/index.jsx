@@ -1,6 +1,6 @@
 import "flatpickr/dist/flatpickr.min.css";
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Chart from "react-apexcharts";
 import Flatpickr from "react-flatpickr";
 import useBangKeChungTu from "../../hooks/useBangKeChungTu";
@@ -12,12 +12,27 @@ const BaoCaoTaiChinhPage = () => {
   const { t, language } = useTranslation();
   const [chartType, setChartType] = useState("bar");
   const [periodType, setPeriodType] = useState("ngay");
+  // Helper function to format date in local timezone (avoid UTC conversion issues)
+  const formatDateLocal = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const startOfYear = `${currentYear}-01-01`;
-  const today = currentDate.toISOString().split('T')[0];
+  const today = formatDateLocal(currentDate);
 
   const [dateRange, setDateRange] = useState({
+    startDate: startOfYear,
+    endDate: today,
+  });
+  // Use ref to store latest dateRange for immediate access (fixes double-click issue)
+  const dateRangeRef = useRef({
     startDate: startOfYear,
     endDate: today,
   });
@@ -25,8 +40,11 @@ const BaoCaoTaiChinhPage = () => {
   const [data, setData] = useState([]);
   const [translatedData, setTranslatedData] = useState([]);
   const [loading, setLoading] = useState(false);
+  // Track data reference to ensure displayData uses latest data
+  const dataRef = useRef(data);
 
   const bangKeChungTuMutation = useBangKeChungTu();
+
   const fetchData = useCallback(async (payload = {}) => {
     try {
       const apiPayload = {
@@ -43,10 +61,16 @@ const BaoCaoTaiChinhPage = () => {
       const rawData = Array.isArray(response)
         ? response
         : (response?.data || response?.rows || []);
+      // Update both state and ref synchronously
       setData(rawData);
+      dataRef.current = rawData;
+      // Reset translatedData immediately to ensure displayData uses new data
+      setTranslatedData([]);
     } catch (error) {
       console.error("Lỗi khi tải dữ liệu:", error);
       setData([]);
+      dataRef.current = [];
+      setTranslatedData([]);
     } finally {
       setLoading(false);
     }
@@ -56,11 +80,20 @@ const BaoCaoTaiChinhPage = () => {
       setTranslatedData([]);
       return;
     }
+    
     if (language === "vi") {
+      // For Vietnamese, use data directly without translation
       setTranslatedData(data);
       return;
     }
+    
+    // For other languages, translate asynchronously
     const translateData = async () => {
+      // Check if data has changed during translation
+      if (dataRef.current !== data) {
+        return; // Data changed, skip this translation
+      }
+      
       const translated = await Promise.all(
         data.map(async (row) => {
           const translatedRow = { ...row };
@@ -90,14 +123,24 @@ const BaoCaoTaiChinhPage = () => {
         })
       );
 
-      setTranslatedData(translated);
+      // Double-check data hasn't changed before setting translated data
+      if (dataRef.current === data) {
+        setTranslatedData(translated);
+      }
     };
 
     translateData();
   }, [data, language]);
 
+  // Always use data directly to ensure chart and table are synchronized
+  // Only use translatedData when it's ready and matches current data
   const displayData = useMemo(() => {
-    return translatedData.length > 0 ? translatedData : data;
+    // Use data directly to ensure immediate synchronization
+    // Only use translatedData if it exists and matches data length
+    if (translatedData.length > 0 && translatedData.length === data.length) {
+      return translatedData;
+    }
+    return data;
   }, [translatedData, data]);
 
   useEffect(() => {
@@ -109,14 +152,15 @@ const BaoCaoTaiChinhPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleFilter = () => {
+  const handleFilter = useCallback(() => {
+    // Read from ref to get the latest values immediately (fixes double-click issue)
     const payload = {
-      ngay_ct1: dateRange.startDate,
-      ngay_ct2: dateRange.endDate,
+      ngay_ct1: dateRangeRef.current.startDate,
+      ngay_ct2: dateRangeRef.current.endDate,
     };
     if (maTaiKhoan) payload.ma_tai_khoan = maTaiKhoan;
     fetchData(payload);
-  };
+  }, [maTaiKhoan, fetchData]);
 
   const getPeriodKey = useCallback((dateString, type) => {
     if (!dateString) return "";
@@ -384,8 +428,13 @@ const BaoCaoTaiChinhPage = () => {
               <Flatpickr
                 value={dateRange.startDate}
                 onChange={(date) => {
-                  const formatted = date[0]?.toISOString().split("T")[0];
-                  setDateRange({ ...dateRange, startDate: formatted || "" });
+                  const formatted = date[0] ? formatDateLocal(date[0]) : "";
+                  // Update both state and ref for immediate access
+                  setDateRange((prev) => {
+                    const updated = { ...prev, startDate: formatted };
+                    dateRangeRef.current = updated;
+                    return updated;
+                  });
                 }}
                 options={{
                   dateFormat: "Y-m-d",
@@ -411,8 +460,13 @@ const BaoCaoTaiChinhPage = () => {
               <Flatpickr
                 value={dateRange.endDate}
                 onChange={(date) => {
-                  const formatted = date[0]?.toISOString().split("T")[0];
-                  setDateRange({ ...dateRange, endDate: formatted || "" });
+                  const formatted = date[0] ? formatDateLocal(date[0]) : "";
+                  // Update both state and ref for immediate access
+                  setDateRange((prev) => {
+                    const updated = { ...prev, endDate: formatted };
+                    dateRangeRef.current = updated;
+                    return updated;
+                  });
                 }}
                 options={{
                   dateFormat: "Y-m-d",

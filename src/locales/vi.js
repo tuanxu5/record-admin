@@ -227,6 +227,7 @@ export const vi = {
     title: "Báo Cáo Nhanh",
     description: "Báo cáo tổng hợp các chỉ số quan trọng",
     capitalContribution: "Góp vốn của các thành viên",
+    member: "Thành viên",
     totalContribution: "Tổng số tiền góp",
     currentContribution: "Số tiền góp hiện tại",
     contributionDetails: "Chi tiết các lần góp vốn",

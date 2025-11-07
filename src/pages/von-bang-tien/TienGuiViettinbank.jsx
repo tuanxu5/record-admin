@@ -11,10 +11,20 @@ import { translateText } from "../../service/translation";
 const TienGuiViettinbankPage = () => {
   const { t, language } = useTranslation();
   const [periodType, setPeriodType] = useState("ngay");
+  
+  const formatDateLocal = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+  
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const firstDayOfYear = `${currentYear}-01-01`;
-  const today = currentDate.toISOString().split('T')[0];
+  const today = formatDateLocal(currentDate);
 
   const [dateRange, setDateRange] = useState({
     startDate: firstDayOfYear,
@@ -327,10 +337,10 @@ const TienGuiViettinbankPage = () => {
               <Flatpickr
                 value={dateRange.startDate}
                 onChange={(date) => {
-                  const formatted = date[0]?.toISOString().split("T")[0];
+                  const formatted = date[0] ? formatDateLocal(date[0]) : "";
                   setDateRange((prev) => ({
                     ...prev,
-                    startDate: formatted || "",
+                    startDate: formatted,
                   }));
                 }}
                 options={{
@@ -357,10 +367,10 @@ const TienGuiViettinbankPage = () => {
               <Flatpickr
                 value={dateRange.endDate}
                 onChange={(date) => {
-                  const formatted = date[0]?.toISOString().split("T")[0];
+                  const formatted = date[0] ? formatDateLocal(date[0]) : "";
                   setDateRange((prev) => ({
                     ...prev,
-                    endDate: formatted || "",
+                    endDate: formatted,
                   }));
                 }}
                 options={{

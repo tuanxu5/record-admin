@@ -222,5 +222,19 @@ export const zh = {
       cancel: "取消",
     },
   },
+  quickReport: {
+    title: "快速报告",
+    description: "综合重要指标报告",
+    capitalContribution: "成员出资",
+    member: "成员",
+    totalContribution: "总出资额",
+    currentContribution: "当前出资额",
+    contributionDetails: "出资详情",
+    establishmentExpenses: "GoLive前公司成立费用",
+    expenseCategory: "费用项目",
+    percentage: "比例 (%)",
+    expenses: "费用",
+    totalEstablishmentExpenses: "公司成立总费用",
+  },
 };
 

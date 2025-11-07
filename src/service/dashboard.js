@@ -390,35 +390,112 @@ const dashboardService = {
     },
 
     getCapitalContribution: async () => {
+        // Định nghĩa 3 thành viên
+        const members = [
+            {
+                name: "Nguyễn Đăng Dương",
+                nameZh: "阮登阳",
+                ma_kh: "DUONGND",
+                totalAmount: 50000000,
+            },
+            {
+                name: "Công ty cổ phần công nghệ Gentech",
+                nameZh: "Gentech 科技股份公司",
+                ma_kh: "GENTECH",
+                totalAmount: 3277000000,
+            },
+            {
+                name: "Bùi Lương Hiệp",
+                nameZh: "裴良协",
+                ma_kh: "HIEPGV",
+                totalAmount: 1673000000,
+            },
+        ];
+
+        // Tính ngày bắt đầu (1/1/2025) và ngày hiện tại
+        const currentDate = new Date();
+        const startDate = "2025-01-01";
+
+        // Helper function to format date in local timezone (avoid UTC conversion issues)
+        const formatDateLocal = (date) => {
+            if (!date) return "";
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, "0");
+            const day = String(d.getDate()).padStart(2, "0");
+            return `${year}-${month}-${day}`;
+        };
+
+        const today = formatDateLocal(currentDate);
+
+        // Lấy dữ liệu từ API bảng kê chứng từ cho từng thành viên
+        const membersData = await Promise.all(
+            members.map(async (member) => {
+                try {
+                    // Gọi API bảng kê chứng từ với tk=41111 và ma_kh của thành viên
+                    // Lấy từ ngày 1/1/2025 đến ngày hiện tại
+                    const response = await bangKeChungTuService.getData({
+                        configName: "bang_ke_chung_tu",
+                        ngay_ct1: startDate, // Từ ngày 1/1/2025
+                        ngay_ct2: today, // Đến ngày hiện tại
+                        ma_tai_khoan: "411", // Tài khoản vốn chủ sở hữu (Cổ phiếu phổ thông có quyền biểu quyết)
+                        ma_kh: member.ma_kh, // Mã khách hàng của thành viên
+                        ma_dvcs: "",
+                    });
+
+                    // Xử lý dữ liệu trả về
+                    let rawData = Array.isArray(response)
+                        ? response
+                        : response?.data || response?.rows || [];
+
+                    // Lọc dữ liệu theo ma_kh (trim để loại bỏ khoảng trắng)
+                    // Vì ma_kh từ API có thể có khoảng trắng ở cuối
+                    const memberMaKhTrimmed = member.ma_kh.trim();
+                    rawData = rawData.filter((item) => {
+                        const itemMaKh = (item.ma_kh || "").trim();
+                        return itemMaKh === memberMaKhTrimmed;
+                    });
+
+                    // Tính tổng ps_co (số tiền góp vốn hiện tại)
+                    const totalContribution = rawData.reduce((sum, item) => {
+                        return sum + parseFloat(item.ps_co || 0);
+                    }, 0);
+
+                    // Lấy chi tiết các lần góp vốn từ chứng từ
+                    const contributions = rawData
+                        .filter((item) => parseFloat(item.ps_co || 0) > 0)
+                        .map((item) => ({
+                            date: item.ngay_ct || item.ngay_ct_tu || "",
+                            amount: parseFloat(item.ps_co || 0),
+                            so_ct: item.so_ct || "",
+                            dien_giai: item.dien_giai || "",
+                            ngay_ct: item.ngay_ct || item.ngay_ct_tu || "",
+                        }))
+                        .sort((a, b) => {
+                            // Sắp xếp theo ngày
+                            const dateA = new Date(a.date);
+                            const dateB = new Date(b.date);
+                            return dateA - dateB;
+                        });
+
+                    return {
+                        ...member,
+                        currentAmount: totalContribution,
+                        contributions: contributions,
+                    };
+                } catch (error) {
+                    console.error(`Lỗi khi lấy dữ liệu góp vốn cho ${member.name}:`, error);
+                    return {
+                        ...member,
+                        currentAmount: 0,
+                        contributions: [],
+                    };
+                }
+            })
+        );
+
         return {
-            members: [
-                {
-                    name: "Thành viên 1",
-                    totalAmount: 1000000000,
-                    contributions: [
-                        { date: "2024-01-15", amount: 300000000 },
-                        { date: "2024-03-20", amount: 200000000 },
-                        { date: "2024-06-10", amount: 250000000 },
-                    ],
-                },
-                {
-                    name: "Thành viên 2",
-                    totalAmount: 1000000000,
-                    contributions: [
-                        { date: "2024-01-15", amount: 250000000 },
-                        { date: "2024-04-25", amount: 300000000 },
-                        { date: "2024-07-05", amount: 200000000 },
-                    ],
-                },
-                {
-                    name: "Thành viên 3",
-                    totalAmount: 1000000000,
-                    contributions: [
-                        { date: "2024-02-01", amount: 400000000 },
-                        { date: "2024-05-12", amount: 300000000 },
-                    ],
-                },
-            ],
+            members: membersData,
         };
     },
 
