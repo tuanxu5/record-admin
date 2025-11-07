@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
+import ProtectedRoute from "../components/auth/ProtectedRoute";
 import { useSidebar } from "../hooks/useSidebar";
 import { SidebarProvider } from "../provider/SidebarProvider";
-import ProtectedRoute from "../components/auth/ProtectedRoute";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 import Backdrop from "./Backdrop";
