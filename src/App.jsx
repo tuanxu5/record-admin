@@ -31,6 +31,7 @@ import TienGuiViettinbankPage from "./pages/von-bang-tien/TienGuiViettinbank";
 import AddAccountPage from "./pages/quan-ly-tai-khoan/AddAccountPage";
 import ListAccountPage from "./pages/quan-ly-tai-khoan/ListAccountPage";
 import KeHoachPage from "./pages/ke-hoach";
+import HopDongPage from "./pages/ke-hoach/HopDong";
 
 export default function App() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
             <Route path="/quan-ly-tai-khoan/them-tai-khoan" element={<AddAccountPage />} />
             <Route path="/quan-ly-tai-khoan/danh-sach" element={<ListAccountPage />} />
             <Route path="/ke-hoach" element={<KeHoachPage />} />
+            <Route path="/ke-hoach/hop-dong" element={<HopDongPage />} />
             <Route path="/cong-cu-dung-cu-do-van-phong" element={<Home />} />
             <Route path="/bao-cao-tai-chinh/bang-can-doi-so-phat-sinh-tai-khoan" element={<BangCanDoiSoPhatSinhTaiKhoanPage />} />
             <Route path="/bao-cao-tai-chinh/bang-can-doi-ke-toan" element={<Home />} />
