@@ -4,9 +4,11 @@ import Chart from "react-apexcharts";
 import PageMeta from "../../components/common/PageMeta";
 import { useDashboardData } from "../../hooks/useDashboard";
 import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../hooks/useTheme";
 
 export default function Home() {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const { cashAndDeposits, revenueKPIExpenses, expenses, topCustomers, isLoading } = useDashboardData();
   const isTopCustomersLoading = topCustomers.isLoading;
   const topCustomersError = topCustomers.error;
@@ -48,6 +50,19 @@ export default function Home() {
         },
       },
       colors: ["#10b981"],
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          type: 'vertical',
+          shadeIntensity: 0.5,
+          gradientToColors: ['#059669'],
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 0.8,
+          stops: [0, 100]
+        }
+      },
       dataLabels: {
         enabled: true,
         formatter: function (val) {
@@ -70,7 +85,7 @@ export default function Home() {
         labels: {
           style: {
             fontSize: "10px",
-            colors: ["#6b7280"],
+            colors: [theme === "dark" ? "#9CA3AF" : "#6b7280"],
           },
           rotate: -45,
           rotateAlways: false,
@@ -81,6 +96,7 @@ export default function Home() {
         labels: {
           style: {
             fontSize: "10px",
+            colors: theme === "dark" ? "#9CA3AF" : "#6b7280",
           },
           formatter: function (val) {
             return new Intl.NumberFormat("vi-VN", {
@@ -116,7 +132,7 @@ export default function Home() {
         },
       },
       grid: {
-        borderColor: "#E5E7EB",
+        borderColor: theme === "dark" ? "#374151" : "#E5E7EB",
         strokeDashArray: 3,
         xaxis: {
           lines: {
@@ -133,7 +149,7 @@ export default function Home() {
         show: false,
       },
     };
-  }, [topCustomers.data]);
+  }, [topCustomers.data, theme]);
 
   const top5HighestChartSeries = useMemo(() => {
     const top5Highest = topCustomers.data?.top5Highest || [];
@@ -185,6 +201,19 @@ export default function Home() {
         },
       },
       colors: ["#ef4444"],
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          type: 'vertical',
+          shadeIntensity: 0.5,
+          gradientToColors: ['#dc2626'],
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 0.8,
+          stops: [0, 100]
+        }
+      },
       dataLabels: {
         enabled: true,
         formatter: function (val) {
@@ -207,7 +236,7 @@ export default function Home() {
         labels: {
           style: {
             fontSize: "10px",
-            colors: ["#6b7280"],
+            colors: [theme === "dark" ? "#9CA3AF" : "#6b7280"],
           },
           rotate: -45,
           rotateAlways: false,
@@ -218,6 +247,7 @@ export default function Home() {
         labels: {
           style: {
             fontSize: "10px",
+            colors: theme === "dark" ? "#9CA3AF" : "#6b7280",
           },
           formatter: function (val) {
             return new Intl.NumberFormat("vi-VN", {
@@ -253,7 +283,7 @@ export default function Home() {
         },
       },
       grid: {
-        borderColor: "#E5E7EB",
+        borderColor: theme === "dark" ? "#374151" : "#E5E7EB",
         strokeDashArray: 3,
         xaxis: {
           lines: {
@@ -270,7 +300,7 @@ export default function Home() {
         show: false,
       },
     };
-  }, [topCustomers.data]);
+  }, [topCustomers.data, theme]);
 
   const top5LowestChartSeries = useMemo(() => {
     const top5Lowest = topCustomers.data?.top5Lowest || [];
@@ -324,7 +354,7 @@ export default function Home() {
         show: false,
       },
       tooltip: {
-        theme: "light",
+        theme: theme === "dark" ? "dark" : "light",
         style: {
           fontSize: "14px",
         },
@@ -369,7 +399,7 @@ export default function Home() {
         align: "center",
       },
     };
-  }, [cashAndDeposits.data, t]);
+  }, [cashAndDeposits.data, t, theme]);
 
   const revenueKPIExpensesChartOptions = useMemo(() => {
     const data = revenueKPIExpenses.data || {};
@@ -432,7 +462,7 @@ export default function Home() {
         },
         labels: {
           style: {
-            colors: "#6B7280",
+            colors: theme === "dark" ? "#9CA3AF" : "#6B7280",
             fontSize: "12px",
           },
         },
@@ -443,12 +473,12 @@ export default function Home() {
           style: {
             fontSize: "14px",
             fontWeight: "bold",
-            color: "#374151",
+            color: theme === "dark" ? "#E5E7EB" : "#374151",
           },
         },
         labels: {
           style: {
-            colors: "#6B7280",
+            colors: theme === "dark" ? "#9CA3AF" : "#6B7280",
             fontSize: "12px",
           },
           formatter: function (value) {
@@ -462,14 +492,24 @@ export default function Home() {
         },
       },
       fill: {
-        opacity: 1,
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          type: 'vertical',
+          shadeIntensity: 0.5,
+          gradientToColors: ['#059669', '#1d4ed8', '#dc2626'],
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 0.8,
+          stops: [0, 100]
+        }
       },
       colors: ["#10B981", "#3B82F6", "#EF4444"],
       legend: {
         show: false,
       },
       tooltip: {
-        theme: "light",
+        theme: theme === "dark" ? "dark" : "light",
         style: {
           fontSize: "14px",
           fontWeight: "bold",
@@ -497,7 +537,7 @@ export default function Home() {
         align: "center",
       },
       grid: {
-        borderColor: "#E5E7EB",
+        borderColor: theme === "dark" ? "#374151" : "#E5E7EB",
         strokeDashArray: 3,
         xaxis: {
           lines: {
@@ -511,7 +551,7 @@ export default function Home() {
         },
       },
     };
-  }, [revenueKPIExpenses.data, t]);
+  }, [revenueKPIExpenses.data, t, theme]);
 
   const revenueKPIExpensesSeries = useMemo(() => {
     const data = revenueKPIExpenses.data || {};
@@ -629,12 +669,12 @@ export default function Home() {
           style: {
             fontSize: "14px",
             fontWeight: "bold",
-            color: "#374151",
+            color: theme === "dark" ? "#E5E7EB" : "#374151",
           },
         },
         labels: {
           style: {
-            colors: "#6B7280",
+            colors: theme === "dark" ? "#9CA3AF" : "#6B7280",
             fontSize: "12px",
           },
           rotate: -45,
@@ -647,12 +687,12 @@ export default function Home() {
           style: {
             fontSize: "14px",
             fontWeight: "bold",
-            color: "#374151",
+            color: theme === "dark" ? "#E5E7EB" : "#374151",
           },
         },
         labels: {
           style: {
-            colors: "#6B7280",
+            colors: theme === "dark" ? "#9CA3AF" : "#6B7280",
             fontSize: "12px",
           },
           formatter: function (value) {
@@ -683,7 +723,7 @@ export default function Home() {
         show: false,
       },
       tooltip: {
-        theme: "light",
+        theme: theme === "dark" ? "dark" : "light",
         style: {
           fontSize: "14px",
           fontWeight: "bold",
@@ -707,7 +747,7 @@ export default function Home() {
         align: "center",
       },
       grid: {
-        borderColor: "#E5E7EB",
+        borderColor: theme === "dark" ? "#374151" : "#E5E7EB",
         strokeDashArray: 3,
         xaxis: {
           lines: {
@@ -721,7 +761,7 @@ export default function Home() {
         },
       },
     };
-  }, [expenses.data, t]);
+  }, [expenses.data, t, theme]);
 
   const expensesSeries = useMemo(() => {
     const data = expenses.data || {};

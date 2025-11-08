@@ -4,12 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import Flatpickr from "react-flatpickr";
 import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../hooks/useTheme";
 import { useVonBangTien } from "../../hooks/useVonBangTien";
 import { CalenderIcon } from "../../icons";
 import { translateText } from "../../service/translation";
 
 const QuyTienMatPage = () => {
   const { t, language } = useTranslation();
+  const { theme } = useTheme();
   const [periodType, setPeriodType] = useState("ngay");
   const [chartType, setChartType] = useState("bar");
   
@@ -287,7 +289,7 @@ const QuyTienMatPage = () => {
           style: {
             fontSize: "20px",
             fontWeight: "bold",
-            color: "#1F2937",
+            color: theme === "dark" ? "#E5E7EB" : "#1F2937",
           },
           margin: 20,
         },
@@ -341,7 +343,7 @@ const QuyTienMatPage = () => {
           color: "#3B82F6",
         },
       ],
-      xaxis: {
+        xaxis: {
         categories: groupDataByPeriod.labels,
         title: {
           text: t(`cashFund.period.${periodType === "ngay" ? "day" :
@@ -352,12 +354,12 @@ const QuyTienMatPage = () => {
           style: {
             fontSize: "14px",
             fontWeight: "bold",
-            color: "#374151",
+            color: theme === "dark" ? "#E5E7EB" : "#374151",
           },
         },
         labels: {
           style: {
-            colors: "#6B7280",
+            colors: theme === "dark" ? "#9CA3AF" : "#6B7280",
             fontSize: "12px",
           },
           rotate: groupDataByPeriod.labels.length > 10 ? -45 : 0,
@@ -369,12 +371,12 @@ const QuyTienMatPage = () => {
           style: {
             fontSize: "14px",
             fontWeight: "bold",
-            color: "#374151",
+            color: theme === "dark" ? "#E5E7EB" : "#374151",
           },
         },
         labels: {
           style: {
-            colors: "#6B7280",
+            colors: theme === "dark" ? "#9CA3AF" : "#6B7280",
             fontSize: "12px",
           },
           formatter: function (value) {
@@ -397,7 +399,7 @@ const QuyTienMatPage = () => {
         style: {
           fontSize: "20px",
           fontWeight: "bold",
-          color: "#1F2937",
+          color: theme === "dark" ? "#E5E7EB" : "#1F2937",
         },
         margin: 20,
       },
@@ -415,7 +417,7 @@ const QuyTienMatPage = () => {
       tooltip: {
         shared: true,
         intersect: false,
-        theme: "light",
+        theme: theme === "dark" ? "dark" : "light",
         style: {
           fontSize: "12px",
         },
@@ -430,7 +432,7 @@ const QuyTienMatPage = () => {
         },
       },
       grid: {
-        borderColor: "#E5E7EB",
+        borderColor: theme === "dark" ? "#374151" : "#E5E7EB",
         strokeDashArray: 3,
         xaxis: {
           lines: {
@@ -458,16 +460,16 @@ const QuyTienMatPage = () => {
         },
       },
     };
-  }, [chartType, groupDataByPeriod, totalThu, totalChi, totalSoTon, periodType, t]);
+  }, [chartType, groupDataByPeriod, totalThu, totalChi, totalSoTon, periodType, t, theme]);
 
   return (
     <div className="w-full min-h-screen p-2 md:p-4 overflow-x-hidden">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-4 md:mb-6 max-w-full overflow-x-hidden">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6 text-center">💰 {t("cashFund.title")}</h1>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6 mb-4 md:mb-6 max-w-full overflow-x-hidden">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-4 md:mb-6 text-center">💰 {t("cashFund.title")}</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">{t("cashFund.fromDate")}</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("cashFund.fromDate")}</label>
             <div className="relative">
               <Flatpickr
                 value={dateRange.startDate}
@@ -484,17 +486,17 @@ const QuyTienMatPage = () => {
                   clickOpens: true,
                 }}
                 placeholder={t("voucherListing.selectStartDate")}
-                className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
+                className="w-full px-4 py-3 pr-12 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                 disabled={isLoading}
               />
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <CalenderIcon className="w-5 h-5 text-gray-400" />
+                <CalenderIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">{t("cashFund.toDate")}</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("cashFund.toDate")}</label>
             <div className="relative">
               <Flatpickr
                 value={dateRange.endDate}
@@ -511,36 +513,36 @@ const QuyTienMatPage = () => {
                   clickOpens: true,
                 }}
                 placeholder={t("voucherListing.selectEndDate")}
-                className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
+                className="w-full px-4 py-3 pr-12 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                 disabled={isLoading}
               />
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <CalenderIcon className="w-5 h-5 text-gray-400" />
+                <CalenderIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
               </div>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">{t("cashFund.account")}</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("cashFund.account")}</label>
             <input
               type="text"
               value="1111"
               disabled
-              className="w-full p-2 md:p-3 border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
+              className="w-full p-2 md:p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed text-sm"
             />
           </div>
         </div>
       </div>
 
       {/* Chart */}
-      <div className="bg-white rounded-xl shadow-lg p-3 md:p-4 mb-4 md:mb-6 max-w-full overflow-x-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 md:p-4 mb-4 md:mb-6 max-w-full overflow-x-hidden">
         {/* Period Tabs và Chart Type */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-200">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setPeriodType("ngay")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "ngay"
                 ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                 }`}
             >
               {t("cashFund.byDay")}
@@ -549,7 +551,7 @@ const QuyTienMatPage = () => {
               onClick={() => setPeriodType("tuan")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "tuan"
                 ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                 }`}
             >
               {t("cashFund.byWeek")}
@@ -558,7 +560,7 @@ const QuyTienMatPage = () => {
               onClick={() => setPeriodType("thang")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "thang"
                 ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                 }`}
             >
               {t("cashFund.byMonth")}
@@ -567,18 +569,18 @@ const QuyTienMatPage = () => {
               onClick={() => setPeriodType("nam")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "nam"
                 ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                 }`}
             >
               {t("cashFund.byYear")}
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold text-gray-700">{t("cashFund.chartType")}:</label>
+            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("cashFund.chartType")}:</label>
             <select
               value={chartType}
               onChange={(e) => setChartType(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-sm"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="pie">🟣 {t("cashFund.pieChart")}</option>
               <option value="bar">📊 {t("cashFund.barChart")}</option>
@@ -621,64 +623,64 @@ const QuyTienMatPage = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-lg p-3 md:p-4 lg:p-6 max-w-full overflow-x-hidden">
-        <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">📋 {t("cashFund.detail")}</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 md:p-4 lg:p-6 max-w-full overflow-x-hidden">
+        <h3 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white mb-3 md:mb-4">📋 {t("cashFund.detail")}</h3>
         {isLoading ? (
           <div className="text-center py-8">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-2 text-gray-600">{t("common.loading")}</p>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">{t("common.loading")}</p>
           </div>
         ) : error ? (
-          <div className="text-center py-8 text-red-500">
+          <div className="text-center py-8 text-red-500 dark:text-red-400">
             <p>{t("errors.loadDataError")}</p>
           </div>
         ) : displayData.length > 0 ? (
           <div className="overflow-x-auto -mx-2 md:mx-0">
             <table className="min-w-full border-collapse">
               <thead>
-                <tr className="bg-gray-100 border-b border-gray-300">
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.voucherDate")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.voucherCreateDate")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.voucherCode")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.voucherNumber")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.person")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.customerCode")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.customerName")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.description")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.income")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.expense")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.balance")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.projectCode")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
                     {t("cashFund.voucherCode")}
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-dashed divide-gray-300">
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-dashed divide-gray-300 dark:divide-gray-700">
                 {displayData.map((row, index) => {
                   const ngayCt = formatDate(row.ngay_ct || row.ngay_ct_tu);
                   const ngayLapCt = formatDate(row.ngay_lct || row.ngay_lap_cti);
@@ -697,31 +699,31 @@ const QuyTienMatPage = () => {
                   return (
                     <tr
                       key={row.stt_rec || row.id || index}
-                      className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-orange-100 transition-colors`}
+                      className={`${index % 2 === 0 ? "bg-white dark:bg-gray-800" : "bg-gray-50 dark:bg-gray-700/50"} hover:bg-orange-100 dark:hover:bg-gray-700 transition-colors`}
                     >
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 border-r border-gray-200">{ngayCt}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 border-r border-gray-200">{ngayLapCt}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 border-r border-gray-200">{maCt}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 border-r border-gray-200">{soCt}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 border-r border-gray-200">{ongBa}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 border-r border-gray-200">{maKh}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 border-r border-gray-200 max-w-[120px] md:max-w-xs truncate" title={tenKh}>
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{ngayCt}</td>
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{ngayLapCt}</td>
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{maCt}</td>
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{soCt}</td>
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{ongBa}</td>
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{maKh}</td>
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 max-w-[120px] md:max-w-xs truncate" title={tenKh}>
                         {tenKh}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 border-r border-gray-200 max-w-[120px] md:max-w-xs truncate" title={dienGiai}>
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 max-w-[120px] md:max-w-xs truncate" title={dienGiai}>
                         {dienGiai}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 text-right border-r border-gray-200">
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-700">
                         {thu > 0 ? formatAmount(thu) : ""}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 text-right border-r border-gray-200">
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-700">
                         {chi > 0 ? formatAmount(chi) : ""}
                       </td>
-                      <td className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-right border-r border-gray-200 ${soTon < 0 ? "text-red-600" : "text-gray-900"}`}>
+                      <td className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-right border-r border-gray-200 dark:border-gray-700 ${soTon < 0 ? "text-red-600 dark:text-red-400" : "text-gray-900 dark:text-white"}`}>
                         {soTon !== 0 ? formatAmount(soTon) : ""}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 border-r border-gray-200">{maDuAn}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900">{maCtTu}</td>
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{maDuAn}</td>
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white">{maCtTu}</td>
                     </tr>
                   );
                 })}
@@ -729,7 +731,7 @@ const QuyTienMatPage = () => {
             </table>
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <p>{t("common.noData")}</p>
           </div>
         )}
@@ -738,38 +740,38 @@ const QuyTienMatPage = () => {
         {totals && (
           <div className="mt-4 md:mt-6 flex justify-center">
             <div className="inline-block">
-              <table className="border-collapse border border-gray-300">
+              <table className="border-collapse border border-gray-300 dark:border-gray-600">
                 <tbody>
-                  <tr className="bg-blue-50 border-b border-gray-300">
-                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 border-r border-gray-300">
+                  <tr className="bg-blue-50 dark:bg-blue-900/20 border-b border-gray-300 dark:border-gray-600">
+                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 dark:text-gray-200 border-r border-gray-300 dark:border-gray-600">
                       {t("cashFund.summary.openingBalance")}:
                     </td>
-                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right border-r border-gray-300">
+                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 dark:text-white text-right border-r border-gray-300 dark:border-gray-600">
                       {formatAmountForTotal(totals.no_dk || 0)}
                     </td>
-                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right">
+                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 dark:text-white text-right">
                       {formatAmountForTotal(totals.co_dk || 0)}
                     </td>
                   </tr>
-                  <tr className="bg-blue-50 border-b border-gray-300">
-                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 border-r border-gray-300">
+                  <tr className="bg-blue-50 dark:bg-blue-900/20 border-b border-gray-300 dark:border-gray-600">
+                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 dark:text-gray-200 border-r border-gray-300 dark:border-gray-600">
                       {t("cashFund.summary.totalIncomeExpense")}:
                     </td>
-                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right border-r border-gray-300">
+                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 dark:text-white text-right border-r border-gray-300 dark:border-gray-600">
                       {formatAmountForTotal(totals.ps_no || 0)}
                     </td>
-                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right">
+                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 dark:text-white text-right">
                       {formatAmountForTotal(totals.ps_co || 0)}
                     </td>
                   </tr>
-                  <tr className="bg-blue-50">
-                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 border-r border-gray-300">
+                  <tr className="bg-blue-50 dark:bg-blue-900/20">
+                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 dark:text-gray-200 border-r border-gray-300 dark:border-gray-600">
                       {t("cashFund.summary.closingBalance")}:
                     </td>
-                    <td className={`px-3 py-2 text-xs md:text-sm text-right border-r border-gray-300 ${(totals.no_ck || 0) < 0 ? "text-red-600" : "text-gray-900"}`}>
+                    <td className={`px-3 py-2 text-xs md:text-sm text-right border-r border-gray-300 dark:border-gray-600 ${(totals.no_ck || 0) < 0 ? "text-red-600 dark:text-red-400" : "text-gray-900 dark:text-white"}`}>
                       {formatAmountForTotal(totals.no_ck || 0)}
                     </td>
-                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right">
+                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 dark:text-white text-right">
                       {formatAmountForTotal(totals.co_ck || 0)}
                     </td>
                   </tr>

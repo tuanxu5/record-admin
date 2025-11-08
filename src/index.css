@@ -9,11 +9,11 @@
     font-family: "Outfit", sans-serif;
   }
   body {
-    @apply relative text-base font-normal z-1 bg-gray-50 font-outfit overflow-x-hidden;
+    @apply relative text-base font-normal z-1 bg-gray-50 text-gray-900 font-outfit overflow-x-hidden dark:bg-gray-900 dark:text-gray-100;
     font-family: "Outfit", sans-serif;
   }
   html {
-    @apply overflow-x-hidden;
+    @apply overflow-x-hidden bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
     font-family: "Outfit", sans-serif;
   }
   #root {

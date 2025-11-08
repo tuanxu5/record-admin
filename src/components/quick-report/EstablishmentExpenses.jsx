@@ -2,16 +2,17 @@ import { useMemo } from "react";
 import { FileText, DollarSign } from "lucide-react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../hooks/useTheme";
 
 export default function EstablishmentExpenses({ data, isLoading }) {
     const { t } = useTranslation();
+    const { theme } = useTheme();
 
     const chartOptions = useMemo(() => {
         if (!data?.categories) return null;
 
         const categories = data.categories || [];
         const labels = categories.map((cat) => cat.name);
-        const amounts = categories.map((cat) => cat.amount || 0);
 
         return {
             chart: {
@@ -54,7 +55,7 @@ export default function EstablishmentExpenses({ data, isLoading }) {
                 categories: labels,
                 labels: {
                     style: {
-                        colors: "#6B7280",
+                        colors: theme === "dark" ? "#9CA3AF" : "#6B7280",
                         fontSize: "11px",
                     },
                 },
@@ -62,7 +63,7 @@ export default function EstablishmentExpenses({ data, isLoading }) {
             yaxis: {
                 labels: {
                     style: {
-                        colors: "#6B7280",
+                        colors: theme === "dark" ? "#9CA3AF" : "#6B7280",
                         fontSize: "11px",
                     },
                 },
@@ -76,7 +77,7 @@ export default function EstablishmentExpenses({ data, isLoading }) {
                 show: false,
             },
             tooltip: {
-                theme: "light",
+                theme: theme === "dark" ? "dark" : "light",
                 style: {
                     fontSize: "14px",
                 },
@@ -95,7 +96,7 @@ export default function EstablishmentExpenses({ data, isLoading }) {
                 },
             },
             grid: {
-                borderColor: "#E5E7EB",
+                borderColor: theme === "dark" ? "#374151" : "#E5E7EB",
                 strokeDashArray: 3,
                 xaxis: {
                     lines: {
@@ -109,7 +110,7 @@ export default function EstablishmentExpenses({ data, isLoading }) {
                 },
             },
         };
-    }, [data]);
+    }, [data, theme]);
 
     const chartSeries = useMemo(() => {
         if (!data?.categories) return [{ name: "", data: [] }];

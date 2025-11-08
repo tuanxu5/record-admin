@@ -4,12 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import Flatpickr from "react-flatpickr";
 import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../hooks/useTheme";
 import { useVonBangTien } from "../../hooks/useVonBangTien";
 import { CalenderIcon } from "../../icons";
 import { translateText } from "../../service/translation";
 
 const TienGuiBIDVPage = () => {
   const { t, language } = useTranslation();
+  const { theme } = useTheme();
   const [periodType, setPeriodType] = useState("ngay");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
@@ -322,6 +324,7 @@ const TienGuiBIDVPage = () => {
         align: "center",
       },
       tooltip: {
+        theme: theme === "dark" ? "dark" : "light",
         y: {
           formatter: function (val) {
             return new Intl.NumberFormat("vi-VN").format(val) + " VND";
@@ -329,7 +332,7 @@ const TienGuiBIDVPage = () => {
         },
       },
     };
-  }, [labels, psNo, psCo, periodType, t, isMobile]);
+  }, [labels, psNo, psCo, periodType, t, isMobile, theme]);
 
   return (
     <div className="w-full space-y-4 md:space-y-6 p-2 md:p-4 lg:p-6 overflow-x-hidden">
@@ -462,40 +465,40 @@ const TienGuiBIDVPage = () => {
           <div className="overflow-x-auto -mx-2 md:mx-0">
             <table className="min-w-full border-collapse">
               <thead>
-                <tr className="bg-gray-100 border-b border-gray-300">
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                <tr className="bg-gray-100 dark:bg-gray-700/40 border-b border-gray-300 dark:border-gray-600">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.voucherDate")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.voucherCreateDate")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.voucherCode")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.voucherNumber")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.customerCode")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.customerName")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.description")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("voucherListing.debit")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("voucherListing.credit")}
                   </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                     {t("cashFund.amountDu")}
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-dashed divide-gray-300">
+              <tbody className="bg-white dark:bg-gray-900/40 divide-y divide-dashed divide-gray-300 dark:divide-gray-700">
                 {displayData.map((row, index) => {
                   const ngayCt = formatDate(row.ngay_ct || row.ngay_ct_tu);
                   const ngayLapCt = formatDate(row.ngay_lct || row.ngay_lap_cti);
@@ -513,31 +516,31 @@ const TienGuiBIDVPage = () => {
 
                   return (
                     <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300">
+                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {ngayCt}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300">
+                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {ngayLapCt}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300">
+                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {maCt}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300">
+                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {soCt}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300">
+                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {maKh}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300">
+                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {tenKh}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300">
+                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {dienGiai}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-right text-gray-900 dark:text-white border-r border-gray-300">
+                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-right text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {formatAmount(psNo)}
                       </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-right text-gray-900 dark:text-white border-r border-gray-300">
+                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-right text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {formatAmount(psCo)}
                       </td>
                       <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white">
@@ -550,7 +553,7 @@ const TienGuiBIDVPage = () => {
             </table>
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <p>{t("common.noData")}</p>
           </div>
         )}
@@ -559,38 +562,38 @@ const TienGuiBIDVPage = () => {
         {totals && (
           <div className="mt-4 md:mt-6 flex justify-center">
             <div className="inline-block">
-              <table className="border-collapse border border-gray-300">
+              <table className="border-collapse border border-gray-300 dark:border-gray-600">
                 <tbody>
-                  <tr className="bg-blue-50 border-b border-gray-300">
-                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 border-r border-gray-300">
+                  <tr className="bg-blue-50 dark:bg-blue-900/20 border-b border-gray-300 dark:border-gray-600">
+                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 dark:text-gray-200 border-r border-gray-300 dark:border-gray-600">
                       {t("voucherListing.summary.openingBalance")}:
                     </td>
-                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right border-r border-gray-300">
+                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 dark:text-white text-right border-r border-gray-300 dark:border-gray-600">
                       {formatAmountForTotal(isNaN(parseFloat(totals.no_dk)) ? 0 : parseFloat(totals.no_dk || 0))}
                     </td>
-                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right">
+                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 dark:text-white text-right">
                       {formatAmountForTotal(isNaN(parseFloat(totals.co_dk)) ? 0 : parseFloat(totals.co_dk || 0))}
                     </td>
                   </tr>
-                  <tr className="bg-blue-50 border-b border-gray-300">
-                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 border-r border-gray-300">
+                  <tr className="bg-blue-50 dark:bg-blue-900/20 border-b border-gray-300 dark:border-gray-600">
+                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 dark:text-gray-200 border-r border-gray-300 dark:border-gray-600">
                       {t("voucherListing.summary.totalTransactions")}:
                     </td>
-                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right border-r border-gray-300">
+                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 dark:text-white text-right border-r border-gray-300 dark:border-gray-600">
                       {formatAmountForTotal(isNaN(parseFloat(totals.ps_no || totals.no_ps)) ? 0 : parseFloat(totals.ps_no || totals.no_ps || 0))}
                     </td>
-                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right">
+                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 dark:text-white text-right">
                       {formatAmountForTotal(isNaN(parseFloat(totals.ps_co || totals.co_ps)) ? 0 : parseFloat(totals.ps_co || totals.co_ps || 0))}
                     </td>
                   </tr>
-                  <tr className="bg-blue-50">
-                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 border-r border-gray-300">
+                  <tr className="bg-blue-50 dark:bg-blue-900/20">
+                    <td className="px-3 py-2 text-xs md:text-sm font-semibold text-gray-800 dark:text-gray-200 border-r border-gray-300 dark:border-gray-600">
                       {t("voucherListing.summary.endingDebitBalance")}:
                     </td>
-                    <td className={`px-3 py-2 text-xs md:text-sm text-right border-r border-gray-300 ${(isNaN(parseFloat(totals.no_ck)) ? 0 : parseFloat(totals.no_ck || 0)) < 0 ? "text-red-600" : "text-gray-900"}`}>
+                    <td className={`px-3 py-2 text-xs md:text-sm text-right border-r border-gray-300 dark:border-gray-600 ${(isNaN(parseFloat(totals.no_ck)) ? 0 : parseFloat(totals.no_ck || 0)) < 0 ? "text-red-600 dark:text-red-400" : "text-gray-900 dark:text-white"}`}>
                       {formatAmountForTotal(isNaN(parseFloat(totals.no_ck)) ? 0 : parseFloat(totals.no_ck || 0))}
                     </td>
-                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 text-right">
+                    <td className="px-3 py-2 text-xs md:text-sm text-gray-900 dark:text-white text-right">
                       {formatAmountForTotal(isNaN(parseFloat(totals.co_ck)) ? 0 : parseFloat(totals.co_ck || 0))}
                     </td>
                   </tr>
