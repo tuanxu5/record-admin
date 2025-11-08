@@ -61,7 +61,7 @@ export default function CapitalContribution({ data, isLoading }) {
         return {
             chart: {
                 type: "pie",
-                height: 350,
+                height: 300,
                 fontFamily: "Outfit, sans-serif",
                 toolbar: {
                     show: false,
@@ -226,7 +226,7 @@ export default function CapitalContribution({ data, isLoading }) {
                                 options={pieChartOptions}
                                 series={pieChartOptions.series}
                                 type="pie"
-                                height={350}
+                                height={300}
                             />
                         </div>
                     </div>
