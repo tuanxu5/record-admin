@@ -338,7 +338,7 @@ const TienGuiViettinbankPage = () => {
             </label>
             <div className="relative">
               <Flatpickr
-                value={dateRange.startDate}
+                value={dateRange.startDate ? new Date(dateRange.startDate) : null}
                 onChange={(date) => {
                   const formatted = date[0] ? formatDateLocal(date[0]) : "";
                   setDateRange((prev) => ({
@@ -347,10 +347,10 @@ const TienGuiViettinbankPage = () => {
                   }));
                 }}
                 options={{
-                  dateFormat: "Y-m-d",
+                  dateFormat: "d/m/Y",
                   locale: Vietnamese,
                   allowInput: true,
-                  maxDate: dateRange.endDate,
+                  maxDate: dateRange.endDate ? new Date(dateRange.endDate) : null,
                   disableMobile: false,
                   clickOpens: true,
                 }}
@@ -368,7 +368,7 @@ const TienGuiViettinbankPage = () => {
             </label>
             <div className="relative">
               <Flatpickr
-                value={dateRange.endDate}
+                value={dateRange.endDate ? new Date(dateRange.endDate) : null}
                 onChange={(date) => {
                   const formatted = date[0] ? formatDateLocal(date[0]) : "";
                   setDateRange((prev) => ({
@@ -377,10 +377,10 @@ const TienGuiViettinbankPage = () => {
                   }));
                 }}
                 options={{
-                  dateFormat: "Y-m-d",
+                  dateFormat: "d/m/Y",
                   locale: Vietnamese,
                   allowInput: true,
-                  minDate: dateRange.startDate,
+                  minDate: dateRange.startDate ? new Date(dateRange.startDate) : null,
                   disableMobile: false,
                   clickOpens: true,
                 }}

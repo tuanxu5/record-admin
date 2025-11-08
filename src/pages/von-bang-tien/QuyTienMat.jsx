@@ -472,16 +472,16 @@ const QuyTienMatPage = () => {
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("cashFund.fromDate")}</label>
             <div className="relative">
               <Flatpickr
-                value={dateRange.startDate}
+                value={dateRange.startDate ? new Date(dateRange.startDate) : null}
                 onChange={(date) => {
                   const formatted = date[0] ? formatDateLocal(date[0]) : "";
                   setDateRange((prev) => ({ ...prev, startDate: formatted }));
                 }}
                 options={{
-                  dateFormat: "Y-m-d",
+                  dateFormat: "d/m/Y",
                   locale: Vietnamese,
                   allowInput: true,
-                  maxDate: dateRange.endDate,
+                  maxDate: dateRange.endDate ? new Date(dateRange.endDate) : null,
                   disableMobile: false,
                   clickOpens: true,
                 }}
@@ -499,16 +499,16 @@ const QuyTienMatPage = () => {
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("cashFund.toDate")}</label>
             <div className="relative">
               <Flatpickr
-                value={dateRange.endDate}
+                value={dateRange.endDate ? new Date(dateRange.endDate) : null}
                 onChange={(date) => {
                   const formatted = date[0] ? formatDateLocal(date[0]) : "";
                   setDateRange((prev) => ({ ...prev, endDate: formatted }));
                 }}
                 options={{
-                  dateFormat: "Y-m-d",
+                  dateFormat: "d/m/Y",
                   locale: Vietnamese,
                   allowInput: true,
-                  minDate: dateRange.startDate,
+                  minDate: dateRange.startDate ? new Date(dateRange.startDate) : null,
                   disableMobile: false,
                   clickOpens: true,
                 }}
