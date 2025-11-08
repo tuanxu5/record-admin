@@ -24,6 +24,8 @@ import BaoCaoNhanhPage from "./pages/bao-cao-nhanh";
 // import BaoCaoTaiChinhPage from "./pages/bao-cao-tai-chinh";
 import BaoCaoTaiChinhPage from "./pages/bao-cao-tai-chinh";
 import BangCanDoiSoPhatSinhTaiKhoanPage from "./pages/bao-cao-tai-chinh/BangCanDoiSoPhatSinhTaiKhoan";
+import BangCanDoiKeToanPage from "./pages/bao-cao-tai-chinh/BangCanDoiKeToan";
+import SanXuatKinhDoanhPage from "./pages/bao-cao-tai-chinh/SanXuatKinhDoanh";
 import BaoCaoThuChiPage from "./pages/bao-cao-thu-chi";
 import QuyTienMatPage from "./pages/von-bang-tien/QuyTienMat";
 import TienGuiBIDVPage from "./pages/von-bang-tien/TienGuiBIDV";
@@ -54,8 +56,8 @@ export default function App() {
             <Route path="/ke-hoach/hop-dong" element={<HopDongPage />} />
             <Route path="/cong-cu-dung-cu-do-van-phong" element={<Home />} />
             <Route path="/bao-cao-tai-chinh/bang-can-doi-so-phat-sinh-tai-khoan" element={<BangCanDoiSoPhatSinhTaiKhoanPage />} />
-            <Route path="/bao-cao-tai-chinh/bang-can-doi-ke-toan" element={<Home />} />
-            <Route path="/bao-cao-tai-chinh/ket-qua-hoat-dong-san-xuat-kinh-doanh" element={<Home />} />
+            <Route path="/bao-cao-tai-chinh/bang-can-doi-ke-toan" element={<BangCanDoiKeToanPage />} />
+            <Route path="/bao-cao-tai-chinh/ket-qua-hoat-dong-san-xuat-kinh-doanh" element={<SanXuatKinhDoanhPage />} />
             <Route path="/bao-cao-tai-chinh/luu-chuyen-tien-te" element={<Home />} />
             <Route path="/phan-tich-tai-chinh" element={<Home />} />
             <Route index path="/bao-cao-phan-he" element={<Home />} />
