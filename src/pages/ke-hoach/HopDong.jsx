@@ -24,7 +24,8 @@ export default function HopDongPage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
     so_hd: "",
-    ngay: "",
+    ngay_bd: "",
+    ngay_kt: "",
     ten_kh: "",
     nd: "",
     gt_hd: "",
@@ -51,14 +52,21 @@ export default function HopDongPage() {
 
   const handleEdit = (item) => {
     setEditingItem(item);
-    const ngayValue = item.ngay
-      ? (item.ngay instanceof Date
-        ? item.ngay.toISOString().split('T')[0]
-        : new Date(item.ngay).toISOString().split('T')[0])
-      : "";
+    const formatDateValue = (date) => {
+      if (!date) return "";
+      if (date instanceof Date) {
+        return date.toISOString().split('T')[0];
+      }
+      try {
+        return new Date(date).toISOString().split('T')[0];
+      } catch {
+        return "";
+      }
+    };
     setFormData({
       so_hd: item.so_hd || "",
-      ngay: ngayValue,
+      ngay_bd: formatDateValue(item.ngay_bd),
+      ngay_kt: formatDateValue(item.ngay_kt),
       ten_kh: item.ten_kh || "",
       nd: item.nd || "",
       gt_hd: item.gt_hd?.toString() || "",
@@ -99,11 +107,19 @@ export default function HopDongPage() {
     return `${year}-${month}-${day}`;
   };
 
-  const handleDateChange = (date) => {
+  const handleDateBdChange = (date) => {
     const formatted = date[0] ? formatDateLocal(date[0]) : "";
     setFormData((prev) => ({
       ...prev,
-      ngay: formatted,
+      ngay_bd: formatted,
+    }));
+  };
+
+  const handleDateKtChange = (date) => {
+    const formatted = date[0] ? formatDateLocal(date[0]) : "";
+    setFormData((prev) => ({
+      ...prev,
+      ngay_kt: formatted,
     }));
   };
 
@@ -111,15 +127,22 @@ export default function HopDongPage() {
     e.preventDefault();
 
     // Validation
-    if (!formData.so_hd || !formData.ngay || !formData.ten_kh || !formData.gt_hd) {
+    if (!formData.so_hd || !formData.ngay_bd || !formData.ngay_kt || !formData.ten_kh || !formData.gt_hd) {
       toast.error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+      return;
+    }
+
+    // Validate ngay_kt >= ngay_bd
+    if (new Date(formData.ngay_kt) < new Date(formData.ngay_bd)) {
+      toast.error("Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu!");
       return;
     }
 
     try {
       const submitData = {
         so_hd: formData.so_hd.trim(),
-        ngay: formData.ngay,
+        ngay_bd: formData.ngay_bd,
+        ngay_kt: formData.ngay_kt,
         ten_kh: formData.ten_kh.trim(),
         nd: formData.nd?.trim() || null,
         gt_hd: parseFloat(formData.gt_hd) || 0,
@@ -138,7 +161,8 @@ export default function HopDongPage() {
       setEditingItem(null);
       setFormData({
         so_hd: "",
-        ngay: "",
+        ngay_bd: "",
+        ngay_kt: "",
         ten_kh: "",
         nd: "",
         gt_hd: "",
@@ -156,7 +180,8 @@ export default function HopDongPage() {
     setEditingItem(null);
     setFormData({
       so_hd: "",
-      ngay: "",
+      ngay_bd: "",
+      ngay_kt: "",
       ten_kh: "",
       nd: "",
       gt_hd: "",
@@ -304,7 +329,10 @@ export default function HopDongPage() {
                         {t("hopDong.soHd")}
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                        {t("hopDong.ngay")}
+                        {t("hopDong.ngayBd")}
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                        {t("hopDong.ngayKt")}
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                         {t("hopDong.tenKh")}
@@ -329,7 +357,7 @@ export default function HopDongPage() {
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-stroke dark:divide-strokedark">
                     {hopDongList.length === 0 ? (
                       <tr>
-                        <td colSpan="8" className="px-6 py-12 text-center">
+                        <td colSpan="9" className="px-6 py-12 text-center">
                           <div className="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                             <svg className="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -351,7 +379,12 @@ export default function HopDongPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900 dark:text-gray-100">
-                              {formatDate(item.ngay)}
+                              {formatDate(item.ngay_bd)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900 dark:text-gray-100">
+                              {formatDate(item.ngay_kt)}
                             </div>
                           </td>
                           <td className="px-6 py-4">
@@ -439,7 +472,7 @@ export default function HopDongPage() {
       </div>
 
       {/* Add/Edit Modal */}
-      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-lg">
+      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-4xl">
         <div className="p-6">
           <div className="mb-6">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -464,25 +497,51 @@ export default function HopDongPage() {
                 />
               </div>
 
-              <div>
-                <Label>{t("hopDong.form.ngay")} <span className="text-red-500">*</span></Label>
-                <div className="relative mt-1">
-                  <Flatpickr
-                    value={formData.ngay ? new Date(formData.ngay) : null}
-                    onChange={handleDateChange}
-                    options={{
-                      dateFormat: "d/m/Y",
-                      locale: Vietnamese,
-                      allowInput: true,
-                      disableMobile: false,
-                      clickOpens: true,
-                    }}
-                    placeholder={t("hopDong.form.placeholderNgay")}
-                    className="h-11 w-full rounded-lg border border-stroke bg-transparent px-5 py-2.5 pr-12 text-sm text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    required
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                    <CalenderIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>{t("hopDong.form.ngayBd")} <span className="text-red-500">*</span></Label>
+                  <div className="relative mt-1">
+                    <Flatpickr
+                      value={formData.ngay_bd ? new Date(formData.ngay_bd) : null}
+                      onChange={handleDateBdChange}
+                      options={{
+                        dateFormat: "d/m/Y",
+                        locale: Vietnamese,
+                        allowInput: true,
+                        disableMobile: false,
+                        clickOpens: true,
+                        maxDate: formData.ngay_kt ? new Date(formData.ngay_kt) : null,
+                      }}
+                      placeholder={t("hopDong.form.placeholderNgayBd")}
+                      className="h-11 w-full rounded-lg border border-stroke bg-transparent px-5 py-2.5 pr-12 text-sm text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      required
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                      <CalenderIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <Label>{t("hopDong.form.ngayKt")} <span className="text-red-500">*</span></Label>
+                  <div className="relative mt-1">
+                    <Flatpickr
+                      value={formData.ngay_kt ? new Date(formData.ngay_kt) : null}
+                      onChange={handleDateKtChange}
+                      options={{
+                        dateFormat: "d/m/Y",
+                        locale: Vietnamese,
+                        allowInput: true,
+                        disableMobile: false,
+                        clickOpens: true,
+                        minDate: formData.ngay_bd ? new Date(formData.ngay_bd) : null,
+                      }}
+                      placeholder={t("hopDong.form.placeholderNgayKt")}
+                      className="h-11 w-full rounded-lg border border-stroke bg-transparent px-5 py-2.5 pr-12 text-sm text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      required
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                      <CalenderIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -582,10 +641,11 @@ export default function HopDongPage() {
                 📋 Định dạng file Excel:
               </p>
               <ul className="text-xs text-blue-700 dark:text-blue-400 space-y-1 list-disc list-inside">
-                <li>Bắt buộc có header: <strong>SO_HD</strong>, <strong>NGAY</strong>, <strong>TEN_KH</strong>, <strong>GT_HD</strong></li>
+                <li>Bắt buộc có header: <strong>SO_HD</strong>, <strong>NGAY_BD</strong>, <strong>NGAY_KT</strong>, <strong>TEN_KH</strong>, <strong>GT_HD</strong></li>
                 <li>Tùy chọn: <strong>ND</strong>, <strong>TAM_UNG</strong>, <strong>CON_LAI</strong></li>
                 <li><strong>SO_HD</strong>: Số hợp đồng (text), ví dụ: <strong>HD001</strong></li>
-                <li><strong>NGAY</strong>: Ngày hợp đồng (date), ví dụ: <strong>2025-01-15</strong></li>
+                <li><strong>NGAY_BD</strong>: Ngày bắt đầu hợp đồng (date), ví dụ: <strong>2025-01-15</strong></li>
+                <li><strong>NGAY_KT</strong>: Ngày kết thúc hợp đồng (date), ví dụ: <strong>2025-12-31</strong></li>
                 <li><strong>TEN_KH</strong>: Tên khách hàng (text), ví dụ: <strong>Công ty ABC</strong></li>
                 <li><strong>ND</strong>: Nội dung (text, tùy chọn)</li>
                 <li><strong>GT_HD</strong>: Giá trị hợp đồng (số), có thể có định dạng <strong>5,000,000.00</strong></li>
