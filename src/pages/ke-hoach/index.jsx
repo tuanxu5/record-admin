@@ -225,7 +225,9 @@ export default function KeHoachPage() {
     <>
       <div className="rounded-sm shadow-default dark:border-strokedark dark:bg-boxdark max-w-full overflow-x-hidden">
         <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark flex items-center justify-between flex-wrap gap-4">
-          <h3 className="font-semibold text-black dark:text-white">{t("keHoach.costPlanQuarter")} {currentQuarter}</h3>
+          <h3 className="font-semibold text-black dark:text-white">
+            {currentQuarter === 4 ? "Bảng chi tiết KPI theo talent - Công Ty" : `${t("keHoach.costPlanQuarter")} ${currentQuarter}`}
+          </h3>
           <div className="flex gap-2">
             <Button size="sm" onClick={handleAddNew}>
               {t("keHoach.addNew")}

@@ -50,6 +50,20 @@ export default function HopDongPage() {
     }
   };
 
+  const formatCurrencyInput = (value) => {
+    // Loại bỏ tất cả ký tự không phải số
+    const numericValue = value.replace(/[^\d]/g, '');
+    if (!numericValue) return '';
+    // Format với dấu phẩy ngăn cách hàng nghìn
+    return new Intl.NumberFormat('vi-VN').format(parseInt(numericValue));
+  };
+
+  const parseCurrencyValue = (value) => {
+    // Loại bỏ dấu phẩy và chuyển thành số
+    if (!value) return '';
+    return value.replace(/[^\d]/g, '');
+  };
+
   const handleEdit = (item) => {
     setEditingItem(item);
     const formatDateValue = (date) => {
@@ -69,8 +83,8 @@ export default function HopDongPage() {
       ngay_kt: formatDateValue(item.ngay_kt),
       ten_kh: item.ten_kh || "",
       nd: item.nd || "",
-      gt_hd: item.gt_hd?.toString() || "",
-      tam_ung: item.tam_ung?.toString() || "",
+      gt_hd: item.gt_hd ? formatCurrencyInput(item.gt_hd.toString()) : "",
+      tam_ung: item.tam_ung ? formatCurrencyInput(item.tam_ung.toString()) : "",
     });
     openModal();
   };
@@ -92,10 +106,20 @@ export default function HopDongPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    
+    // Format số tiền cho gt_hd và tam_ung
+    if (name === 'gt_hd' || name === 'tam_ung') {
+      const formatted = formatCurrencyInput(value);
+      setFormData((prev) => ({
+        ...prev,
+        [name]: formatted,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const formatDateLocal = (date) => {
@@ -145,8 +169,8 @@ export default function HopDongPage() {
         ngay_kt: formData.ngay_kt,
         ten_kh: formData.ten_kh.trim(),
         nd: formData.nd?.trim() || null,
-        gt_hd: parseFloat(formData.gt_hd) || 0,
-        tam_ung: parseFloat(formData.tam_ung) || 0,
+        gt_hd: parseFloat(parseCurrencyValue(formData.gt_hd)) || 0,
+        tam_ung: parseFloat(parseCurrencyValue(formData.tam_ung)) || 0,
       };
 
       if (editingItem) {
@@ -576,8 +600,7 @@ export default function HopDongPage() {
                   <Label>{t("hopDong.form.gtHd")} <span className="text-red-500">*</span></Label>
                   <Input
                     name="gt_hd"
-                    type="number"
-                    step="0.01"
+                    type="text"
                     placeholder={t("hopDong.form.placeholderGtHd")}
                     value={formData.gt_hd}
                     onChange={handleChange}
@@ -589,8 +612,7 @@ export default function HopDongPage() {
                   <Label>{t("hopDong.form.tamUng")}</Label>
                   <Input
                     name="tam_ung"
-                    type="number"
-                    step="0.01"
+                    type="text"
                     placeholder={t("hopDong.form.placeholderTamUng")}
                     value={formData.tam_ung}
                     onChange={handleChange}

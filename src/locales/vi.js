@@ -73,6 +73,7 @@ export const vi = {
     hopDongManagement: "Quản lý hợp đồng",
     revenuePlan: "Doanh thu",
     costPlan: "Chi phí",
+    costPlanQuarter4: "Kế hoạch chi phí quý 4",
     officeSupplies: "Công cụ dụng cụ đồ văn phòng",
     accountManagement: "Quản lí tài khoản",
     addAccount: "Thêm tài khoản",

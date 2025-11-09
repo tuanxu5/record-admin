@@ -73,6 +73,7 @@ export const zh = {
     hopDongManagement: "合同管理",
     revenuePlan: "收入计划",
     costPlan: "费用计划",
+    costPlanQuarter4: "第四季度费用计划",
     officeSupplies: "办公用品工具",
     accountManagement: "账户管理",
     addAccount: "添加账户",
