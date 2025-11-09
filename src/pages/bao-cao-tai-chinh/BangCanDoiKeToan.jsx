@@ -150,9 +150,9 @@ const BangCanDoiKeToanPage = () => {
     <>
       <PageMeta title={t("balanceSheet.title")} description={t("balanceSheet.description")} />
 
-      <div className="w-full h-[calc(100vh-80px)] p-2 md:p-4 overflow-hidden flex flex-col md:-mx-6 -mt-4 md:-mt-6">
+      <div className="w-full h-[calc(100vh-80px)] p-2 md:p-4 overflow-hidden flex flex-col">
         {/* Header - Sticky */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6 mb-4 md:mb-6 max-w-full overflow-x-hidden flex-shrink-0 mt-4 md:mt-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6 mb-4 md:mb-6 max-w-full overflow-x-hidden flex-shrink-0">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-4 md:mb-6 text-center">
             📊 {t("balanceSheet.title")}
           </h1>
