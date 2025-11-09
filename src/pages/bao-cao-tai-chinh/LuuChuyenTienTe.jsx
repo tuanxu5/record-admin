@@ -3,11 +3,11 @@ import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Flatpickr from "react-flatpickr";
 import PageMeta from "../../components/common/PageMeta";
-import useSanXuatKinhDoanh from "../../hooks/useSanXuatKinhDoanh";
+import useLuuChuyenTienTe from "../../hooks/useLuuChuyenTienTe";
 import { useTranslation } from "../../hooks/useTranslation";
 import { CalenderIcon } from "../../icons";
 
-const SanXuatKinhDoanhPage = () => {
+const LuuChuyenTienTePage = () => {
   const { t } = useTranslation();
 
   const formatDateLocal = (date) => {
@@ -25,32 +25,23 @@ const SanXuatKinhDoanhPage = () => {
   const firstDayOfMonth = `${currentYear}-${String(currentMonth).padStart(2, "0")}-01`;
   const today = formatDateLocal(currentDate);
 
-  // Calculate ngay_ct2: last day of current month
-  const getLastDayOfCurrentMonth = () => {
-    // currentMonth is 1-12, but Date constructor expects 0-11 for month
-    // So we use currentMonth (which is already 1-12) to get last day of current month
-    const lastDay = new Date(currentYear, currentMonth, 0);
-    return formatDateLocal(lastDay);
-  };
-
   // Calculate ngay_ct3: first day of current month, previous year
   const getFirstDayCurrentMonthPreviousYear = () => {
     const prevYear = currentYear - 1;
     return `${prevYear}-${String(currentMonth).padStart(2, "0")}-01`;
   };
 
-  const lastDayOfCurrentMonth = getLastDayOfCurrentMonth();
   const firstDayCurrentMonthPrevYear = getFirstDayCurrentMonthPreviousYear();
 
   const [ngayCt1, setNgayCt1] = useState(firstDayOfMonth);
-  const [ngayCt2, setNgayCt2] = useState(lastDayOfCurrentMonth);
+  const [ngayCt2, setNgayCt2] = useState(today);
   const [ngayCt3, setNgayCt3] = useState(firstDayCurrentMonthPrevYear);
   const [ngayCt4, setNgayCt4] = useState(today);
   const [luyKeChecked, setLuyKeChecked] = useState(false);
   const [mau, setMau] = useState("");
 
   const ngayCt1Ref = useRef(firstDayOfMonth);
-  const ngayCt2Ref = useRef(lastDayOfCurrentMonth);
+  const ngayCt2Ref = useRef(today);
   const ngayCt3Ref = useRef(firstDayCurrentMonthPrevYear);
   const ngayCt4Ref = useRef(today);
   const luyKeCheckedRef = useRef(false);
@@ -59,7 +50,7 @@ const SanXuatKinhDoanhPage = () => {
   const [rawData, setRawData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const sanXuatKinhDoanhMutation = useSanXuatKinhDoanh();
+  const luuChuyenTienTeMutation = useLuuChuyenTienTe();
 
   const fetchData = useCallback(
     async (payload = {}) => {
@@ -78,11 +69,11 @@ const SanXuatKinhDoanhPage = () => {
           ngay_ct4,
           luyke,
           ma_dvcs,
-          mau: "GLTCC2002",
+          mau: "GLTCD2003",
         };
 
         setLoading(true);
-        const response = await sanXuatKinhDoanhMutation.mutateAsync(apiPayload);
+        const response = await luuChuyenTienTeMutation.mutateAsync(apiPayload);
         setRawData(response?.data || []);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
@@ -91,7 +82,7 @@ const SanXuatKinhDoanhPage = () => {
         setLoading(false);
       }
     },
-    [sanXuatKinhDoanhMutation]
+    [luuChuyenTienTeMutation]
   );
 
   const handleFilter = useCallback(() => {
@@ -157,13 +148,13 @@ const SanXuatKinhDoanhPage = () => {
 
   return (
     <>
-      <PageMeta title={t("businessResult.title")} description={t("businessResult.description")} />
+      <PageMeta title={t("cashFlow.title")} description={t("cashFlow.description")} />
 
       <div className="w-full h-[calc(100vh-80px)] p-2 md:p-4 overflow-hidden flex flex-col md:-mx-6 -mt-4 md:-mt-6">
         {/* Header - Sticky */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6 mb-4 md:mb-6 max-w-full overflow-x-hidden flex-shrink-0 mt-4 md:mt-6">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-4 md:mb-6 text-center">
-            📊 {t("businessResult.title")}
+            📊 {t("cashFlow.title")}
           </h1>
 
           {/* Filter Conditions */}
@@ -171,7 +162,7 @@ const SanXuatKinhDoanhPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  {t("businessResult.fromDate")}
+                  {t("cashFlow.fromDate")}
                 </label>
                 <div className="relative">
                   <Flatpickr
@@ -189,7 +180,7 @@ const SanXuatKinhDoanhPage = () => {
                       clickOpens: true,
                       maxDate: ngayCt2 ? new Date(ngayCt2) : null,
                     }}
-                    placeholder={t("businessResult.selectFromDate")}
+                    placeholder={t("cashFlow.selectFromDate")}
                     className="w-full px-4 py-3 pr-12 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                     disabled={loading}
                   />
@@ -201,7 +192,7 @@ const SanXuatKinhDoanhPage = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  {t("businessResult.toDate")}
+                  {t("cashFlow.toDate")}
                 </label>
                 <div className="relative">
                   <Flatpickr
@@ -219,7 +210,7 @@ const SanXuatKinhDoanhPage = () => {
                       clickOpens: true,
                       minDate: ngayCt1 ? new Date(ngayCt1) : null,
                     }}
-                    placeholder={t("businessResult.selectToDate")}
+                    placeholder={t("cashFlow.selectToDate")}
                     className="w-full px-4 py-3 pr-12 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                     disabled={loading}
                   />
@@ -231,7 +222,7 @@ const SanXuatKinhDoanhPage = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  {t("businessResult.prevPeriodStartDate")}
+                  {t("cashFlow.prevPeriodStartDate")}
                 </label>
                 <div className="relative">
                   <Flatpickr
@@ -249,7 +240,7 @@ const SanXuatKinhDoanhPage = () => {
                       clickOpens: true,
                       maxDate: ngayCt4 ? new Date(ngayCt4) : null,
                     }}
-                    placeholder={t("businessResult.selectPrevPeriodStartDate")}
+                    placeholder={t("cashFlow.selectPrevPeriodStartDate")}
                     className="w-full px-4 py-3 pr-12 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                     disabled={loading}
                   />
@@ -261,7 +252,7 @@ const SanXuatKinhDoanhPage = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  {t("businessResult.prevPeriodEndDate")}
+                  {t("cashFlow.prevPeriodEndDate")}
                 </label>
                 <div className="relative">
                   <Flatpickr
@@ -279,7 +270,7 @@ const SanXuatKinhDoanhPage = () => {
                       clickOpens: true,
                       minDate: ngayCt3 ? new Date(ngayCt3) : null,
                     }}
-                    placeholder={t("businessResult.selectPrevPeriodEndDate")}
+                    placeholder={t("cashFlow.selectPrevPeriodEndDate")}
                     className="w-full px-4 py-3 pr-12 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                     disabled={loading}
                   />
@@ -306,7 +297,7 @@ const SanXuatKinhDoanhPage = () => {
                     htmlFor="luyKeCheckbox"
                     className="ml-2 text-sm font-semibold text-gray-700 dark:text-gray-300"
                   >
-                    {t("businessResult.cumulative")}
+                    {t("cashFlow.cumulative")}
                   </label>
                 </div>
                 <button
@@ -324,7 +315,7 @@ const SanXuatKinhDoanhPage = () => {
         {/* Table */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 md:p-4 lg:p-6 max-w-full flex-1 flex flex-col overflow-hidden">
           <h3 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white mb-3 md:mb-4 flex-shrink-0">
-            📋 {t("businessResult.detail")}
+            📋 {t("cashFlow.detail")}
           </h3>
           {loading ? (
             <div className="text-center py-8 flex-1 flex items-center justify-center">
@@ -341,26 +332,26 @@ const SanXuatKinhDoanhPage = () => {
                     <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                       {t("balanceSheet.stt")}
                     </th>
-                    <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                      {t("businessResult.chiTieu")}
+                    <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600 min-w-[200px]">
+                      {t("cashFlow.chiTieu")}
                     </th>
                     <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                      {t("businessResult.maSo")}
+                      {t("cashFlow.maSo")}
                     </th>
                     <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                      {t("businessResult.kyNay")}
+                      {t("cashFlow.kyNay")}
                     </th>
                     <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                      {t("businessResult.kyTruoc")}
+                      {t("cashFlow.kyTruoc")}
+                    </th>
+                    <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600 w-20 max-w-24">
+                      {t("cashFlow.tkNo")}
+                    </th>
+                    <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600 w-20 max-w-24">
+                      {t("cashFlow.tkCo")}
                     </th>
                     <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                      {t("businessResult.tkNo")}
-                    </th>
-                    <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                      {t("businessResult.tkCo")}
-                    </th>
-                    <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                      {t("businessResult.congThuc")}
+                      {t("cashFlow.congThuc")}
                     </th>
                   </tr>
                 </thead>
@@ -373,7 +364,7 @@ const SanXuatKinhDoanhPage = () => {
                       ? "bg-white dark:bg-gray-800"
                       : "bg-gray-50 dark:bg-gray-700/50";
 
-                    // Highlight row if it's a main category (like row with ma_so "01")
+                    // Highlight row if it's a main category
                     const isHighlighted = row.ma_so === "01" || row.ma_so === "10" || row.ma_so === "20";
 
                     return (
@@ -391,7 +382,7 @@ const SanXuatKinhDoanhPage = () => {
                           {row.stt || ""}
                         </td>
                         <td
-                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${
+                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 min-w-[200px] ${
                             isBold ? "font-bold" : ""
                           }`}
                         >
@@ -419,16 +410,18 @@ const SanXuatKinhDoanhPage = () => {
                           {formatAmount(row.ky_truoc)}
                         </td>
                         <td
-                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${
+                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 w-20 max-w-24 overflow-hidden text-ellipsis whitespace-nowrap ${
                             isBold ? "font-bold" : ""
                           }`}
+                          title={row.tk_no || ""}
                         >
                           {row.tk_no || ""}
                         </td>
                         <td
-                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${
+                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 w-20 max-w-24 overflow-hidden text-ellipsis whitespace-nowrap ${
                             isBold ? "font-bold" : ""
                           }`}
+                          title={row.tk_co || ""}
                         >
                           {row.tk_co || ""}
                         </td>
@@ -456,4 +449,4 @@ const SanXuatKinhDoanhPage = () => {
   );
 };
 
-export default SanXuatKinhDoanhPage;
+export default LuuChuyenTienTePage;
