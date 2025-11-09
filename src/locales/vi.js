@@ -265,6 +265,8 @@ export const vi = {
     title: "Quản Lý Kế Hoạch",
     listTitle: "Danh Sách Kế Hoạch",
     costPlanQuarter: "Bảng kế hoạch chi phí quý",
+    costPlanQuarter4Title: "Bảng chi tiết kế hoạch chi phí quý 4",
+    kpiTalentCompanyTitle: "Bảng chi tiết KPI theo talent - Công Ty",
     addNew: "Thêm mới",
     importExcel: "Import Excel",
     edit: "Sửa Kế Hoạch",

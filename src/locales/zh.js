@@ -266,6 +266,8 @@ export const zh = {
     title: "计划管理",
     listTitle: "计划列表",
     costPlanQuarter: "费用计划季度表",
+    costPlanQuarter4Title: "第四季度费用计划明细表",
+    kpiTalentCompanyTitle: "按人才-公司详细KPI表",
     addNew: "新增",
     importExcel: "导入Excel",
     edit: "编辑计划",

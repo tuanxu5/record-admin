@@ -460,7 +460,7 @@ export default function ChiPhiQuy4Page() {
     <div className="rounded-sm shadow-default dark:border-strokedark dark:bg-boxdark max-w-full overflow-x-auto">
       <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
         <h3 className="font-semibold text-black dark:text-white">
-          Bảng chi tiết KPI theo talent - Công Ty
+          {t("keHoach.costPlanQuarter4Title")}
         </h3>
       </div>
 
