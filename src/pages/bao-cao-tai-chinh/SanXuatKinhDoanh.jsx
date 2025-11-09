@@ -354,12 +354,6 @@ const SanXuatKinhDoanhPage = () => {
                       {t("businessResult.kyTruoc")}
                     </th>
                     <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                      {t("businessResult.tkNo")}
-                    </th>
-                    <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                      {t("businessResult.tkCo")}
-                    </th>
-                    <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
                       {t("businessResult.congThuc")}
                     </th>
                   </tr>
@@ -417,20 +411,6 @@ const SanXuatKinhDoanhPage = () => {
                           }`}
                         >
                           {formatAmount(row.ky_truoc)}
-                        </td>
-                        <td
-                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${
-                            isBold ? "font-bold" : ""
-                          }`}
-                        >
-                          {row.tk_no || ""}
-                        </td>
-                        <td
-                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${
-                            isBold ? "font-bold" : ""
-                          }`}
-                        >
-                          {row.tk_co || ""}
                         </td>
                         <td
                           className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${
