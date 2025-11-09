@@ -264,6 +264,7 @@ export const zh = {
   keHoach: {
     title: "计划管理",
     listTitle: "计划列表",
+    costPlanQuarter: "费用计划季度表",
     addNew: "新增",
     importExcel: "导入Excel",
     edit: "编辑计划",

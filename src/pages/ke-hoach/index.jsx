@@ -12,6 +12,15 @@ import keHoachService from "../../service/keHoach";
 
 export default function KeHoachPage() {
   const { t } = useTranslation();
+  
+  // Calculate current quarter
+  const getCurrentQuarter = () => {
+    const currentMonth = new Date().getMonth() + 1; // 1-12
+    return Math.ceil(currentMonth / 3);
+  };
+  
+  const currentQuarter = getCurrentQuarter();
+  
   const [keHoachList, setKeHoachList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -216,7 +225,7 @@ export default function KeHoachPage() {
     <>
       <div className="rounded-sm shadow-default dark:border-strokedark dark:bg-boxdark max-w-full overflow-x-hidden">
         <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark flex items-center justify-between flex-wrap gap-4">
-          <h3 className="font-semibold text-black dark:text-white">{t("keHoach.listTitle")}</h3>
+          <h3 className="font-semibold text-black dark:text-white">{t("keHoach.costPlanQuarter")} {currentQuarter}</h3>
           <div className="flex gap-2">
             <Button size="sm" onClick={handleAddNew}>
               {t("keHoach.addNew")}

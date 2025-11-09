@@ -69,7 +69,7 @@ export const vi = {
     receivables: "Công nợ phải thu",
     payables: "Công nợ phải trả",
     plan: "Kế hoạch",
-    keHoachManagement: "Quản lý kế hoạch",
+    keHoachManagement: "KPI của Talent - Công ty",
     hopDongManagement: "Quản lý hợp đồng",
     revenuePlan: "Doanh thu",
     costPlan: "Chi phí",
@@ -263,6 +263,7 @@ export const vi = {
   keHoach: {
     title: "Quản Lý Kế Hoạch",
     listTitle: "Danh Sách Kế Hoạch",
+    costPlanQuarter: "Bảng kế hoạch chi phí quý",
     addNew: "Thêm mới",
     importExcel: "Import Excel",
     edit: "Sửa Kế Hoạch",
