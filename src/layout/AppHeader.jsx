@@ -72,8 +72,7 @@ const AppHeader = () => {
           </button>
 
           <Link to="/" className="lg:hidden">
-            <img className="dark:hidden transition-all duration-300 object-contain rounded-lg shadow-sm" src="/images/logo/genlive.jpg" alt="Logo" width={40} height={20} />
-
+            <img className="transition-all duration-300 object-contain rounded-lg shadow-sm" src="/images/logo/genlive.jpg" alt="Logo" width={40} height={20} />
           </Link>
 
           <button
