@@ -3,21 +3,23 @@ import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Chart from "react-apexcharts";
 import Flatpickr from "react-flatpickr";
+import SearchableSelect from "../../components/form/SearchableSelect";
 import useBangKeChungTu from "../../hooks/useBangKeChungTu";
-import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../hooks/useTheme";
+import { useTranslation } from "../../hooks/useTranslation";
 import { CalenderIcon } from "../../icons";
-import { translateText } from "../../service/translation";
 import accountDirectoryService from "../../service/account-directory";
 import customerService from "../../service/customer";
 import dmphiService from "../../service/dmphi";
-import SearchableSelect from "../../components/form/SearchableSelect";
+import { translateText } from "../../service/translation";
 
 const BaoCaoTaiChinhPage = () => {
   const { t, language } = useTranslation();
   const { theme } = useTheme();
   const [chartType, setChartType] = useState("bar");
   const [periodType, setPeriodType] = useState("ngay");
+  const [showChart, setShowChart] = useState(true);
+  const [showTable, setShowTable] = useState(true);
   const formatDateLocal = (date) => {
     if (!date) return "";
     const d = new Date(date);
@@ -92,17 +94,17 @@ const BaoCaoTaiChinhPage = () => {
       setTranslatedData([]);
       return;
     }
-    
+
     if (language === "vi") {
       setTranslatedData(data);
       return;
     }
-    
+
     const translateData = async () => {
       if (dataRef.current !== data) {
         return;
       }
-      
+
       const translated = await Promise.all(
         data.map(async (row) => {
           const translatedRow = { ...row };
@@ -139,7 +141,7 @@ const BaoCaoTaiChinhPage = () => {
     };
 
     translateData();
-  }, [data, language]);     
+  }, [data, language]);
   const displayData = useMemo(() => {
     if (translatedData.length > 0 && translatedData.length === data.length) {
       return translatedData;
@@ -314,13 +316,13 @@ const BaoCaoTaiChinhPage = () => {
         color: "#EF4444",
       },
     ],
-      xaxis: {
+    xaxis: {
       categories: labels,
       title: {
         text: t(`voucherListing.period.${periodType === "ngay" ? "day" :
-            periodType === "tuan" ? "week" :
-              periodType === "thang" ? "month" :
-                "year"
+          periodType === "tuan" ? "week" :
+            periodType === "thang" ? "month" :
+              "year"
           }`),
         style: {
           fontSize: "14px",
@@ -360,20 +362,20 @@ const BaoCaoTaiChinhPage = () => {
         },
       },
     },
-      title: {
-        text: `${t("voucherListing.chartTitle")} ${t(`voucherListing.period.${periodType === "ngay" ? "day" :
-          periodType === "tuan" ? "week" :
-            periodType === "thang" ? "month" :
-              "year"
+    title: {
+      text: `${t("voucherListing.chartTitle")} ${t(`voucherListing.period.${periodType === "ngay" ? "day" :
+        periodType === "tuan" ? "week" :
+          periodType === "thang" ? "month" :
+            "year"
         }`)}`,
-        align: "center",
-        style: {
-          fontSize: "20px",
-          fontWeight: "bold",
-          color: theme === "dark" ? "#E5E7EB" : "#1F2937",
-        },
-        margin: 20,
+      align: "center",
+      style: {
+        fontSize: "20px",
+        fontWeight: "bold",
+        color: theme === "dark" ? "#E5E7EB" : "#1F2937",
       },
+      margin: 20,
+    },
     legend: {
       position: "top",
       horizontalAlign: "center",
@@ -516,7 +518,7 @@ const BaoCaoTaiChinhPage = () => {
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                 <CalenderIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
               </div>
-          </div>
+            </div>
           </div>
 
           <SearchableSelect
@@ -566,14 +568,14 @@ const BaoCaoTaiChinhPage = () => {
           <div className="flex items-end gap-2">
             <div className="flex-1">
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("voucherListing.chartType")}</label>
-            <select
-              value={chartType}
-              onChange={(e) => setChartType(e.target.value)}
+              <select
+                value={chartType}
+                onChange={(e) => setChartType(e.target.value)}
                 className="w-full p-2 md:p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            >
+              >
                 <option value="bar">📊 {t("voucherListing.barChart")}</option>
                 <option value="line">📈 {t("voucherListing.lineChart")}</option>
-            </select>
+              </select>
             </div>
             <button
               onClick={handleFilter}
@@ -587,191 +589,243 @@ const BaoCaoTaiChinhPage = () => {
       </div>
 
       {/* Chart */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 md:p-4 mb-4 md:mb-6 max-w-full overflow-x-hidden">
-        {/* Period Tabs */}
-        <div className="flex flex-wrap gap-2 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-4 md:mb-6 max-w-full overflow-x-hidden">
+        {/* Header with toggle button */}
+        <div className="flex items-center justify-between p-3 md:p-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white">📊 {t("voucherListing.chartTitle")}</h3>
           <button
-            onClick={() => setPeriodType("ngay")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "ngay"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-              }`}
+            onClick={() => setShowChart(!showChart)}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            title={showChart ? "Ẩn biểu đồ" : "Hiện biểu đồ"}
           >
-            {t("voucherListing.byDay")}
+            <svg
+              className={`w-5 h-5 text-gray-600 dark:text-gray-400 transition-transform ${showChart ? "" : "rotate-180"}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+            </svg>
           </button>
-          <button
-            onClick={() => setPeriodType("tuan")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "tuan"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-              }`}
-          >
-            {t("voucherListing.byWeek")}
-          </button>
-          <button
-            onClick={() => setPeriodType("thang")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "thang"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-              }`}
-          >
-            {t("voucherListing.byMonth")}
-          </button>
-          <button
-            onClick={() => setPeriodType("nam")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "nam"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-              }`}
-          >
-            {t("voucherListing.byYear")}
-          </button>
-      </div>
+        </div>
 
-        {/* Chart */}
-        {labels.length > 0 && psNo.length > 0 ? (
-          <div className="w-full overflow-x-auto">
-            <Chart
-              options={chartOptions}
-              series={chartOptions.series}
-              type={chartType}
-              height={400}
-            />
-          </div>
-        ) : (
-          <div className="flex items-center justify-center h-96 text-gray-500 dark:text-gray-400">
-            <p>{t("common.noData")}</p>
+        {showChart && (
+          <div className="p-3 md:p-4">
+            {/* Period Tabs */}
+            <div className="flex flex-wrap gap-2 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setPeriodType("ngay")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "ngay"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  }`}
+              >
+                {t("voucherListing.byDay")}
+              </button>
+              <button
+                onClick={() => setPeriodType("tuan")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "tuan"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  }`}
+              >
+                {t("voucherListing.byWeek")}
+              </button>
+              <button
+                onClick={() => setPeriodType("thang")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "thang"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  }`}
+              >
+                {t("voucherListing.byMonth")}
+              </button>
+              <button
+                onClick={() => setPeriodType("nam")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${periodType === "nam"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  }`}
+              >
+                {t("voucherListing.byYear")}
+              </button>
+            </div>
+
+            {/* Chart */}
+            {labels.length > 0 && psNo.length > 0 ? (
+              <div className="w-full overflow-x-auto">
+                <Chart
+                  options={chartOptions}
+                  series={chartOptions.series}
+                  type={chartType}
+                  height={400}
+                />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-96 text-gray-500 dark:text-gray-400">
+                <p>{t("common.noData")}</p>
+              </div>
+            )}
           </div>
         )}
       </div>
       {/* Bảng kê chứng từ */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 md:p-4 lg:p-6 max-w-full overflow-x-hidden">
-        <h3 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white mb-3 md:mb-4">📋 {t("voucherListing.detail")}</h3>
-        {loading ? (
-          <div className="text-center py-8">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">{t("common.loading")}</p>
-          </div>
-        ) : data.length > 0 ? (
-          <div className="overflow-x-auto -mx-2 md:mx-0">
-            <table className="min-w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600">
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                    <div className="flex items-center gap-1 md:gap-2">
-                      <span>{t("voucherListing.voucherDate")}</span>
-                    </div>
-                  </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                    <div className="flex items-center gap-1 md:gap-2">
-                      <span>{t("voucherListing.voucherCode")}</span>
-                    </div>
-                  </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                    <div className="flex items-center gap-1 md:gap-2">
-                      <span>{t("voucherListing.voucherNumber")}</span>
-                  </div>
-                  </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                    <div className="flex items-center gap-1 md:gap-2">
-                      <span>{t("voucherListing.customerCode")}</span>
-                </div>
-                  </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                    <div className="flex items-center gap-1 md:gap-2">
-                      <span>{t("voucherListing.customerName")}</span>
-              </div>
-                  </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                    <div className="flex items-center gap-1 md:gap-2">
-                      <span>{t("voucherListing.description")}</span>
-            </div>
-                  </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                    <div className="flex items-center gap-1 md:gap-2">
-                      <span>{t("voucherListing.account")}</span>
-      </div>
-                </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                    <div className="flex items-center gap-1 md:gap-2">
-                      <span>{t("voucherListing.contraAccount")}</span>
-                    </div>
-                </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                    <div className="flex items-center justify-end gap-1 md:gap-2">
-                      <span>{t("voucherListing.debit")}</span>
-                    </div>
-                </th>
-                  <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
-                    <div className="flex items-center justify-end gap-1 md:gap-2">
-                      <span>{t("voucherListing.credit")}</span>
-                    </div>
-                </th>
-              </tr>
-            </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-dashed divide-gray-300 dark:divide-gray-700">
-                {displayData.map((row, index) => {
-                  const formatDate = (dateString) => {
-                    if (!dateString) return "";
-                    try {
-                      const date = new Date(dateString);
-                      const day = String(date.getDate()).padStart(2, "0");
-                      const month = String(date.getMonth() + 1).padStart(2, "0");
-                      const year = date.getFullYear();
-                      return `${day}-${month}-${year}`;
-                    } catch {
-                      return dateString;
-                    }
-                  };
-                  const formatAmount = (amount) => {
-                    if (!amount && amount !== 0) return "";
-                    return new Intl.NumberFormat("vi-VN").format(amount);
-                  };
-
-                  const ngayCt = formatDate(row.ngay_ct);
-                  const maCt = row.ma_ct || row.ma_cto || "";
-                  const soCt = row.so_ct || "";
-                  const maKh = row.ma_kh || "";
-                  const tenKh = row.ten_kh || "";
-                  const dienGiai = row.dien_giai || "";
-                  const tk = row.tk || "";
-                  const tkDu = row.tk_du || "";
-                  const psNo = row.ps_no || 0;
-                  const psCo = row.ps_co || 0;
-
-                return (
-                  <tr
-                      key={ index}
-                      className={`${index % 2 === 0 ? "bg-white dark:bg-gray-800" : "bg-gray-50 dark:bg-gray-700/50"} hover:bg-orange-100 dark:hover:bg-gray-700 transition-colors`}
-                    >
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{ngayCt}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{maCt}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{soCt}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{maKh}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 max-w-[120px] md:max-w-xs truncate" title={tenKh}>
-                        {tenKh}
-                    </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 max-w-[120px] md:max-w-xs truncate" title={dienGiai}>
-                        {dienGiai}
-                    </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{tk}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{tkDu}</td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-700">
-                        {psNo > 0 ? formatAmount(psNo) : ""}
-                    </td>
-                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-700">
-                        {psCo > 0 ? formatAmount(psCo) : ""}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-full overflow-x-hidden">
+        {/* Header with toggle button */}
+        <div className="flex items-center justify-between p-3 md:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white">📋 {t("voucherListing.detail")}</h3>
+          <button
+            onClick={() => setShowTable(!showTable)}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            title={showTable ? "Ẩn bảng chi tiết" : "Hiện bảng chi tiết"}
+          >
+            <svg
+              className={`w-5 h-5 text-gray-600 dark:text-gray-400 transition-transform ${showTable ? "" : "rotate-180"}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+            </svg>
+          </button>
         </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <p>{t("common.noData")}</p>
-      </div>
+
+        {showTable && (
+          <div className="p-3 md:p-4 lg:p-6">
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <p className="mt-2 text-gray-600 dark:text-gray-400">{t("common.loading")}</p>
+              </div>
+            ) : data.length > 0 ? (
+              <div className="overflow-x-auto -mx-2 md:mx-0">
+                <table className="min-w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600">
+                      <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <span>{t("voucherListing.voucherDate")}</span>
+                        </div>
+                      </th>
+                      <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <span>{t("voucherListing.voucherCode")}</span>
+                        </div>
+                      </th>
+                      <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <span>{t("voucherListing.voucherNumber")}</span>
+                        </div>
+                      </th>
+                      <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <span>{t("voucherListing.customerCode")}</span>
+                        </div>
+                      </th>
+                      <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <span>{t("voucherListing.customerName")}</span>
+                        </div>
+                      </th>
+                      <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <span>{t("voucherListing.description")}</span>
+                        </div>
+                      </th>
+                      <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <span>{t("voucherListing.account")}</span>
+                        </div>
+                      </th>
+                      <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <span>{t("voucherListing.contraAccount")}</span>
+                        </div>
+                      </th>
+                      <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center gap-1 md:gap-2">
+                            <span>{t("voucherListing.maphi")}</span>
+                        </div>
+                      </th>
+                      <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center justify-end gap-1 md:gap-2">
+                          <span>{t("voucherListing.debit")}</span>
+                        </div>
+                      </th>
+                      <th className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider border-r border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center justify-end gap-1 md:gap-2">
+                          <span>{t("voucherListing.credit")}</span>
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-dashed divide-gray-300 dark:divide-gray-700">
+                    {displayData.map((row, index) => {
+                      const formatDate = (dateString) => {
+                        if (!dateString) return "";
+                        try {
+                          const date = new Date(dateString);
+                          const day = String(date.getDate()).padStart(2, "0");
+                          const month = String(date.getMonth() + 1).padStart(2, "0");
+                          const year = date.getFullYear();
+                          return `${day}-${month}-${year}`;
+                        } catch {
+                          return dateString;
+                        }
+                      };
+                      const formatAmount = (amount) => {
+                        if (!amount && amount !== 0) return "";
+                        return new Intl.NumberFormat("vi-VN").format(amount);
+                      };
+
+                      const ngayCt = formatDate(row.ngay_ct);
+                      const maCt = row.ma_ct || row.ma_cto || "";
+                      const soCt = row.so_ct || "";
+                      const maKh = row.ma_kh || "";
+                      const tenKh = row.ten_kh || "";
+                      const dienGiai = row.dien_giai || "";
+                      const tk = row.tk || "";
+                      const tkDu = row.tk_du || "";
+                      const maPhi = row.ma_phi || "";
+                      const psNo = row.ps_no || 0;
+                      const psCo = row.ps_co || 0;
+
+                      return (
+                        <tr
+                          key={index}
+                          className={`${index % 2 === 0 ? "bg-white dark:bg-gray-800" : "bg-gray-50 dark:bg-gray-700/50"} hover:bg-orange-100 dark:hover:bg-gray-700 transition-colors`}
+                        >
+                          <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{ngayCt}</td>
+                          <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{maCt}</td>
+                          <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{soCt}</td>
+                          <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{maKh}</td>
+                          <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 max-w-[120px] md:max-w-xs truncate" title={tenKh}>
+                            {tenKh}
+                          </td>
+                          <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 max-w-[120px] md:max-w-xs truncate" title={dienGiai}>
+                            {dienGiai}
+                          </td>
+                          <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{tk}</td>
+                          <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{tkDu}</td>
+                          <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{maPhi || "-"}</td>
+                          <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-700">
+                            {psNo > 0 ? formatAmount(psNo) : ""}
+                          </td>
+                          <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-700">
+                            {psCo > 0 ? formatAmount(psCo) : ""}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p>{t("common.noData")}</p>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

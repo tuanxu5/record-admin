@@ -84,6 +84,7 @@ export const vi = {
     businessResult: "Kết quả hoạt động sản xuất kinh doanh",
     cashFlow: "Lưu chuyển tiền tệ",
     financialAnalysis: "Phân tích tài chính",
+
   },
   voucherListing: {
     title: "Bảng Kê Chứng Từ",
@@ -110,6 +111,7 @@ export const vi = {
     byDay: "Theo Ngày",
     byWeek: "Theo Tuần",
     byMonth: "Theo Tháng",
+    maphi: "Mã phí",
     byYear: "Theo Năm",
     chartTitle: "Biểu đồ Phát Sinh Nợ (PS Nợ) theo",
     period: {
@@ -337,6 +339,7 @@ export const vi = {
     gtHd: "Giá trị HĐ",
     tamUng: "Tạm ứng",
     conLai: "Còn lại",
+    daThanhToan: "Đã thanh toán",
     actions: "Thao tác",
     noData: "Không có dữ liệu",
     loading: "Đang tải...",

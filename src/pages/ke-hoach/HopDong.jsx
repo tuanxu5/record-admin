@@ -458,9 +458,15 @@ export default function HopDongPage() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                               {item.con_lai !== null && item.con_lai !== undefined ? (
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
-                                  {formatNumber(parseFloat(item.con_lai))}
-                                </span>
+                                parseFloat(item.con_lai) === 0 ? (
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
+                                    {t("hopDong.daThanhToan")}
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                    {formatNumber(parseFloat(item.con_lai))}
+                                  </span>
+                                )
                               ) : (
                                 <span className="text-gray-400 dark:text-gray-500">-</span>
                               )}
