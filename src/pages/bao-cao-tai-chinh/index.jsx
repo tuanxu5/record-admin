@@ -8,6 +8,10 @@ import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../hooks/useTheme";
 import { CalenderIcon } from "../../icons";
 import { translateText } from "../../service/translation";
+import accountDirectoryService from "../../service/account-directory";
+import customerService from "../../service/customer";
+import dmphiService from "../../service/dmphi";
+import SearchableSelect from "../../components/form/SearchableSelect";
 
 const BaoCaoTaiChinhPage = () => {
   const { t, language } = useTranslation();
@@ -38,11 +42,17 @@ const BaoCaoTaiChinhPage = () => {
     endDate: today,
   });
   const [maTaiKhoan, setMaTaiKhoan] = useState("");
+  const [tkDu, setTkDu] = useState("");
+  const [maKh, setMaKh] = useState("");
+  const [maPhi, setMaPhi] = useState("");
   const [data, setData] = useState([]);
   const [translatedData, setTranslatedData] = useState([]);
   const [loading, setLoading] = useState(false);
-  // Track data reference to ensure displayData uses latest data
   const dataRef = useRef(data);
+  const [accountList, setAccountList] = useState([]);
+  const [customerList, setCustomerList] = useState([]);
+  const [dmphiList, setDmphiList] = useState([]);
+  const [loadingFilters, setLoadingFilters] = useState(false);
 
   const bangKeChungTuMutation = useBangKeChungTu();
 
@@ -53,6 +63,9 @@ const BaoCaoTaiChinhPage = () => {
         ngay_ct1: payload.ngay_ct1 || dateRange.startDate || "",
         ngay_ct2: payload.ngay_ct2 || dateRange.endDate || "",
         ma_tai_khoan: payload.ma_tai_khoan || "",
+        tk_du: payload.tk_du || "",
+        ma_kh: payload.ma_kh || "",
+        ma_phi: payload.ma_phi || "",
         chung_tu_tu_so: payload.chung_tu_tu_so || "",
         den_so: payload.den_so || "",
         ma_dvcs: payload.ma_dvcs || "",
@@ -62,10 +75,8 @@ const BaoCaoTaiChinhPage = () => {
       const rawData = Array.isArray(response)
         ? response
         : (response?.data || response?.rows || []);
-      // Update both state and ref synchronously
       setData(rawData);
       dataRef.current = rawData;
-      // Reset translatedData immediately to ensure displayData uses new data
       setTranslatedData([]);
     } catch (error) {
       console.error("Lỗi khi tải dữ liệu:", error);
@@ -83,16 +94,13 @@ const BaoCaoTaiChinhPage = () => {
     }
     
     if (language === "vi") {
-      // For Vietnamese, use data directly without translation
       setTranslatedData(data);
       return;
     }
     
-    // For other languages, translate asynchronously
     const translateData = async () => {
-      // Check if data has changed during translation
       if (dataRef.current !== data) {
-        return; // Data changed, skip this translation
+        return;
       }
       
       const translated = await Promise.all(
@@ -131,13 +139,8 @@ const BaoCaoTaiChinhPage = () => {
     };
 
     translateData();
-  }, [data, language]);
-
-  // Always use data directly to ensure chart and table are synchronized
-  // Only use translatedData when it's ready and matches current data
+  }, [data, language]);     
   const displayData = useMemo(() => {
-    // Use data directly to ensure immediate synchronization
-    // Only use translatedData if it exists and matches data length
     if (translatedData.length > 0 && translatedData.length === data.length) {
       return translatedData;
     }
@@ -150,18 +153,47 @@ const BaoCaoTaiChinhPage = () => {
       ngay_ct2: dateRange.endDate,
     };
     fetchData(payload);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFilter = useCallback(() => {
-    // Read from ref to get the latest values immediately (fixes double-click issue)
     const payload = {
       ngay_ct1: dateRangeRef.current.startDate,
       ngay_ct2: dateRangeRef.current.endDate,
     };
     if (maTaiKhoan) payload.ma_tai_khoan = maTaiKhoan;
+    if (tkDu) payload.tk_du = tkDu;
+    if (maKh) payload.ma_kh = maKh;
+    if (maPhi) payload.ma_phi = maPhi;
     fetchData(payload);
-  }, [maTaiKhoan, fetchData]);
+  }, [maTaiKhoan, tkDu, maKh, maPhi, fetchData]);
+
+  // Load filter dropdown data
+  useEffect(() => {
+    const loadFilters = async () => {
+      setLoadingFilters(true);
+      try {
+        // Load accounts
+        const accountResponse = await accountDirectoryService.getList({ limit: 500, onlyList: true });
+        const accounts = accountResponse?.data || [];
+        setAccountList(accounts);
+
+        // Load customers
+        const customerResponse = await customerService.getList({ limit: 500 });
+        const customers = customerResponse?.data || [];
+        setCustomerList(customers);
+
+        // Load dmphi
+        const dmphiResponse = await dmphiService.getList({ limit: 500 });
+        const dmphi = dmphiResponse?.data || [];
+        setDmphiList(dmphi);
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu filter:", error);
+      } finally {
+        setLoadingFilters(false);
+      }
+    };
+    loadFilters();
+  }, []);
 
   const getPeriodKey = useCallback((dateString, type) => {
     if (!dateString) return "";
@@ -422,7 +454,7 @@ const BaoCaoTaiChinhPage = () => {
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-4 md:mb-6 text-center">📋 {t("voucherListing.title")}</h1>
 
         {/* Controls */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("voucherListing.fromDate")}</label>
             <div className="relative">
@@ -487,16 +519,49 @@ const BaoCaoTaiChinhPage = () => {
           </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("voucherListing.accountCode")}</label>
-            <input
-              type="text"
-              value={maTaiKhoan}
-              onChange={(e) => setMaTaiKhoan(e.target.value)}
-              placeholder={t("voucherListing.enterAccountCode")}
-              className="w-full p-2 md:p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            />
-          </div>
+          <SearchableSelect
+            label={t("voucherListing.accountCode")}
+            options={accountList}
+            value={maTaiKhoan}
+            onChange={setMaTaiKhoan}
+            placeholder={t("voucherListing.enterAccountCode")}
+            disabled={loadingFilters}
+            getOptionLabel={(option) => `${option.tk || option.id || ""} - ${option.ten_tk || ""}`}
+            getOptionValue={(option) => option.tk || option.id || ""}
+          />
+
+          <SearchableSelect
+            label="Tài khoản đối ứng"
+            options={accountList}
+            value={tkDu}
+            onChange={setTkDu}
+            placeholder="-- Chọn tài khoản --"
+            disabled={loadingFilters}
+            getOptionLabel={(option) => `${option.tk || option.id || ""} - ${option.ten_tk || ""}`}
+            getOptionValue={(option) => option.tk || option.id || ""}
+          />
+
+          <SearchableSelect
+            label="Mã khách hàng"
+            options={customerList}
+            value={maKh}
+            onChange={setMaKh}
+            placeholder="-- Chọn khách hàng --"
+            disabled={loadingFilters}
+            getOptionLabel={(option) => `${option.ma_kh || option.id || ""} - ${option.ten_kh || ""}`}
+            getOptionValue={(option) => option.ma_kh || option.id || ""}
+          />
+
+          <SearchableSelect
+            label="Mã phí"
+            options={dmphiList}
+            value={maPhi}
+            onChange={setMaPhi}
+            placeholder="-- Chọn mã phí --"
+            disabled={loadingFilters}
+            getOptionLabel={(option) => `${option.ma_phi || option.id || ""} - ${option.ten_phi || ""}`}
+            getOptionValue={(option) => option.ma_phi || option.id || ""}
+          />
 
           <div className="flex items-end gap-2">
             <div className="flex-1">
@@ -676,7 +741,7 @@ const BaoCaoTaiChinhPage = () => {
 
                 return (
                   <tr
-                      key={row.stt_rec || index}
+                      key={ index}
                       className={`${index % 2 === 0 ? "bg-white dark:bg-gray-800" : "bg-gray-50 dark:bg-gray-700/50"} hover:bg-orange-100 dark:hover:bg-gray-700 transition-colors`}
                     >
                       <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">{ngayCt}</td>
