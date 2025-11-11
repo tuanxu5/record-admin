@@ -11,7 +11,7 @@ export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [tenantCode, setTenantCode] = useState("");
+  const [tenantCode, setTenantCode] = useState("0111239474");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ export default function SignInForm() {
                     value={tenantCode}
                     onChange={(e) => setTenantCode(e.target.value)}
                     placeholder="Nhập mã số thuế của công ty"
-                    disabled={isLoading}
+                    disabled
                   />
                 </div>
                 <div>
