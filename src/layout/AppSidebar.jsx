@@ -16,17 +16,30 @@ import { useAuth } from "../hooks/useAuth";
 import { useSidebar } from "../hooks/useSidebar";
 import { useTranslation } from "../hooks/useTranslation";
 import { BoxCubeIcon, ChevronDownIcon, HorizontaLDots, PieChartIcon, PlugInIcon } from "../icons";
+import { Settings } from "lucide-react";
 
 const AppSidebar = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
   const { t } = useTranslation();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isMasterAdmin } = useAuth();
 
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [subMenuHeight, setSubMenuHeight] = useState({});
   const subMenuRefs = useRef({});
   const navItems = useMemo(() => {
+    // Nếu là master admin (user từ DB QUANLY), chỉ hiển thị menu Quản lý tenant
+    if (isMasterAdmin()) {
+      return [
+        {
+          icon: <Settings />,
+          name: "Quản lý Tenant",
+          path: "/quan-ly-tenant",
+        },
+      ];
+    }
+
+    // Menu cho user từ tenant DB
     const items = [
       {
         icon: <Zap />,
@@ -117,7 +130,7 @@ const AppSidebar = () => {
     }
 
     return items;
-  }, [t, isAdmin]);
+  }, [t, isAdmin, isMasterAdmin]);
 
   const othersItems = useMemo(() => [
     {

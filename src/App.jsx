@@ -1,4 +1,4 @@
-import { Route, BrowserRouter as Router, Routes } from "react-router";
+import { Route, BrowserRouter as Router, Routes, Outlet } from "react-router";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ScrollToTop } from "./components/common/ScrollToTop";
@@ -36,6 +36,9 @@ import ListAccountPage from "./pages/quan-ly-tai-khoan/ListAccountPage";
 import KeHoachPage from "./pages/ke-hoach";
 import HopDongPage from "./pages/ke-hoach/HopDong";
 import ChiPhiQuy4Page from "./pages/ke-hoach/ChiPhiQuy4";
+import QuanLyTenantPage from "./pages/quan-ly-tenant";
+import MasterAdminRoute from "./components/auth/MasterAdminRoute";
+import TenantUserRoute from "./components/auth/TenantUserRoute";
 
 export default function App() {
   return (
@@ -43,9 +46,20 @@ export default function App() {
       <Router>
         <ScrollToTop />
         <Routes>
-          {/* Dashboard Layout */}
+          {/* Master Admin Route - Chỉ cho user từ DB QUANLY */}
           <Route element={<AppLayout />}>
-            {" "}
+            <Route
+              path="/quan-ly-tenant"
+              element={
+                <MasterAdminRoute>
+                  <QuanLyTenantPage />
+                </MasterAdminRoute>
+              }
+            />
+          </Route>
+
+          {/* Tenant User Routes - Chỉ cho user từ tenant DB */}
+          <Route element={<TenantUserRoute><AppLayout /></TenantUserRoute>}>
             <Route index path="/bao-cao-thu-chi" element={<BaoCaoThuChiPage />} />
             <Route index path="/bao-cao-tai-chinh" element={<BaoCaoTaiChinhPage />} />
             <Route index path="/bao-cao-nhanh" element={<BaoCaoNhanhPage />} />

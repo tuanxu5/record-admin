@@ -54,6 +54,11 @@ export const AuthProvider = ({ children }) => {
         return user?.is_admin === 1 || user?.is_admin === true;
     };
 
+    const isMasterAdmin = () => {
+        // User từ DB QUANLY có tenant_id = null hoặc undefined
+        return user && (user.tenant_id === null || user.tenant_id === undefined);
+    };
+
     return (
         <AuthContext.Provider
             value={{
@@ -64,6 +69,7 @@ export const AuthProvider = ({ children }) => {
                 register,
                 logout,
                 isAdmin,
+                isMasterAdmin,
             }}
         >
             {children}

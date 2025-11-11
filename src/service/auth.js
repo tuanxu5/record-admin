@@ -20,6 +20,11 @@ const authService = {
         return response.data;
     },
 
+    getTenants: async () => {
+        const response = await axios.get(`${API_BASE_URL}/tenants/public`);
+        return response.data;
+    },
+
     register: async (userData) => {
         const response = await axios.post(`${API_BASE_URL}/auth/register`, userData);
         return response.data;
