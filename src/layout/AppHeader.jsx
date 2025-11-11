@@ -1,15 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 import { LanguageSwitcher } from "../components/common/LanguageSwitcher";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import UserDropdown from "../components/header/UserDropdown";
+import { useAuth } from "../hooks/useAuth";
 import { useSidebar } from "../hooks/useSidebar";
+import { LogOut } from "lucide-react";
 
 const AppHeader = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
 
   const { isMobileOpen, isExpanded, isHovered, toggleSidebar, toggleMobileSidebar } = useSidebar();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleToggle = () => {
     if (window.innerWidth >= 991) {
@@ -21,6 +26,12 @@ const AppHeader = () => {
 
   const toggleApplicationMenu = () => {
     setApplicationMenuOpen(!isApplicationMenuOpen);
+  };
+
+  const handleMobileLogout = () => {
+    logout();
+    toast.success("Đăng xuất thành công!");
+    navigate("/signin");
   };
 
   const inputRef = useRef(null);
@@ -89,21 +100,28 @@ const AppHeader = () => {
             </svg>
           </button>
         </div>
-        <div
-          className={`${isApplicationMenuOpen ? "flex" : "hidden"
-            } items-center justify-end w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:px-0 lg:shadow-none relative z-[99999] bg-white dark:bg-gray-900`}
-        >
+        <div className="hidden lg:flex items-center justify-end w-full gap-4 px-5 py-4">
           <div className="flex items-center gap-2 2xsm:gap-3">
-            {/* <!-- Language Switcher --> */}
             <LanguageSwitcher />
-            {/* <!-- Dark Mode Toggler --> */}
             <ThemeToggleButton />
-            {/* <!-- User Area --> */}
             <div className="relative overflow-visible z-[99999]">
               <UserDropdown />
             </div>
           </div>
         </div>
+
+        {isApplicationMenuOpen && (
+          <div className="flex lg:hidden w-full items-center justify-end gap-3 px-3 pb-4 mt-4">
+            <LanguageSwitcher />
+            <button
+              onClick={handleMobileLogout}
+              className="flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg shadow-sm hover:bg-red-600 transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="text-sm font-medium">Đăng xuất</span>
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );
