@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { useAuth } from "../../hooks/useAuth";
@@ -49,13 +49,13 @@ export default function UserDropdown() {
   };
   return (
     <div className="relative z-[999999]">
-      <button 
+      <button
         ref={buttonRef}
-        onClick={toggleDropdown} 
+        onClick={toggleDropdown}
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
         <span className="lg:mr-3 overflow-hidden rounded-full h-10 w-10 lg:h-11 lg:w-11">
-          <img src="/images/user/owner.jpg" alt="User" />
+          <img src="/images/logo/genlive.jpg" alt="User" />
         </span>
 
         <span className="hidden lg:block mr-1 font-medium text-theme-sm">

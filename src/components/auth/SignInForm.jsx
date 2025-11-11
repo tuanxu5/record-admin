@@ -58,14 +58,13 @@ export default function SignInForm() {
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
               Đăng nhập
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Đăng nhập để quản lí trang quản trị!</p>
           </div>
           <div>
             <form onSubmit={handleSubmit}>
               <div className="space-y-6">
                 <div>
                   <Label>
-                    Mã số thuế (Tùy chọn)
+                    Mã số thuế
                   </Label>
                   <Input
                     type="text"
@@ -74,9 +73,6 @@ export default function SignInForm() {
                     placeholder="Nhập mã số thuế (để trống nếu đăng nhập quản trị)"
                     disabled={isLoading}
                   />
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Nhập mã số thuế để đăng nhập vào tenant. Để trống nếu đăng nhập quản trị hệ thống.
-                  </p>
                 </div>
                 <div>
                   <Label>
