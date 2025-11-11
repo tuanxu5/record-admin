@@ -6,7 +6,7 @@ import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import { Modal } from "../../components/ui/modal";
 import { useModal } from "../../hooks/useModal";
-import { PencilIcon, TrashBinIcon, PlusIcon } from "../../icons";
+import { PencilIcon, PlusIcon, TrashBinIcon } from "../../icons";
 import tenantService from "../../service/tenant";
 
 export default function QuanLyTenantPage() {
@@ -262,7 +262,6 @@ export default function QuanLyTenantPage() {
                     value={formData.tenant_code}
                     onChange={handleChange}
                     required
-                    disabled={!isAddMode}
                   />
                 </div>
 

@@ -36,6 +36,7 @@ import ListAccountPage from "./pages/quan-ly-tai-khoan/ListAccountPage";
 import KeHoachPage from "./pages/ke-hoach";
 import HopDongPage from "./pages/ke-hoach/HopDong";
 import ChiPhiQuy4Page from "./pages/ke-hoach/ChiPhiQuy4";
+import TruocKeHoachQuy4Page from "./pages/ke-hoach/TruocKeHoachQuy4";
 import QuanLyTenantPage from "./pages/quan-ly-tenant";
 import MasterAdminRoute from "./components/auth/MasterAdminRoute";
 import TenantUserRoute from "./components/auth/TenantUserRoute";
@@ -71,6 +72,7 @@ export default function App() {
             <Route path="/ke-hoach" element={<KeHoachPage />} />
             <Route path="/ke-hoach/hop-dong" element={<HopDongPage />} />
             <Route path="/ke-hoach/chi-phi-quy-4" element={<ChiPhiQuy4Page />} />
+            <Route path="/ke-hoach/truoc-ke-hoach-quy-4" element={<TruocKeHoachQuy4Page />} />
             <Route path="/cong-cu-dung-cu-do-van-phong" element={<Home />} />
             <Route path="/bao-cao-tai-chinh/bang-can-doi-so-phat-sinh-tai-khoan" element={<BangCanDoiSoPhatSinhTaiKhoanPage />} />
             <Route path="/bao-cao-tai-chinh/bang-can-doi-ke-toan" element={<BangCanDoiKeToanPage />} />

@@ -36,7 +36,8 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (userData) => {
         try {
-            const response = await authService.register(userData);
+            // Sử dụng createUser để tạo user trong tenant database của user hiện tại
+            const response = await authService.createUser(userData);
             return response;
         } catch (error) {
             throw error;

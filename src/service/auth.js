@@ -30,6 +30,16 @@ const authService = {
         return response.data;
     },
 
+    registerTenantUser: async (userData) => {
+        const response = await axios.post(`${API_BASE_URL}/auth/register-tenant-user`, userData);
+        return response.data;
+    },
+
+    createUser: async (userData) => {
+        const response = await apiClient.post(`${API_BASE_URL}/auth/create-user`, userData);
+        return response.data;
+    },
+
     getProfile: async (token) => {
         const response = await axios.get(`${API_BASE_URL}/auth/me`, {
             headers: {

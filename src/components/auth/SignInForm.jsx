@@ -1,41 +1,21 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router";
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import { useAuth } from "../../hooks/useAuth";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
-import SearchableSelect from "../form/SearchableSelect";
-import { useAuth } from "../../hooks/useAuth";
-import authService from "../../service/auth";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [tenantCode, setTenantCode] = useState("");
-  const [tenants, setTenants] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingTenants, setIsLoadingTenants] = useState(true);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    const loadTenants = async () => {
-      try {
-        setIsLoadingTenants(true);
-        const data = await authService.getTenants();
-        setTenants(data || []);
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách tenants:", error);
-        toast.error("Không thể tải danh sách database. Vui lòng thử lại sau.");
-      } finally {
-        setIsLoadingTenants(false);
-      }
-    };
-    loadTenants();
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,7 +32,6 @@ export default function SignInForm() {
       }
       await login(credentials);
       toast.success("Đăng nhập thành công!");
-      // Redirect to the page user was trying to access, or home page
       const from = location.state?.from?.pathname || "/";
       navigate(from, { replace: true });
     } catch (error) {
@@ -86,27 +65,25 @@ export default function SignInForm() {
               <div className="space-y-6">
                 <div>
                   <Label>
-                    Database (Tùy chọn)
+                    Mã số thuế (Tùy chọn)
                   </Label>
-                  <SearchableSelect
-                    options={tenants}
+                  <Input
+                    type="text"
                     value={tenantCode}
-                    onChange={setTenantCode}
-                    placeholder={isLoadingTenants ? "Đang tải..." : "Chọn database (để trống nếu đăng nhập quản trị)"}
-                    disabled={isLoading || isLoadingTenants}
-                    getOptionLabel={(option) => `${option.tenant_code} - ${option.tenant_name}`}
-                    getOptionValue={(option) => option.tenant_code}
+                    onChange={(e) => setTenantCode(e.target.value)}
+                    placeholder="Nhập mã số thuế (để trống nếu đăng nhập quản trị)"
+                    disabled={isLoading}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Chọn database để đăng nhập vào tenant. Để trống nếu đăng nhập quản trị hệ thống.
+                    Nhập mã số thuế để đăng nhập vào tenant. Để trống nếu đăng nhập quản trị hệ thống.
                   </p>
                 </div>
                 <div>
                   <Label>
                     Tên đăng nhập <span className="text-error-500">*</span>{" "}
                   </Label>
-                  <Input 
-                    placeholder="abc" 
+                  <Input
+                    placeholder="abc"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     disabled={isLoading}
@@ -117,9 +94,9 @@ export default function SignInForm() {
                     Mật khẩu <span className="text-error-500">*</span>{" "}
                   </Label>
                   <div className="relative">
-                    <Input 
-                      type={showPassword ? "text" : "password"} 
-                      placeholder="Vui lòng nhập mật khẩu !" 
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Vui lòng nhập mật khẩu !"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={isLoading}
