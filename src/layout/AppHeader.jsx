@@ -91,7 +91,7 @@ const AppHeader = () => {
         </div>
         <div
           className={`${isApplicationMenuOpen ? "flex" : "hidden"
-            } items-center justify-end w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:px-0 lg:shadow-none`}
+            } items-center justify-end w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:px-0 lg:shadow-none relative z-[99999] bg-white dark:bg-gray-900`}
         >
           <div className="flex items-center gap-2 2xsm:gap-3">
             {/* <!-- Language Switcher --> */}
@@ -99,7 +99,7 @@ const AppHeader = () => {
             {/* <!-- Dark Mode Toggler --> */}
             <ThemeToggleButton />
             {/* <!-- User Area --> */}
-            <div className="relative overflow-visible z-99999">
+            <div className="relative overflow-visible z-[99999]">
               <UserDropdown />
             </div>
           </div>

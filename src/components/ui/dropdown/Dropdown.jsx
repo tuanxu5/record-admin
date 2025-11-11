@@ -40,7 +40,7 @@ export const Dropdown = ({ isOpen, onClose, children, className = "", position }
   return (
     <div
       ref={dropdownRef}
-      className={`${position ? 'fixed' : 'absolute'} z-99999 ${!position ? 'right-0 top-full mt-1' : ''} rounded-xl border border-gray-200 bg-white shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark ${className}`}
+      className={`${position ? 'fixed' : 'absolute'} z-[999999] ${!position ? 'right-0 top-full mt-1' : ''} rounded-xl border border-gray-200 bg-white shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark ${className}`}
       style={style}
     >
       {children}

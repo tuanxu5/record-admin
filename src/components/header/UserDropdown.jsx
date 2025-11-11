@@ -48,7 +48,7 @@ export default function UserDropdown() {
     closeDropdown();
   };
   return (
-    <div className="relative z-[99999]">
+    <div className="relative z-[999999]">
       <button 
         ref={buttonRef}
         onClick={toggleDropdown} 
