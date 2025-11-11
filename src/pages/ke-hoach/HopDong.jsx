@@ -106,7 +106,7 @@ export default function HopDongPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Format số tiền cho gt_hd và tam_ung
     if (name === 'gt_hd' || name === 'tam_ung') {
       const formatted = formatCurrencyInput(value);
@@ -597,7 +597,7 @@ export default function HopDongPage() {
                   value={formData.nd}
                   onChange={handleChange}
                   className="mt-1 w-full rounded-lg border border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  rows={3}
+                  rows={5}
                 />
               </div>
 
