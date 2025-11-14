@@ -1,13 +1,12 @@
 import { useState } from "react";
 
 const Select = ({ options, placeholder = "Select an option", onChange, className = "", defaultValue = "" }) => {
-  // Manage the selected value
   const [selectedValue, setSelectedValue] = useState(defaultValue);
 
   const handleChange = (e) => {
     const value = e.target.value;
     setSelectedValue(value);
-    onChange(value); // Trigger parent handler
+    onChange(value);
   };
 
   return (
@@ -18,11 +17,9 @@ const Select = ({ options, placeholder = "Select an option", onChange, className
       value={selectedValue}
       onChange={handleChange}
     >
-      {/* Placeholder option */}
       <option value="" disabled className="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
         {placeholder}
-      </option>
-      {/* Map over options */}
+      </option> 
       {options.map((option) => (
         <option key={option.value} value={option.value} className="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
           {option.label}
