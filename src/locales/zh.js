@@ -74,7 +74,7 @@ export const zh = {
     revenuePlan: "收入计划",
     costPlan: "费用计划",
     costPlanQuarter4: "第四季度费用计划",
-    preQuarter4Plan: "第四季度前预算",
+    preQuarter4Plan: "12月预算",
     officeSupplies: "办公用品工具",
     accountManagement: "账户管理",
     addAccount: "添加账户",

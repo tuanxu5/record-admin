@@ -74,7 +74,7 @@ export const vi = {
     revenuePlan: "Doanh thu",
     costPlan: "Chi phí",
     costPlanQuarter4: "Kế hoạch chi phí quý 4",
-    preQuarter4Plan: "Trước kế hoạch quý 4",
+    preQuarter4Plan: "Dự chi tháng 12",
     officeSupplies: "Công cụ dụng cụ đồ văn phòng",
     accountManagement: "Quản lí tài khoản",
     addAccount: "Thêm tài khoản",
