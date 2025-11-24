@@ -9,7 +9,7 @@ import { useTheme } from "../../hooks/useTheme";
 export default function Home() {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const { cashAndDeposits, revenueKPIExpenses, expenses, topCustomers, isLoading } = useDashboardData();
+  const { cashAndDeposits, revenueKPIExpenses, expenses, topCustomers, accountsPayable, isLoading } = useDashboardData();
   const isTopCustomersLoading = topCustomers.isLoading;
   const topCustomersError = topCustomers.error;
 
@@ -786,6 +786,251 @@ export default function Home() {
     ];
   }, [expenses.data, t]);
 
+  // Chart options cho Công nợ phải trả
+  const accountsPayableChartOptions = useMemo(() => {
+    const data = accountsPayable.data?.data || [];
+    
+    // Process data: get top suppliers by closing balance (C = need to pay)
+    const suppliersData = data
+      .map((item) => {
+        // Parse dư cuối: du_cuoi2 là "Cr." (C) hoặc "Dr." (N)
+        const duCuoi2 = String(item.du_cuoi2 || "").trim();
+        const duCuoiType = duCuoi2 === "Cr." ? "C" : (duCuoi2 === "Dr." ? "N" : "");
+        const noCk = parseFloat(item.no_ck || 0);
+        const coCk = parseFloat(item.co_ck || 0);
+        const duCuoiValue = duCuoiType === "C" ? coCk : (duCuoiType === "N" ? noCk : 0);
+        
+        // Only show suppliers with C (need to pay)
+        const closingBalance = duCuoiType === "C" ? duCuoiValue : 0;
+        
+        return {
+          maKh: item.ma_kh || item.maKh || "",
+          tenKh: item.ten_kh || item.tenKh || item.ten_khach_hang || "",
+          closingBalance,
+        };
+      })
+      .filter((item) => item.closingBalance > 0)
+      .sort((a, b) => b.closingBalance - a.closingBalance)
+      .slice(0, 10); // Top 10
+
+    const labels = suppliersData.map((s) => s.maKh || s.tenKh || "");
+
+    return {
+      chart: {
+        type: "bar",
+        height: 300,
+        fontFamily: "Outfit, sans-serif",
+        toolbar: {
+          show: false,
+        },
+      },
+      plotOptions: {
+        bar: {
+          horizontal: true,
+          barHeight: "55%",
+          borderRadius: 8,
+          borderRadiusApplication: "end",
+          dataLabels: {
+            position: "center",
+          },
+        },
+      },
+      colors: ["#F59E0B"],
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          type: 'horizontal',
+          shadeIntensity: 0.5,
+          gradientToColors: ['#D97706'],
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 0.8,
+          stops: [0, 100]
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+          if (val === 0) return "";
+          return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            minimumFractionDigits: 0,
+          }).format(val);
+        },
+        style: {
+          fontSize: "11px",
+          fontWeight: 600,
+          colors: ["#fff"],
+        },
+      },
+      xaxis: {
+        categories: labels,
+        labels: {
+          style: {
+            fontSize: "11px",
+            colors: theme === "dark" ? "#9CA3AF" : "#6b7280",
+          },
+          formatter: function (val) {
+            return new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+              minimumFractionDigits: 0,
+              notation: "compact",
+            }).format(val);
+          },
+        },
+      },
+      yaxis: {
+        labels: {
+          style: {
+            fontSize: "11px",
+            colors: theme === "dark" ? "#9CA3AF" : "#6b7280",
+          },
+        },
+      },
+      tooltip: {
+        theme: theme === "dark" ? "dark" : "light",
+        style: {
+          fontSize: "14px",
+        },
+        fillSeriesColor: false,
+        marker: {
+          show: true,
+        },
+        custom: function({ series, seriesIndex, dataPointIndex }) {
+          const supplierName = labels[dataPointIndex] || '';
+          const value = series[seriesIndex][dataPointIndex];
+          const formattedValue = new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            minimumFractionDigits: 0,
+          }).format(value);
+          return `<div class="apexcharts-tooltip-title" style="font-family: Outfit, sans-serif; font-size: 12px;"></div>
+                  <div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;">
+                    <span class="apexcharts-tooltip-marker" style="background-color: #F59E0B;"></span>
+                    <div class="apexcharts-tooltip-text" style="font-family: Outfit, sans-serif; font-size: 12px;">
+                      <div class="apexcharts-tooltip-y-group">
+                        <span class="apexcharts-tooltip-text-y-label">${supplierName}: </span>
+                        <span class="apexcharts-tooltip-text-y-value">${formattedValue}</span>
+                      </div>
+                    </div>
+                  </div>`;
+        },
+      },
+      grid: {
+        borderColor: theme === "dark" ? "#374151" : "#E5E7EB",
+        strokeDashArray: 3,
+        xaxis: {
+          lines: {
+            show: true,
+          },
+        },
+        yaxis: {
+          lines: {
+            show: true,
+          },
+        },
+      },
+      legend: {
+        show: false,
+      },
+    };
+  }, [accountsPayable.data, theme]);
+
+  const accountsPayableChartSeries = useMemo(() => {
+    const data = accountsPayable.data?.data || [];
+    
+    const suppliersData = data
+      .map((item) => {
+        // Parse dư cuối: du_cuoi2 là "Cr." (C) hoặc "Dr." (N)
+        const duCuoi2 = String(item.du_cuoi2 || "").trim();
+        const duCuoiType = duCuoi2 === "Cr." ? "C" : (duCuoi2 === "Dr." ? "N" : "");
+        const noCk = parseFloat(item.no_ck || 0);
+        const coCk = parseFloat(item.co_ck || 0);
+        const duCuoiValue = duCuoiType === "C" ? coCk : (duCuoiType === "N" ? noCk : 0);
+        
+        const closingBalance = duCuoiType === "C" ? duCuoiValue : 0;
+        
+        return {
+          maKh: item.ma_kh || item.maKh || "",
+          tenKh: item.ten_kh || item.tenKh || item.ten_khach_hang || "",
+          closingBalance,
+        };
+      })
+      .filter((item) => item.closingBalance > 0)
+      .sort((a, b) => b.closingBalance - a.closingBalance)
+      .slice(0, 10);
+
+    const chartData = suppliersData.map((s) => s.closingBalance);
+
+    return [
+      {
+        name: t("dashboard.accountsPayable"),
+        data: chartData,
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: 'vertical',
+            shadeIntensity: 0.5,
+            gradientToColors: ['#D97706'],
+            inverseColors: false,
+            opacityFrom: 1,
+            opacityTo: 0.8,
+            stops: [0, 100]
+          }
+        }
+      },
+    ];
+  }, [accountsPayable.data, t]);
+
+  // Format balance with C/N indicator
+  const formatBalance = (value, type) => {
+    if (!value && value !== 0) return "";
+    const formatted = new Intl.NumberFormat("vi-VN", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+    return type === "C" ? `${formatted} C` : type === "N" ? `${formatted} N` : formatted;
+  };
+
+  // Process table data
+  const accountsPayableTableData = useMemo(() => {
+    const data = accountsPayable.data?.data || [];
+    return data.map((item, index) => {
+      // Parse dư đầu: du_dau là "C" hoặc "N", giá trị từ no_dk hoặc co_dk
+      const duDauType = String(item.du_dau || "").trim();
+      const noDk = parseFloat(item.no_dk || 0);
+      const coDk = parseFloat(item.co_dk || 0);
+      const duDauValue = duDauType === "N" ? noDk : (duDauType === "C" ? coDk : 0);
+      
+      // Parse phát sinh
+      const psNo = parseFloat(item.ps_no || 0);
+      const psCo = parseFloat(item.ps_co || 0);
+      
+      // Parse dư cuối: du_cuoi2 là "Cr." (C) hoặc "Dr." (N), giá trị từ no_ck hoặc co_ck
+      const duCuoi2 = String(item.du_cuoi2 || "").trim();
+      const duCuoiType = duCuoi2 === "Cr." ? "C" : (duCuoi2 === "Dr." ? "N" : "");
+      const noCk = parseFloat(item.no_ck || 0);
+      const coCk = parseFloat(item.co_ck || 0);
+      const duCuoiValue = duCuoiType === "C" ? coCk : (duCuoiType === "N" ? noCk : 0);
+
+      return {
+        stt: index + 1,
+        maKh: item.ma_kh || item.maKh || "",
+        tenKh: item.ten_kh || item.tenKh || item.ten_khach_hang || "",
+        duDau: duDauValue,
+        duDauType,
+        psNo,
+        psCo,
+        duCuoi: duCuoiValue,
+        duCuoiType,
+      };
+    });
+  }, [accountsPayable.data]);
+
   return (
     <>
       <PageMeta
@@ -1004,9 +1249,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Chart 3: Các khoản chi (Bar Chart) */}
-        <div className="col-span-12 lg:col-span-6 lg:h-[620px]">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-3 md:p-4 lg:p-6 border border-gray-100 dark:border-gray-700 lg:h-full">
+        {/* Chart 3: Các khoản chi (Bar Chart) - Full Width */}
+        <div className="col-span-12">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-3 md:p-4 lg:p-6 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
               <div className="bg-red-100 dark:bg-red-900 rounded-lg p-1.5">
                 <BarChart3 className="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -1031,7 +1276,7 @@ export default function Home() {
         </div>
 
         {/* Chart 4: Top 5 Khách hàng doanh thu cao nhất và thấp nhất */}
-        <div className="col-span-12 lg:col-span-6 lg:h-[620px]">
+        <div className="col-span-12 lg:h-[620px]">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-3 md:p-4 lg:p-6 border border-gray-100 dark:border-gray-700 lg:h-full flex flex-col">
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
               <div className="bg-purple-100 dark:bg-purple-900 rounded-lg p-1.5">
@@ -1324,6 +1569,132 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* Chart 5: Công nợ còn phải thanh toán */}
+        <div className="col-span-12">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-3 md:p-4 lg:p-6 border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+              <div className="bg-orange-100 dark:bg-orange-900 rounded-lg p-1.5">
+                <BarChart3 className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <h3 className="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+                {t("dashboard.accountsPayable")}
+              </h3>
+            </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-[300px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            ) : (
+              <>
+                <Chart
+                  options={accountsPayableChartOptions}
+                  series={accountsPayableChartSeries}
+                  type="bar"
+                  height={isMobile ? 300 : 380}
+                />
+                
+                {/* Detail Table */}
+                <div className="mt-6 overflow-x-auto">
+                  <h4 className="text-sm md:text-base font-semibold text-gray-800 dark:text-white mb-3">
+                    {t("dashboard.accountsPayableDetail")}
+                  </h4>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full border-collapse">
+                      <thead className="bg-gray-100 dark:bg-gray-700">
+                        <tr>
+                          <th className="px-2 py-2 md:px-3 md:py-2 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase border-r border-gray-300 dark:border-gray-600">
+                            {t("dashboard.stt")}
+                          </th>
+                          <th className="px-2 py-2 md:px-3 md:py-2 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase border-r border-gray-300 dark:border-gray-600">
+                            {t("dashboard.customerCode")}
+                          </th>
+                          <th className="px-2 py-2 md:px-3 md:py-2 text-left text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase border-r border-gray-300 dark:border-gray-600">
+                            {t("dashboard.customerName")}
+                          </th>
+                          <th className="px-2 py-2 md:px-3 md:py-2 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase border-r border-gray-300 dark:border-gray-600">
+                            {t("dashboard.openingBalance")}
+                          </th>
+                          <th className="px-2 py-2 md:px-3 md:py-2 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase border-r border-gray-300 dark:border-gray-600">
+                            {t("dashboard.debitAccrual")}
+                          </th>
+                          <th className="px-2 py-2 md:px-3 md:py-2 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase border-r border-gray-300 dark:border-gray-600">
+                            {t("dashboard.creditAccrual")}
+                          </th>
+                          <th className="px-2 py-2 md:px-3 md:py-2 text-right text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-300 uppercase">
+                            {t("dashboard.closingBalance")}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {accountsPayableTableData.length > 0 ? (
+                          accountsPayableTableData.map((row, index) => (
+                            <tr
+                              key={index}
+                              className={index % 2 === 0 ? "bg-white dark:bg-gray-800" : "bg-gray-50 dark:bg-gray-700/50"}
+                            >
+                              <td className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
+                                {row.stt}
+                              </td>
+                              <td className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
+                                {row.maKh}
+                              </td>
+                              <td className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
+                                {row.tenKh}
+                              </td>
+                              <td className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-600">
+                                {row.duDau > 0 ? formatBalance(row.duDau, row.duDauType) : ""}
+                              </td>
+                              <td className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-600">
+                                {row.psNo > 0 ? new Intl.NumberFormat("vi-VN", { minimumFractionDigits: 0 }).format(row.psNo) : ""}
+                              </td>
+                              <td className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-600">
+                                {row.psCo > 0 ? new Intl.NumberFormat("vi-VN", { minimumFractionDigits: 0 }).format(row.psCo) : ""}
+                              </td>
+                              <td className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white text-right">
+                                {row.duCuoi > 0 ? formatBalance(row.duCuoi, row.duCuoiType) : ""}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="7" className="px-4 py-4 text-center text-gray-500 dark:text-gray-400">
+                              {t("common.noData")}
+                            </td>
+                          </tr>
+                        )}
+                        {/* Totals Row */}
+                        {accountsPayable.data?.totals && (
+                          <tr className="bg-blue-50 dark:bg-blue-900/20 border-t-2 border-blue-500 dark:border-blue-600 font-bold">
+                            <td colSpan="3" className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
+                              {t("dashboard.total")}:
+                            </td>
+                            <td className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-600">
+                              {accountsPayable.data.totals.duDau !== 0 
+                                ? formatBalance(Math.abs(accountsPayable.data.totals.duDau), accountsPayable.data.totals.duDau > 0 ? "C" : "N")
+                                : ""}
+                            </td>
+                            <td className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-600">
+                              {new Intl.NumberFormat("vi-VN", { minimumFractionDigits: 0 }).format(accountsPayable.data.totals.psNo)}
+                            </td>
+                            <td className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-600">
+                              {new Intl.NumberFormat("vi-VN", { minimumFractionDigits: 0 }).format(accountsPayable.data.totals.psCo)}
+                            </td>
+                            <td className="px-2 py-2 md:px-3 md:py-2 text-[10px] md:text-xs text-gray-900 dark:text-white text-right">
+                              {accountsPayable.data.totals.duCuoi !== 0
+                                ? formatBalance(Math.abs(accountsPayable.data.totals.duCuoi), accountsPayable.data.totals.duCuoi > 0 ? "C" : "N")
+                                : ""}
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>

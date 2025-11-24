@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useTranslation } from "./useTranslation";
 import dashboardService from "../service/dashboard";
 
 export const useDashboardData = () => {
+    // Lấy ngôn ngữ hiện tại từ context
+    const { language } = useTranslation();
     const cashAndDepositsQuery = useQuery({
         queryKey: ["dashboard", "cashAndDeposits"],
         queryFn: async () => {
@@ -46,7 +49,7 @@ export const useDashboardData = () => {
     });
 
     const expensesQuery = useQuery({
-        queryKey: ["dashboard", "expenses"],
+        queryKey: ["dashboard", "expenses", language], // Thêm language vào queryKey
         queryFn: async () => {
             try {
                 const data = await dashboardService.getExpenses();
@@ -90,6 +93,20 @@ export const useDashboardData = () => {
         staleTime: 1000 * 60 * 5,
     });
 
+    const accountsPayableQuery = useQuery({
+        queryKey: ["dashboard", "accountsPayable"],
+        queryFn: async () => {
+            try {
+                const data = await dashboardService.getAccountsPayable();
+                return data;
+            } catch (error) {
+                toast.error("Lỗi khi tải dữ liệu công nợ phải trả!");
+                throw error;
+            }
+        },
+        staleTime: 1000 * 60 * 5,
+    });
+
     return {
         cashAndDeposits: cashAndDepositsQuery,
         revenueByTaler: revenueByTalerQuery,
@@ -97,7 +114,8 @@ export const useDashboardData = () => {
         expenses: expensesQuery,
         kpiPlan: kpiPlanQuery,
         topCustomers: topCustomersQuery,
-        isLoading: cashAndDepositsQuery.isLoading || revenueByTalerQuery.isLoading || revenueKPIExpensesQuery.isLoading || expensesQuery.isLoading || kpiPlanQuery.isLoading || topCustomersQuery.isLoading,
+        accountsPayable: accountsPayableQuery,
+        isLoading: cashAndDepositsQuery.isLoading || revenueByTalerQuery.isLoading || revenueKPIExpensesQuery.isLoading || expensesQuery.isLoading || kpiPlanQuery.isLoading || topCustomersQuery.isLoading || accountsPayableQuery.isLoading,
     };
 };
 

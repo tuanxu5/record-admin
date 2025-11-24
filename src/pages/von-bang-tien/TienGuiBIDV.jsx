@@ -3,8 +3,8 @@ import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import Flatpickr from "react-flatpickr";
-import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../hooks/useTheme";
+import { useTranslation } from "../../hooks/useTranslation";
 import { useVonBangTien } from "../../hooks/useVonBangTien";
 import { CalenderIcon } from "../../icons";
 import { translateText } from "../../service/translation";
@@ -14,7 +14,7 @@ const TienGuiBIDVPage = () => {
   const { theme } = useTheme();
   const [periodType, setPeriodType] = useState("ngay");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  
+
   // Helper function to format date in local timezone (avoid UTC conversion issues)
   const formatDateLocal = (date) => {
     if (!date) return "";
@@ -24,7 +24,7 @@ const TienGuiBIDVPage = () => {
     const day = String(d.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
-  
+
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const firstDayOfYear = `${currentYear}-01-01`;
@@ -513,38 +513,39 @@ const TienGuiBIDVPage = () => {
                   const psNo = isNaN(parseFloat(psNoValue)) ? 0 : parseFloat(psNoValue);
                   const psCo = isNaN(parseFloat(psCoValue)) ? 0 : parseFloat(psCoValue);
                   const tenTkDU = row.ten_tk_du || "";
+                  const tenTk2DU = row.ten_tk2 || "";
 
                   return (
                     <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {ngayCt}
                       </td>
-                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {ngayLapCt}
                       </td>
-                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {maCt}
                       </td>
-                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {soCt}
                       </td>
-                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {maKh}
                       </td>
-                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {tenKh}
                       </td>
-                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {dienGiai}
                       </td>
-                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-right text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-right text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {formatAmount(psNo)}
                       </td>
-                    <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-right text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
+                      <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-right text-gray-900 dark:text-white border-r border-gray-300 dark:border-gray-700">
                         {formatAmount(psCo)}
                       </td>
                       <td className="px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs text-gray-900 dark:text-white">
-                        {tenTkDU}
+                        {tenTkDU} ( {tenTk2DU} )
                       </td>
                     </tr>
                   );

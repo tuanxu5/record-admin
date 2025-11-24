@@ -98,19 +98,19 @@ const BangCanDoiSoPhatSinhTaiKhoanPage = () => {
     // Recalculate totals for filtered data
     const filteredTotals = filteredData.length > 0
       ? filteredData.reduce(
-          (acc, row) => {
-            if (row.bold !== 1) {
-              acc.no_dk = (acc.no_dk || 0) + (parseFloat(row.no_dk) || 0);
-              acc.co_dk = (acc.co_dk || 0) + (parseFloat(row.co_dk) || 0);
-              acc.ps_no = (acc.ps_no || 0) + (parseFloat(row.ps_no) || 0);
-              acc.ps_co = (acc.ps_co || 0) + (parseFloat(row.ps_co) || 0);
-              acc.no_ck = (acc.no_ck || 0) + (parseFloat(row.no_ck) || 0);
-              acc.co_ck = (acc.co_ck || 0) + (parseFloat(row.co_ck) || 0);
-            }
-            return acc;
-          },
-          { no_dk: 0, co_dk: 0, ps_no: 0, ps_co: 0, no_ck: 0, co_ck: 0 }
-        )
+        (acc, row) => {
+          if (row.bold !== 1) {
+            acc.no_dk = (acc.no_dk || 0) + (parseFloat(row.no_dk) || 0);
+            acc.co_dk = (acc.co_dk || 0) + (parseFloat(row.co_dk) || 0);
+            acc.ps_no = (acc.ps_no || 0) + (parseFloat(row.ps_no) || 0);
+            acc.ps_co = (acc.ps_co || 0) + (parseFloat(row.ps_co) || 0);
+            acc.no_ck = (acc.no_ck || 0) + (parseFloat(row.no_ck) || 0);
+            acc.co_ck = (acc.co_ck || 0) + (parseFloat(row.co_ck) || 0);
+          }
+          return acc;
+        },
+        { no_dk: 0, co_dk: 0, ps_no: 0, ps_co: 0, no_ck: 0, co_ck: 0 }
+      )
       : null;
 
     return { data: filteredData, totals: filteredTotals };
@@ -316,7 +316,7 @@ const BangCanDoiSoPhatSinhTaiKhoanPage = () => {
                           {row.tk || ""}
                         </td>
                         <td className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${isBold ? "font-bold" : ""}`}>
-                          {row.ten_tk || ""}
+                          {row.ten_tk || ""} ( {row.ten_tk2 || ""} )
                         </td>
                         <td className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-600 ${isBold ? "font-bold" : ""}`}>
                           {formatAmount(row.no_dk)}
