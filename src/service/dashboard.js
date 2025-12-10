@@ -1,22 +1,9 @@
-import axios from "axios";
 import bangKeChungTuService from "./bang-ke-chung-tu";
 import congNoPhaiTraService from "./cong-no-phai-tra";
 import dmphiService from "./dmphi";
 import keHoachService from "./keHoach";
 import vonBangTienService from "./von-bang-tien";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
-
-const apiClient = axios.create({
-    baseURL: API_BASE_URL,
-});
-apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
 
 const dashboardService = {
     getCashAndDeposits: async () => {
