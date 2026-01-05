@@ -9,7 +9,7 @@ const dashboardService = {
     getCashAndDeposits: async () => {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth() + 1;
+        const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
         const firstDayOfYear = `${currentYear}-${currentMonth}-01`;
         const today = currentDate.toISOString().split('T')[0];
         const [quyTienMat, tienGuiBIDV, tienGuiViettinbank] = await Promise.all([
@@ -62,7 +62,7 @@ const dashboardService = {
     getRevenueKPIExpenses: async () => {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth() + 1;
+        const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
         const firstDayOfMonth = `${currentYear}-${String(currentMonth).padStart(2, "0")}-01`;
         const today = currentDate.toISOString().split('T')[0];
         try {
@@ -205,7 +205,7 @@ const dashboardService = {
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu Revenue/KPI/Expenses:", error);
             const currentDate = new Date();
-            const currentMonth = currentDate.getMonth() + 1;
+            const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
             const currentYear = currentDate.getFullYear();
             const currentMonthKey = `${String(currentMonth).padStart(2, "0")}/${currentYear}`;
             return {
@@ -221,7 +221,7 @@ const dashboardService = {
         try {
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth() + 1;
+            const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
             const firstDayOfMonth = `${currentYear}-${String(currentMonth).padStart(2, "0")}-01`;
             const today = currentDate.toISOString().split('T')[0];
 
@@ -307,7 +307,7 @@ const dashboardService = {
     getTopCustomersByRevenue: async () => {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth() + 1;
+        const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
         const firstDayOfMonth = `${currentYear}-${String(currentMonth).padStart(2, "0")}-01`;
         const today = currentDate.toISOString().split('T')[0];
         const currentMonthKey = `${String(currentMonth).padStart(2, "0")}/${currentYear}`;
@@ -569,7 +569,7 @@ const dashboardService = {
     getAccountsPayable: async () => {
         try {
             const currentDate = new Date();
-            const currentMonth = currentDate.getMonth() + 1; // 1-12
+            const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0'); // 1-12
             const currentYear = currentDate.getFullYear();
 
             // Calculate current quarter start month

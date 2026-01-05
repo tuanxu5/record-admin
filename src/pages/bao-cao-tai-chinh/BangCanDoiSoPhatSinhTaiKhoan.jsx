@@ -19,7 +19,7 @@ const BangCanDoiSoPhatSinhTaiKhoanPage = () => {
   };
 
   const currentDate = new Date();
-  const currentMonth = currentDate.getMonth() + 1;
+  const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
   const currentYear = currentDate.getFullYear();
   const firstDayOfMonth = `${currentYear}-${String(currentMonth).padStart(2, "0")}-01`;
   const today = formatDateLocal(currentDate);

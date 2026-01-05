@@ -20,7 +20,7 @@ const SanXuatKinhDoanhPage = () => {
   };
 
   const currentDate = new Date();
-  const currentMonth = currentDate.getMonth() + 1;
+  const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
   const currentYear = currentDate.getFullYear();
   const firstDayOfMonth = `${currentYear}-${String(currentMonth).padStart(2, "0")}-01`;
   const today = formatDateLocal(currentDate);
@@ -364,8 +364,8 @@ const SanXuatKinhDoanhPage = () => {
                     const bgColor = isBold
                       ? "bg-gray-100 dark:bg-gray-700"
                       : index % 2 === 0
-                      ? "bg-white dark:bg-gray-800"
-                      : "bg-gray-50 dark:bg-gray-700/50";
+                        ? "bg-white dark:bg-gray-800"
+                        : "bg-gray-50 dark:bg-gray-700/50";
 
                     // Highlight row if it's a main category (like row with ma_so "01")
                     const isHighlighted = row.ma_so === "01" || row.ma_so === "10" || row.ma_so === "20";
@@ -373,49 +373,42 @@ const SanXuatKinhDoanhPage = () => {
                     return (
                       <tr
                         key={row.stt_rec || row.stt || index}
-                        className={`${bgColor} ${
-                          isHighlighted ? "bg-orange-100 dark:bg-orange-900/30" : ""
-                        } hover:bg-orange-100 dark:hover:bg-orange-900/20 transition-colors`}
+                        className={`${bgColor} ${isHighlighted ? "bg-orange-100 dark:bg-orange-900/30" : ""
+                          } hover:bg-orange-100 dark:hover:bg-orange-900/20 transition-colors`}
                       >
                         <td
-                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${
-                            isBold ? "font-bold" : ""
-                          }`}
+                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${isBold ? "font-bold" : ""
+                            }`}
                         >
                           {row.stt || ""}
                         </td>
                         <td
-                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${
-                            isBold ? "font-bold" : ""
-                          }`}
+                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${isBold ? "font-bold" : ""
+                            }`}
                         >
                           {row.chi_tieu || row.chi_tieu2 || ""}
                         </td>
                         <td
-                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${
-                            isBold ? "font-bold" : ""
-                          }`}
+                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${isBold ? "font-bold" : ""
+                            }`}
                         >
                           {row.ma_so || ""}
                         </td>
                         <td
-                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-600 ${
-                            isBold ? "font-bold" : ""
-                          }`}
+                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-600 ${isBold ? "font-bold" : ""
+                            }`}
                         >
                           {formatAmount(row.ky_nay)}
                         </td>
                         <td
-                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-600 ${
-                            isBold ? "font-bold" : ""
-                          }`}
+                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 whitespace-nowrap text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white text-right border-r border-gray-200 dark:border-gray-600 ${isBold ? "font-bold" : ""
+                            }`}
                         >
                           {formatAmount(row.ky_truoc)}
                         </td>
                         <td
-                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${
-                            isBold ? "font-bold" : ""
-                          }`}
+                          className={`px-2 py-2 md:px-3 md:py-2 lg:px-4 lg:py-3 text-[10px] md:text-xs lg:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 ${isBold ? "font-bold" : ""
+                            }`}
                         >
                           {row.cach_tinh || row.cong_thuc || ""}
                         </td>
