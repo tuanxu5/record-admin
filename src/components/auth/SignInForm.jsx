@@ -62,7 +62,7 @@ export default function SignInForm() {
                     value={tenantCode}
                     onChange={(e) => setTenantCode(e.target.value)}
                     placeholder="Nhập mã số thuế của công ty"
-                    disabled
+                    
                   />
                 </div>
                 <div>
