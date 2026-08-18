@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import { LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { LanguageSwitcher } from "../components/common/LanguageSwitcher";
@@ -7,7 +8,6 @@ import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import UserDropdown from "../components/header/UserDropdown";
 import { useAuth } from "../hooks/useAuth";
 import { useSidebar } from "../hooks/useSidebar";
-import { LogOut } from "lucide-react";
 
 const AppHeader = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -83,7 +83,7 @@ const AppHeader = () => {
           </button>
 
           <Link to="/" className="lg:hidden">
-            <img className="transition-all duration-300 object-contain rounded-lg shadow-sm" src="/images/logo/genlive.jpg" alt="Logo" width={40} height={20} />
+            <img className="transition-all duration-300 object-contain rounded-lg shadow-sm" src="/images/logo/logo.png" alt="Logo" width={40} height={20} />
           </Link>
 
           <button

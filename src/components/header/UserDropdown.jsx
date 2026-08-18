@@ -55,7 +55,7 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
         <span className="lg:mr-3 overflow-hidden rounded-full h-10 w-10 lg:h-11 lg:w-11">
-          <img src="/images/logo/genlive.jpg" alt="User" />
+          <img src="/images/logo/logo.png" alt="User" />
         </span>
 
         <span className="hidden lg:block mr-1 font-medium text-theme-sm">

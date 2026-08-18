@@ -12,11 +12,11 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 
+import { Settings } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useSidebar } from "../hooks/useSidebar";
 import { useTranslation } from "../hooks/useTranslation";
 import { BoxCubeIcon, ChevronDownIcon, HorizontaLDots, PieChartIcon, PlugInIcon } from "../icons";
-import { Settings } from "lucide-react";
 
 const AppSidebar = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
@@ -95,7 +95,7 @@ const AppSidebar = () => {
           { name: t("sidebar.hopDongManagement"), path: "/ke-hoach/hop-dong", pro: false },
           { name: t("sidebar.revenuePlan"), path: "/ke-hoach/doanh-thu", pro: false },
           { name: t("sidebar.costPlan"), path: "/ke-hoach/chi-phi", pro: false },
-          
+
         ],
       },
       {
@@ -322,10 +322,10 @@ const AppSidebar = () => {
           className="flex items-center justify-center w-full"
         >
           <img
-            src="/images/logo/genlive.jpg"
+            src="/images/logo/logo.png"
             alt="Genlive Logo"
-            className={`transition-all duration-300 object-contain rounded-lg shadow-sm ${isExpanded || isHovered || isMobileOpen
-              ? "w-[60px] h-auto"
+            className={`transition-all  ${isExpanded || isHovered || isMobileOpen
+              ? "w-[60px] h-[60px]"
               : "w-[45px] h-[45px]"
               }`}
           />
