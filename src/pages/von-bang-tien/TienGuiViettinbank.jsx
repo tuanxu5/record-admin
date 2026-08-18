@@ -33,7 +33,7 @@ const TienGuiViettinbankPage = () => {
     endDate: today,
   });
   const params = useMemo(() => ({
-    tk: '1121.2',
+    tk: '1121VIETTIN',
     ngay_ct1: dateRange.startDate,
     ngay_ct2: dateRange.endDate,
     ma_dvcs: 'CTY',
@@ -395,7 +395,7 @@ const TienGuiViettinbankPage = () => {
             <label className="block text-sm font-semibold text-gray-700 mb-2">{t("cashFund.account")}</label>
             <input
               type="text"
-              value="1121.2"
+              value="1121VIETTIN"
               disabled
               className="w-full p-2 md:p-3 border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
             />

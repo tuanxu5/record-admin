@@ -22,7 +22,7 @@ const dashboardService = {
                 gop_tk: '1',
             }),
             vonBangTienService.getData({
-                tk: '1121.1',
+                tk: '1121BIDV',
                 ngay_ct1: firstDayOfYear,
                 ngay_ct2: today,
                 ma_dvcs: 'CTY',
@@ -30,7 +30,7 @@ const dashboardService = {
                 gop_tk: '1',
             }),
             vonBangTienService.getData({
-                tk: '1121.2',
+                tk: '1121VIETTIN',
                 ngay_ct1: firstDayOfYear,
                 ngay_ct2: today,
                 ma_dvcs: 'CTY',
